@@ -1,0 +1,4458 @@
+typeOfLevel:  meanSea
+level:  0
+name:  Pressure reduced to MSL
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  1
+name:  Derived radar reflectivity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  hybrid
+level:  2
+name:  Derived radar reflectivity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  atmosphere
+level:  0
+name:  Maximum/Composite radar reflectivity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Visibility
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Ventilation Rate
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Wind speed (gust)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  1
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  2
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  4
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  7
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  10
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  20
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  40
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInPa
+level:  70
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  2
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  3
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  5
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  7
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  10
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  15
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  20
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  30
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  40
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  50
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  70
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  100
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  150
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  200
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  250
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  300
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  350
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  400
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  450
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  500
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  550
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  600
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  650
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  700
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  750
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  800
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  850
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  900
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  925
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  950
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Haines Index
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  975
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Geometric vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Absolute vorticity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Cloud mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Ice water mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Rain mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Snow mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Graupel (snow pellets)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Ozone mixing ratio
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  meanSea
+level:  0
+name:  MSLP (Eta model reduction)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isobaricInhPa
+level:  1000
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  4000
+name:  Derived radar reflectivity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  1000
+name:  Derived radar reflectivity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Surface pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Orography
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Soil Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Volumetric soil moisture content
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Liquid volumetric soil moisture (non-frozen)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Soil Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Volumetric soil moisture content
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Liquid volumetric soil moisture (non-frozen)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Soil Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Volumetric soil moisture content
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  0
+name:  Liquid volumetric soil moisture (non-frozen)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  1
+name:  Soil Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  1
+name:  Volumetric soil moisture content
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  depthBelowLandLayer
+level:  1
+name:  Liquid volumetric soil moisture (non-frozen)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Plant canopy surface water
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Water equivalent of accumulated snow depth (deprecated)
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Snow depth
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Potential evaporation rate
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Ice thickness
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  2 metre temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  2 metre specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  2 metre dewpoint temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  2 metre relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  Apparent temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  2
+name:  Maximum temperature
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  heightAboveGround
+level:  2
+name:  Minimum temperature
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  heightAboveGround
+level:  10
+name:  10 metre U wind component
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  10
+name:  10 metre V wind component
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  10
+name:  Ice growth rate
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Percent frozen precipitation
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Convective precipitation rate
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Precipitation rate
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Convective precipitation rate
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Precipitation rate
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Total Precipitation
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Total Precipitation
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Convective precipitation (water)
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Convective precipitation (water)
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Water runoff
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Categorical snow
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Categorical ice pellets
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Categorical freezing rain
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Categorical rain
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Categorical snow
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Categorical ice pellets
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Categorical freezing rain
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Categorical rain
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Latent heat net flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Sensible heat net flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Ground heat flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Momentum flux, u component
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Momentum flux, v component
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Surface roughness
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Frictional velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Zonal flux of gravity wave stress
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Meridional flux of gravity wave stress
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Vegetation
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Soil type
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Wilting Point
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Field Capacity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Sunshine Duration
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Surface lifted index
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Convective available potential energy
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Convective inhibition
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Precipitable water
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Cloud water
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Total ozone
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Low cloud cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Low cloud cover
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Medium cloud cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Medium cloud cover
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  High cloud cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  High cloud cover
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  atmosphere
+level:  0
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  atmosphere
+level:  0
+name:  Total Cloud Cover
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Pressure
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Temperature
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Temperature
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Temperature
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Total Cloud Cover
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Total Cloud Cover
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  unknown
+level:  0
+name:  Cloud work function
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Downward short-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Downward long-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Upward short-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Upward long-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  nominalTop
+level:  0
+name:  Upward short-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  nominalTop
+level:  0
+name:  Upward long-wave radiation flux
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  heightAboveGroundLayer
+level:  3000
+name:  Storm relative helicity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGroundLayer
+level:  6000
+name:  U-component storm motion
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGroundLayer
+level:  6000
+name:  V-component storm motion
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  ICAO Standard Atmosphere reference height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  tropopause
+level:  0
+name:  Vertical speed shear
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  ICAO Standard Atmosphere reference height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  maxWind
+level:  0
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  20
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  20
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  30
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  30
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  40
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  40
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  50
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  50
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  80
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  80
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  80
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  80
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  80
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  100
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  100
+name:  100 metre U wind component
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveGround
+level:  100
+name:  100 metre V wind component
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  1829
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  1829
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  1829
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  2743
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  2743
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  2743
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  3658
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  3658
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  heightAboveSea
+level:  3658
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isothermZero
+level:  0
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  isothermZero
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  unknown
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  3000
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  3000
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  3000
+name:  Specific humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  3000
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  3000
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Best (4-layer) lifted index
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  18000
+name:  Convective available potential energy
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  18000
+name:  Convective inhibition
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Planetary boundary layer height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigmaLayer
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigmaLayer
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigmaLayer
+level:  1
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigmaLayer
+level:  0
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  Potential temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  Relative humidity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  sigma
+level:  1
+name:  Vertical velocity
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  9000
+name:  Convective available potential energy
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  9000
+name:  Convective inhibition
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  25500
+name:  Convective available potential energy
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  25500
+name:  Convective inhibition
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  pressureFromGroundLayer
+level:  25500
+name:  Pressure of level from which parcel was lifted
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Land-sea mask
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Sea ice area fraction
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  surface
+level:  0
+name:  Albedo
+validDate:  2021-04-05 00:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  0
+typeOfLevel:  surface
+level:  0
+name:  Ice temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2
+name:  Vertical speed shear
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  U component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  V component of wind
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  Temperature
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  Geopotential Height
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  Pressure
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3
+typeOfLevel:  potentialVorticity
+level:  2147486
+name:  Vertical speed shear
+validDate:  2021-04-05 03:00:00
+analDate:  2021-04-05 00:00:00
+forecastTime:  3

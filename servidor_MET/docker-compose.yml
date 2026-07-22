@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  met-server:
+    build: .
+    container_name: met-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - grib_data:/app/data/gribs
+      - mapas_data:/app/data/mapasGrib
+      - matriz_data:/app/data/matrizGrib
+      - ./environment:/app/environment
+    environment:
+      - TZ=America/Sao_Paulo
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8000/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  grib_data:
+  mapas_data:
+  matriz_data:

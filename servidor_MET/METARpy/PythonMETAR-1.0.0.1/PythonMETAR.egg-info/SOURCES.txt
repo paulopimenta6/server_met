@@ -1,0 +1,10 @@
+README.md
+setup.cfg
+setup.py
+PythonMETAR/__init__.py
+PythonMETAR/metar.py
+PythonMETAR/test.py
+PythonMETAR.egg-info/PKG-INFO
+PythonMETAR.egg-info/SOURCES.txt
+PythonMETAR.egg-info/dependency_links.txt
+PythonMETAR.egg-info/top_level.txt
