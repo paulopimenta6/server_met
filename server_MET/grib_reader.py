@@ -42,6 +42,12 @@ class GribReader:
         )
         return None
 
+    def find_available_analyses(self, date_str: str) -> list[str]:
+        base_dir = self.settings.dir_gribs / date_str
+        if not base_dir.exists():
+            return []
+        return sorted(d.name for d in base_dir.iterdir() if d.is_dir())
+
     def find_all_grib_files(
         self,
         date_str: str,

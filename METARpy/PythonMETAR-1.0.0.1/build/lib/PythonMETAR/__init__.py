@@ -1,1 +1,0 @@
-from PythonMETAR.metar import *

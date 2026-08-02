@@ -10,11 +10,8 @@ and read the ReadMe
 
 from http.client import NOT_EXTENDED, PRECONDITION_FAILED
 import urllib.request as url
-import ssl
 import re
 import copy
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class Metar:
@@ -106,13 +103,13 @@ class Metar:
 
     def text_recover(self):
         """`text_recover()` method recover text file from NOAA
-        weather FTP server (https://tgftp.nws.noaa.gov/data/observations/metar/stations/).
+        weather service (aviationweather.gov API).
 
-        Recovers text file with `url.urlretrieve()` function.
-        Read the file with `readlines()` method. This method return a list
-        of lines ([0] = Datetime ; [1] = METAR).
-        A `for` loop browses list to remove line break character.
-        Return a list with datetime index 0 and METAR index 1.
+        Fetches the METAR report in JSON format from
+        `https://aviationweather.gov/api/data/metar` and extracts the
+        raw report text.
+
+        Return a tuple with datetime index 0 and METAR index 1.
 
 
         Require
@@ -123,7 +120,7 @@ class Metar:
 
         Returns
         --------
-            datas (tuple): List recovered from text file ([0] = Datetime ; [1] = METAR).
+            datas (tuple): List recovered from the API ([0] = Datetime ; [1] = METAR).
 
         Exception raised
         -------
@@ -132,8 +129,12 @@ class Metar:
         """
 
         try:
-            request = url.urlretrieve(
-                "https://tgftp.nws.noaa.gov/data/observations/metar/stations/{}.TXT".format(self.airport))
+            import json
+
+            request = url.urlopen(
+                "https://aviationweather.gov/api/data/metar?ids={}&format=json&hours=2".format(self.airport),
+                timeout=30)
+            content = json.loads(request.read().decode("utf-8"))
         except url.HTTPError as err:
             if(err.code == 404):
                 raise NOAAServError(self.airport, 404)
@@ -143,20 +144,16 @@ class Metar:
         except:
             raise NOAAServError(self.airport)
 
-        try:
-            file_txt = open(request[0], 'r')
+        if not content:
+            raise NOAAServError(self.airport, 404)
 
-        except:
-            raise ReadFileError
+        metar_text = content[0].get("rawOb")
+        if not metar_text:
+            raise NOAAServError(self.airport)
 
-        datas = file_txt.readlines()  # List : [0] = Datetime ; [1] = METAR
+        datetime_text = content[0].get("reportTime", "")
 
-        # Remove '\n' from string
-        for i in range(len(datas)):
-            datas[i] = re.sub("\n", '', datas[i])
-
-        file_txt.close()
-        return datas[0], datas[1]
+        return datetime_text, metar_text
 
     def analyzeChangements(self):
         """Method analysis and erase changements portions (create metarWithoutChangements variable)

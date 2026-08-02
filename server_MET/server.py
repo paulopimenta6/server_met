@@ -60,7 +60,7 @@ map_generator = MapGenerator()
 matrix_generator = MatrixGenerator()
 metar_client = MetarClient()
 
-TEMP_DIR = Path("/tmp/opencode/servidor_MET")
+TEMP_DIR = settings.dir_tmp
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -85,31 +85,28 @@ def _build_region(grib_req) -> Region:
     )
 
 
-def _get_level_str(level) -> str:
-    if level is None or level == "surface":
-        return "surface"
-    return str(level)
-
-
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    grib_dirs = list(settings.dir_gribs.rglob("*.grb2"))
+    grib_files = list(settings.dir_gribs.rglob("*.f0*"))
     return HealthResponse(
         status="ok",
         version="2.0.0",
-        grib_files_available=len(grib_dirs) > 0,
+        grib_files_available=len(grib_files) > 0,
         uptime=time.time() - START_TIME,
     )
 
 
 @app.get("/variables")
 async def list_variables():
-    return {
-        "variables": [
-            {"key": k, "name": v[0], "level_type": v[1]}
-            for k, v in DP_VAR_MAP.items()
-        ]
-    }
+    variables = [
+        {"key": k, "name": v[0], "level_type": v[1]}
+        for k, v in DP_VAR_MAP.items()
+    ]
+    variables += [
+        {"key": "wind", "name": "Wind speed (computed from u/v)", "level_type": "pressure"},
+        {"key": "winds", "name": "Wind speed surface (computed from uSupe/vSupe)", "level_type": "surface"},
+    ]
+    return {"variables": variables}
 
 
 @app.get("/regions")
@@ -158,6 +155,12 @@ async def grib_info(request: GribRequest):
     ana = request.analysis or data_processor.get_current_analysis_hour()
     prev = request.forecast or "00"
     f = grib_reader.find_grib_file(date_str, ana, prev)
+    if f is None and not request.analysis:
+        for alt_ana in grib_reader.find_available_analyses(date_str):
+            f = grib_reader.find_grib_file(date_str, alt_ana, prev)
+            if f is not None:
+                ana = alt_ana
+                break
     if f is None:
         raise HTTPException(status_code=404, detail="GRIB file not found")
     vars_list = grib_reader.list_variables(f)
@@ -179,6 +182,8 @@ async def generate_map(request: MapRequest):
         date_str=date_str,
         analysis=ana,
         output_dir=output_dir,
+        dpi=request.dpi,
+        title=request.title,
     )
     if not files:
         raise HTTPException(status_code=500, detail="Map generation failed")
@@ -243,6 +248,7 @@ async def generate_bluesky_wind(request: WindRequest):
     result = matrix_generator.generate_bluesky(
         region=region,
         level=request.level,
+        date_str=request.date,
     )
     if result is None:
         raise HTTPException(status_code=500, detail="Bluesky wind generation failed")

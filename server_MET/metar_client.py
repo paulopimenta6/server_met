@@ -1,10 +1,9 @@
 import json
 import logging
-import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from server_MET.METAR import Metar, NOAAServError
+from server_MET.METAR import Metar
 from server_MET.config import Settings
 
 logger = logging.getLogger(__name__)
@@ -21,50 +20,47 @@ AERODROMOS: dict[str, str] = {
     "FZ": "SBFZ",
 }
 
-NOAA_METAR_URL = "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString={}&hoursBeforeNow=2"
+NOAA_METAR_URL = "https://aviationweather.gov/api/data/metar?ids={}&format=json&hours=2"
 
 
 class MetarClient:
     def __init__(self) -> None:
         self.settings = Settings()
 
-    def fetch_raw_xml(self, icao: str) -> Optional[str]:
+    def fetch_metar_json(self, icao: str) -> Optional[list[dict]]:
         url = NOAA_METAR_URL.format(icao)
         try:
             from urllib.request import urlopen
+
             with urlopen(url, timeout=30) as response:
-                data = response.read().decode("utf-8")
-                logger.info("Raw METAR XML fetched for %s", icao)
+                data = json.loads(response.read().decode("utf-8"))
+                logger.info("Raw METAR JSON fetched for %s", icao)
                 return data
         except Exception as e:
             logger.error("Failed to fetch raw METAR for %s: %s", icao, e)
             return None
 
-    def extract_raw_text_from_xml(self, xml_data: str) -> Optional[str]:
-        try:
-            root = ET.fromstring(xml_data)
-            for metar in root.iter("raw_text"):
-                return metar.text
-            for data_set in root.iter("data"):
-                for metar in data_set.iter("raw_text"):
-                    return metar.text
+    def extract_raw_text_from_json(self, data: Optional[list[dict]]) -> Optional[str]:
+        if not data:
             return None
-        except ET.ParseError as e:
-            logger.error("XML parse error: %s", e)
-            return None
+        for entry in data:
+            raw = entry.get("rawOb")
+            if raw:
+                return raw
+        return None
 
     def get_raw_metar(self, icao: str) -> Optional[str]:
-        xml = self.fetch_raw_xml(icao)
-        if xml is None:
+        data = self.fetch_metar_json(icao)
+        if data is None:
             return None
-        return self.extract_raw_text_from_xml(xml)
+        return self.extract_raw_text_from_json(data)
 
     def get_parsed_metar(self, icao: str, raw_text: str) -> Optional[dict]:
         try:
             metar_obj = Metar(icao, text=raw_text)
             props = metar_obj.getAll()
             parsed = {
-                "station": props.get("metar", {}),
+                "station": icao,
                 "station_code": icao,
                 "observation": props.get("dateTime"),
                 "auto": props.get("auto"),
@@ -82,30 +78,52 @@ class MetarClient:
             logger.error("Failed to parse METAR for %s: %s", icao, e)
             return None
 
+    def _extract_metadata(self, data: Optional[list[dict]]) -> Optional[dict]:
+        if not data:
+            return None
+        entry = data[0]
+        keys = (
+            "icaoId",
+            "obsTime",
+            "reportTime",
+            "temp",
+            "dewp",
+            "wdir",
+            "wspd",
+            "visib",
+            "altim",
+            "metarType",
+            "lat",
+            "lon",
+        )
+        return {k: entry.get(k) for k in keys if k in entry}
+
     def get_metar(self, icao: str) -> Optional[dict]:
-        raw_text = self.get_raw_metar(icao)
+        data = self.fetch_metar_json(icao)
+        if data is None:
+            return None
+        raw_text = self.extract_raw_text_from_json(data)
         if raw_text is None:
             return None
         parsed = self.get_parsed_metar(icao, raw_text)
         result = {
             "station": icao,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "raw_metar": raw_text,
         }
+        metadata = self._extract_metadata(data)
+        if metadata:
+            result["metadata"] = metadata
         if parsed:
             result["parsed"] = parsed
         return result
 
     def get_metar_light(self, icao: str) -> Optional[str]:
-        try:
-            metar_obj = Metar(icao)
-            return metar_obj.metar
-        except NOAAServError as e:
-            logger.error("NOAA server error for %s: %s", icao, e)
+        raw_text = self.get_raw_metar(icao)
+        if raw_text is None:
+            logger.error("Failed to fetch raw METAR light for %s", icao)
             return None
-        except Exception as e:
-            logger.error("Failed to fetch METAR light for %s: %s", icao, e)
-            return None
+        return raw_text
 
     def get_metar_for_region(self, region: str) -> Optional[dict]:
         region = region.upper()

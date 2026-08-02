@@ -75,6 +75,20 @@ class DataProcessor:
             forecast_hours = ["00", "06", "12", "18"]
 
         files = self.reader.find_all_grib_files(date_str, analysis, forecast_hours)
+        if not files:
+            for alt_analysis in self.reader.find_available_analyses(date_str):
+                if alt_analysis == analysis:
+                    continue
+                files = self.reader.find_all_grib_files(
+                    date_str, alt_analysis, forecast_hours
+                )
+                if files:
+                    logger.info(
+                        "Fallback: análise %s não encontrada, usando %s",
+                        analysis, alt_analysis,
+                    )
+                    break
+
         grib_objs = []
         for f in files:
             grb = self.reader.open_grib(f)

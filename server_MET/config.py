@@ -24,6 +24,7 @@ class Settings:
         self._dir_matrizes: Optional[str] = None
         self._dir_matrizes_predi: Optional[str] = None
         self._dir_matrizes_bluesky: Optional[str] = None
+        self._dir_tmp: Optional[str] = None
         self._parse_env_file()
 
     def _parse_env_file(self) -> None:
@@ -45,6 +46,8 @@ class Settings:
                             self._dir_matrizes_predi = value
                         elif key == "dir_matrizes_bluesky":
                             self._dir_matrizes_bluesky = value
+                        elif key == "dir_tmp":
+                            self._dir_tmp = value
 
     def _resolve_dir(self, path_str: Optional[str], default_subdir: str) -> Path:
         if path_str:
@@ -75,6 +78,10 @@ class Settings:
         return self._resolve_dir(self._dir_matrizes_bluesky, "data/matrizGrib/bluesky")
 
     @property
+    def dir_tmp(self) -> Path:
+        return self._resolve_dir(self._dir_tmp, "data/tmp")
+
+    @property
     def gfs_url(self) -> str:
         return "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs."
 
@@ -85,6 +92,7 @@ class Settings:
             self.dir_matrizes,
             self.dir_matrizes_predi,
             self.dir_matrizes_bluesky,
+            self.dir_tmp,
         ]:
             d.mkdir(parents=True, exist_ok=True)
 

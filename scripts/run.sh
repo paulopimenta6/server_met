@@ -29,11 +29,13 @@ case "${1:-help}" in
     download)
         DATE="${2:-$(date +%Y%m%d)}"
         ANA="${3:-}"
-        echo "Downloading GRIBS for date=$DATE analysis=$ANA"
+        RES="${4:-}"
+        echo "Downloading GRIBS for date=$DATE analysis=$ANA resolution=${RES:-all}"
         python3 -c "
 from server_MET.grib_downloader import GribDownloader
 d = GribDownloader()
-files = d.download_gribs_all_resolutions(date_str='$DATE', analysis_hour='$ANA' if '$ANA' else None)
+res = ['$RES'] if '$RES' else None
+files = d.download_gribs_all_resolutions(date_str='$DATE', analysis_hour='$ANA' if '$ANA' else None, resolutions=res)
 print(f'Downloaded: {files}')
 "
         ;;
@@ -43,11 +45,11 @@ print(f'Downloaded: {files}')
         ;;
     clean)
         DAYS="${2:-2}"
-        echo "Cleaning GRIB files older than $DAYS days..."
+        echo "Cleaning GRIB/map/matrix data older than $DAYS days..."
         python3 -c "
 from server_MET.grib_downloader import GribDownloader
 d = GribDownloader()
-removed = d.clean_old_gribs(days_old=$DAYS)
+removed = d.clean_old_data(days_old=$DAYS)
 print(f'Removed {removed} files')
 "
         ;;
@@ -65,9 +67,9 @@ print(f'Removed {removed} files')
         echo ""
         echo "  install      Install dependencies and prepare environment"
         echo "  server       Start development server on :8000"
-        echo "  download     Download GFS GRIB data (optional: YYYYMMDD and analysis hour)"
+        echo "  download     Download GFS GRIB data (optional: YYYYMMDD, analysis hour, resolution 0p25|0p50|1p00)"
         echo "  test         Run test suite"
-        echo "  clean [N]    Remove GRIB data older than N days (default: 2)"
+        echo "  clean [N]    Remove GRIB/map/matrix data older than N days (default: 2)"
         echo "  docker-build Build Docker image"
         echo "  docker-up    Start Docker Compose services"
         echo "  docker-down  Stop Docker Compose services"

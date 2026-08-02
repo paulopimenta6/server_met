@@ -34,6 +34,16 @@ async def test_variables_endpoint(client):
 
 
 @pytest.mark.asyncio
+async def test_variables_include_wind_keys(client):
+    response = await client.get("/variables")
+    data = response.json()
+    keys = [v["key"] for v in data["variables"]]
+    assert "wind" in keys
+    assert "winds" in keys
+    assert "temp" in keys
+
+
+@pytest.mark.asyncio
 async def test_regions_endpoint(client):
     response = await client.get("/regions")
     assert response.status_code == 200

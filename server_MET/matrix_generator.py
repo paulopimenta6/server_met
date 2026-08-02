@@ -1,4 +1,3 @@
-import csv
 import logging
 from pathlib import Path
 from typing import Optional
@@ -65,12 +64,13 @@ class MatrixGenerator:
             )
             filepath = f"{output_dir}/{filename}"
 
-            with open(filepath, "w", newline="", encoding="utf-8") as f:
-                w = csv.writer(f)
-                w.writerow(["lat", "lon", var_name])
-                for i in range(data.shape[0]):
-                    for j in range(data.shape[1]):
-                        w.writerow([lat_grid[i, j], lon_grid[i, j], data[i, j]])
+            table = np.column_stack(
+                [lat_grid.ravel(), lon_grid.ravel(), data.ravel()]
+            )
+            np.savetxt(
+                filepath, table, delimiter=",",
+                header=f"lat,lon,{var_name}", comments="", fmt="%.6f",
+            )
 
             saved_files.append(filepath)
             logger.info("Matrix saved: %s", filepath)
@@ -121,21 +121,21 @@ class MatrixGenerator:
             )
             filepath = f"{output_dir}/{filename}"
 
-            with open(filepath, "w", newline="", encoding="utf-8") as f:
-                w = csv.writer(f)
-                w.writerow(["lat", "lon", "vento_u", "vento_v", "velocidade", "direcao"])
-                for r in range(data_u.shape[0]):
-                    for c in range(data_u.shape[1]):
-                        w.writerow(
-                            [
-                                lat_grid[r, c],
-                                lon_grid[r, c],
-                                data_u[r, c],
-                                data_v[r, c],
-                                speed[r, c],
-                                direction[r, c],
-                            ]
-                        )
+            table = np.column_stack(
+                [
+                    lat_grid.ravel(),
+                    lon_grid.ravel(),
+                    data_u.ravel(),
+                    data_v.ravel(),
+                    speed.ravel(),
+                    direction.ravel(),
+                ]
+            )
+            np.savetxt(
+                filepath, table, delimiter=",",
+                header="lat,lon,vento_u,vento_v,velocidade,direcao",
+                comments="", fmt="%.6f",
+            )
 
             saved_files.append(filepath)
             logger.info("Wind matrix saved: %s", filepath)
@@ -180,20 +180,20 @@ class MatrixGenerator:
         filename = f"bluesky_wind_{region.name}_N{resolved_level}_{u_msg.dataDate}.csv"
         filepath = str(output_dir / filename)
 
-        with open(filepath, "w", newline="", encoding="utf-8") as f:
-            w = csv.writer(f)
-            w.writerow(["lat", "lon", "alt_ft", "wind_dir_deg", "wind_spd_kt"])
-            for r in range(data_u.shape[0]):
-                for c in range(data_u.shape[1]):
-                    w.writerow(
-                        [
-                            lat_grid[r, c],
-                            lon_grid[r, c],
-                            h_alt,
-                            direction[r, c],
-                            speed_knot[r, c],
-                        ]
-                    )
+        table = np.column_stack(
+            [
+                lat_grid.ravel(),
+                lon_grid.ravel(),
+                np.full_like(data_u.ravel(), h_alt),
+                direction.ravel(),
+                speed_knot.ravel(),
+            ]
+        )
+        np.savetxt(
+            filepath, table, delimiter=",",
+            header="lat,lon,alt_ft,wind_dir_deg,wind_spd_kt",
+            comments="", fmt="%.6f",
+        )
 
         logger.info("Bluesky wind matrix saved: %s", filepath)
         return filepath

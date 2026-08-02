@@ -115,10 +115,11 @@ class GribDownloader:
         date_str: Optional[str] = None,
         analysis_hour: Optional[str] = None,
         forecast_hours: Optional[list[str]] = None,
+        resolutions: Optional[list[str]] = None,
         force: bool = False,
     ) -> dict[str, list[Path]]:
         results = {}
-        for res in RESOLUTIONS:
+        for res in resolutions or RESOLUTIONS:
             files = self.download_gribs(
                 date_str=date_str,
                 analysis_hour=analysis_hour,
@@ -130,24 +131,32 @@ class GribDownloader:
                 results[res] = files
         return results
 
-    def clean_old_gribs(self, days_old: int = 2) -> int:
+    def clean_old_data(self, days_old: int = 2) -> int:
         removed = 0
         cutoff = datetime.now() - timedelta(days=days_old)
 
-        for date_dir in self.settings.dir_gribs.iterdir():
-            if not date_dir.is_dir():
-                continue
-            try:
-                dir_date = datetime.strptime(date_dir.name, "%Y%m%d")
-            except ValueError:
-                continue
-            if dir_date < cutoff:
-                for ana_dir in date_dir.iterdir():
-                    if ana_dir.is_dir():
-                        for f in ana_dir.iterdir():
-                            f.unlink(missing_ok=True)
-                            removed += 1
-                        ana_dir.rmdir()
-                date_dir.rmdir()
-                logger.info("Removed old grib dir: %s", date_dir)
+        for data_dir in (
+            self.settings.dir_gribs,
+            self.settings.dir_mapas,
+            self.settings.dir_matrizes,
+        ):
+            for date_dir in data_dir.iterdir():
+                if not date_dir.is_dir():
+                    continue
+                try:
+                    dir_date = datetime.strptime(date_dir.name, "%Y%m%d")
+                except ValueError:
+                    continue
+                if dir_date < cutoff:
+                    for ana_dir in date_dir.iterdir():
+                        if ana_dir.is_dir():
+                            for f in ana_dir.iterdir():
+                                f.unlink(missing_ok=True)
+                                removed += 1
+                            ana_dir.rmdir()
+                    date_dir.rmdir()
+                    logger.info("Removed old data dir: %s", date_dir)
         return removed
+
+    def clean_old_gribs(self, days_old: int = 2) -> int:
+        return self.clean_old_data(days_old=days_old)

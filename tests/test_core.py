@@ -30,6 +30,11 @@ class TestConfig:
         s = Settings()
         assert "nomads.ncep.noaa.gov" in s.gfs_url
 
+    def test_dir_tmp(self):
+        s = Settings()
+        assert s.dir_tmp is not None
+        assert str(s.dir_tmp).endswith("tmp")
+
 
 class TestRegion:
     def test_predefined_region(self):
@@ -167,6 +172,21 @@ class TestMetarClient:
         assert "aviationweather.gov" in NOAA_METAR_URL
         assert "{}" in NOAA_METAR_URL
 
+    def test_metar_new_api_endpoint(self):
+        from server_MET.metar_client import NOAA_METAR_URL
+
+        assert "api/data/metar" in NOAA_METAR_URL
+        assert "format=json" in NOAA_METAR_URL
+
+    def test_extract_raw_text_from_json(self):
+        from server_MET.metar_client import MetarClient
+
+        client = MetarClient()
+        data = [{"icaoId": "SBGR", "rawOb": "METAR SBGR 010900Z 36003KT CAVOK 15/10 Q1020"}]
+        assert client.extract_raw_text_from_json(data) == "METAR SBGR 010900Z 36003KT CAVOK 15/10 Q1020"
+        assert client.extract_raw_text_from_json([]) is None
+        assert client.extract_raw_text_from_json([{"icaoId": "SBGR"}]) is None
+
     def test_parse_local_metar(self):
         from server_MET.metar_client import MetarClient
 
@@ -206,6 +226,37 @@ class TestMatrixGenerator:
 
         gen = MatrixGenerator()
         assert gen is not None
+
+
+class TestMapGenerator:
+    def test_map_backend_available(self):
+        from server_MET.map_generator import HAS_MAP_BACKEND
+
+        assert HAS_MAP_BACKEND is True
+
+    def test_unit_labels(self):
+        from server_MET.map_generator import MapGenerator
+
+        gen = MapGenerator()
+        assert gen._get_unit_label("temp") == "°C"
+        assert gen._get_unit_label("ps") == "hPa"
+        assert gen._get_unit_label("chuvaConvec") == "mm"
+        assert gen._get_unit_label("unknown") == ""
+
+    def test_generate_without_grib_returns_empty(self):
+        from server_MET.map_generator import MapGenerator
+        from server_MET.region import Region
+
+        gen = MapGenerator()
+        region = Region(name="SP")
+        files = gen.generate(
+            var_name="temp",
+            region=region,
+            level=500,
+            date_str="20000101",
+            analysis="00",
+        )
+        assert files == []
 
 
 class TestServerHealth:
