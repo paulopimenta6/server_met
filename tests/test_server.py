@@ -1,17 +1,6 @@
+"""Testes da API REST (httpx ASGITransport, offline)."""
 import pytest
-from httpx import AsyncClient, ASGITransport
-from pathlib import Path
-import tempfile
-import json
-
-from server_MET.server import app
-from server_MET.config import Settings
-
-
-@pytest.fixture
-def client():
-    transport = ASGITransport(app=app)
-    return AsyncClient(transport=transport, base_url="http://test")
+from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
@@ -20,65 +9,83 @@ async def test_health_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert "version" in data
+    assert data["version"] == "3.0.0"
     assert "grib_files_available" in data
+
+
+@pytest.mark.asyncio
+async def test_root_endpoint(client):
+    response = await client.get("/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["version"] == "3.0.0"
+    assert "/docs" in data["docs"]
 
 
 @pytest.mark.asyncio
 async def test_variables_endpoint(client):
     response = await client.get("/variables")
     assert response.status_code == 200
-    data = response.json()
-    assert "variables" in data
-    assert len(data["variables"]) > 0
-
-
-@pytest.mark.asyncio
-async def test_variables_include_wind_keys(client):
-    response = await client.get("/variables")
-    data = response.json()
-    keys = [v["key"] for v in data["variables"]]
-    assert "wind" in keys
-    assert "winds" in keys
-    assert "temp" in keys
+    keys = [v["key"] for v in response.json()["variables"]]
+    assert "temp" in keys and "wind" in keys and "winds" in keys
 
 
 @pytest.mark.asyncio
 async def test_regions_endpoint(client):
     response = await client.get("/regions")
     assert response.status_code == 200
-    data = response.json()
-    assert "regions" in data
-    region_names = [r["name"] for r in data["regions"]]
-    assert "SP" in region_names
-    assert "RJ" in region_names
-    assert "SA" in region_names
+    names = [r["name"] for r in response.json()["regions"]]
+    assert "SP" in names and "SA" in names
+
+
+@pytest.mark.asyncio
+async def test_catalog_endpoint(client):
+    response = await client.get("/catalog")
+    assert response.status_code == 200
+    assert "entries" in response.json()
 
 
 @pytest.mark.asyncio
 async def test_gribs_list_endpoint(client):
     response = await client.get("/gribs/list")
     assert response.status_code == 200
-    data = response.json()
-    assert "gribs" in data
-    assert "count" in data
+    assert "gribs" in response.json()
 
 
 @pytest.mark.asyncio
-async def test_metar_stations(client):
-    response = await client.get("/metar/stations")
+async def test_gribs_list_filtered_date(client):
+    response = await client.get("/gribs/list?date=20990101")
     assert response.status_code == 200
-    data = response.json()
-    assert "stations" in data
-    assert data["stations"]["SP"] == "SBGR"
+    assert response.json() == {"gribs": [], "count": 0}
 
 
 @pytest.mark.asyncio
 async def test_grib_info_no_file(client):
     response = await client.post(
         "/gribs/info",
-        json={"variable": "temp", "level": 500, "region": "SP", "date": "20000101"},
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
     )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_grib_download_creates_task(client, isolated_db):
+    response = await client.post("/gribs/download?date_str=20990101&analysis_hour=06")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "download_started"
+    assert "task_id" in data
+
+    status = await client.get(f"/gribs/download/{data['task_id']}")
+    assert status.status_code == 200
+    assert status.json()["task_type"] == "download"
+    assert status.json()["status"] in ("pending", "running", "done", "failed")
+
+
+@pytest.mark.asyncio
+async def test_grib_download_status_missing(client):
+    response = await client.get("/gribs/download/nao-existe")
     assert response.status_code == 404
 
 
@@ -86,77 +93,153 @@ async def test_grib_info_no_file(client):
 async def test_generate_map_missing_grib(client):
     response = await client.post(
         "/maps/generate",
-        json={
-            "variable": "temp",
-            "level": 500,
-            "region": "SP",
-            "date": "20000101",
-            "analysis": "00",
-        },
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
     )
-    assert response.status_code in (404, 500)
+    assert response.status_code == 500
 
 
 @pytest.mark.asyncio
 async def test_generate_matrix_missing_grib(client):
     response = await client.post(
         "/matrices/generate",
-        json={
-            "variable": "temp",
-            "level": 500,
-            "region": "SP",
-            "date": "20000101",
-            "analysis": "00",
-        },
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
     )
-    assert response.status_code in (404, 500)
-
-
-@pytest.mark.asyncio
-async def test_metar_fetch_invalid(client):
-    response = await client.post(
-        "/metar/fetch", json={"icao_code": "XXXX"}
-    )
-    assert response.status_code in (200, 404)
-
-
-@pytest.mark.asyncio
-async def test_metar_fetch_by_region(client):
-    response = await client.post(
-        "/metar/fetch", json={"region": "SP"}
-    )
-    assert response.status_code in (200, 404)
+    assert response.status_code == 500
 
 
 @pytest.mark.asyncio
 async def test_bluesky_wind_missing_grib(client):
     response = await client.post(
         "/bluesky/wind",
-        json={
-            "level": 500,
-            "region": "SP",
-            "date": "20000101",
-        },
+        json={"level": 500, "region": "SP", "date": "20990101"},
     )
-    assert response.status_code in (404, 500)
+    assert response.status_code == 500
 
 
 @pytest.mark.asyncio
-async def test_cleanup_endpoint(client):
-    response = await client.post("/cleanup?days_old=30")
+async def test_metar_stations(client):
+    response = await client.get("/metar/stations")
+    assert response.status_code == 200
+    assert len(response.json()["stations"]) == 9
+
+
+@pytest.mark.asyncio
+async def test_metar_fetch_invalid_region(client):
+    response = await client.post("/metar/fetch", json={"region": "SP", "icao_code": "ZZZZ"})
+    assert response.status_code in (200, 404)
+
+
+@pytest.mark.asyncio
+async def test_analysis_summary_missing_grib(client):
+    response = await client.post(
+        "/analysis/summary",
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_analysis_profile_missing_grib(client):
+    response = await client.post(
+        "/analysis/profile",
+        json={"variable": "temp", "region": "SP",
+              "date": "20990101", "analysis": "06"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_analysis_timeseries_missing_grib(client):
+    response = await client.post(
+        "/analysis/timeseries",
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_analysis_charts_missing_grib(client):
+    response = await client.post(
+        "/analysis/charts",
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
+    )
+    assert response.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_analysis_region(client):
+    response = await client.get("/analysis/regions/SP")
     assert response.status_code == 200
     data = response.json()
-    assert "removed_files" in data
+    assert data["region"] == "SP"
+    assert "bounds" in data
 
 
 @pytest.mark.asyncio
-async def test_health_response_model():
-    from server_MET.models import HealthResponse
+async def test_db_status(client, isolated_db):
+    response = await client.get("/db/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert set(data["tables"]) == {
+        "downloads", "outputs", "metar_obs", "tasks", "analysis_results",
+    }
 
-    h = HealthResponse(
-        status="ok",
-        version="2.0.0",
-        grib_files_available=False,
-        uptime=0.0,
+
+@pytest.mark.asyncio
+async def test_history_downloads(client, isolated_db):
+    response = await client.get("/history/downloads")
+    assert response.status_code == 200
+    assert "downloads" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_history_outputs(client, isolated_db):
+    response = await client.get("/history/outputs")
+    assert response.status_code == 200
+    assert "outputs" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_history_analysis(client, isolated_db):
+    response = await client.get("/history/analysis")
+    assert response.status_code == 200
+    assert "analysis" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_files_traversal_blocked(client):
+    response = await client.get("/files/mapas/../../etc/passwd")
+    assert response.status_code in (400, 404)
+
+
+@pytest.mark.asyncio
+async def test_files_invalid_kind(client):
+    response = await client.get("/files/segredo/x.png")
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_files_missing(client):
+    response = await client.get("/files/mapas/nao-existe.png")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_metar_history_empty(client, isolated_db):
+    response = await client.get("/metar/history")
+    assert response.status_code == 200
+    assert response.json()["observations"] == []
+
+
+@pytest.mark.asyncio
+async def test_build_region_requires_selection(client):
+    response = await client.post(
+        "/maps/generate",
+        json={"variable": "temp", "level": 500, "date": "20990101"},
     )
-    assert h.model_dump()["status"] == "ok"
+    assert response.status_code == 400

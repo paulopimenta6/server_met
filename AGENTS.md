@@ -1,41 +1,66 @@
 # AGENTS.md
 
-FastAPI server (v2.0.0) that downloads NOAA GFS GRIB2 data, processes it with `pygrib`/`numpy`, generates maps and BlueSky wind matrices, and decodes METAR reports. Package: `server_MET`, entrypoint `server_MET.server:app` (uvicorn, port 8000).
+Servidor meteorológico **FastAPI v3.0.0** com pipeline modular: **captação** (NOAA GFS GRIB2 + METAR), **tratamento** (pygrib/numpy), **análise** (estatística, perfis, séries com statsmodels), **persistência** (SQLite) e **distribuição** (mapas PNG, matrizes CSV, BlueSky). Pacote: `server_MET`, entrypoint `server_MET.api.app:app` (uvicorn, porta 8000).
 
 ## README.md
 
-`README.md` is up to date with the current architecture (v2.0.0). If you change behavior, update it; it is the single source of documentation. User-facing docs are in Portuguese.
+`README.md` é a fonte única de documentação (v3.0.0, em português). Se mudar comportamento, atualize-o. Documentação de APIs, banco e arquitetura está lá.
 
-## Commands
+## Comandos
 
 ```bash
-~/envs/met/bin/python -m pytest tests/ -v   # venv do projeto; or: ./scripts/run.sh test (52 tests, pass, offline)
-./scripts/run.sh server          # uvicorn server_MET.server:app --port 8000
-./scripts/run.sh download [YYYYMMDD] [HH] [0p25|0p50|1p00]   # GFS download; also ./scripts/download_gribs.sh
-./scripts/run.sh clean [days]    # remove data antigos de gribs+mapas+matrizes (default 2)
+~/envs/met/bin/python -m pytest tests/ -v   # venv do projeto; 102 testes, offline
+./scripts/run.sh server          # uvicorn server_MET.api.app:app --port 8000
+./scripts/run.sh download [YYYYMMDD] [HH] [0p25|0p50|1p00]   # GFS download
+./scripts/run.sh analysis [YYYYMMDD]   # exemplo de análise (SP)
+./scripts/run.sh db-status       # tabelas/contagens do SQLite
+./scripts/run.sh clean [days]    # remove dados antigos (default 2)
 ```
 
-The project venv is `~/envs/met` (activate with `source ~/envs/met/bin/activate`). There is no configured lint/typecheck toolchain installed; ruff/black config lives in `pyproject.toml`. Don't invent lint commands.
+O venv é `~/envs/met` (inclui pandas e statsmodels). Sem toolchain de lint/typecheck configurado (ruff/black em `pyproject.toml` apenas); não invente comandos de lint.
 
-## Layout and gotchas
+## Arquitetura (camadas)
 
-- `Settings` (server_MET/config.py) is a singleton reading `environment/path.conf` (plain `key=value`); paths resolve relative to `PROJECT_ROOT` (repo root). `ensure_dirs()` auto-creates all data dirs on server startup. Never hardcode `data/...` paths — go through `Settings`.
-- Data dirs: `data/gribs`, `data/mapasGrib`, `data/matrizGrib/{predi,bluesky}`, `data/tmp` (outputs temporários da API).
-- GRIB files live at `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. `GribReader.find_grib_file` matches by `.f0{ff}` suffix + resolution substring. Downloads use the `wget` binary via subprocess (required; `check_url_exists` silently fails without it).
-- Variable keys are Portuguese-ish internal names defined in `VAR_MAP` (server_MET/data_processor.py): `ps, prnm, temp, temps, nuvem, chuvaNaoConvec, chuvaConvec, umidadeRel, u, v, uSupe, vSupe`. `wind`/`winds` exist in the API enum (`models.py`) and in `/variables`, but are **not** in `VAR_MAP` (computed from u/v).
-- Pressure levels clamp to 150–1000 hPa and snap to `PRESSURE_LEVELS`; surface variables expect `level=None`/"surface".
-- METAR parsing uses a vendored copy of PythonMETAR at `server_MET/METAR/` (import `from server_MET.METAR import Metar`) — not installed from PyPI. Parsing is offline; fetching uses the **new** aviationweather JSON API (`https://aviationweather.gov/api/data/metar?ids={icao}&format=json&hours=2`) — the old `adds/dataserver_current` endpoint is retired (403).
-- API quirks: `POST /gribs/download` takes **query params** (`date_str`, `analysis_hour`), not a JSON body. `POST /maps/generate` and `/matrices/generate` return JSON with file paths written under `data/tmp/<uuid>` — not PNG responses. Region requests need `region` name, a lon/lat bbox, or center `lon`/`lat` (see `_build_region` in server.py).
-- Map generation uses matplotlib (Agg) with **Cartopy** as primary backend (installed in `~/envs/met`); Basemap is a fallback if Cartopy is absent. Feature data (coastlines/borders) degrades gracefully offline.
-- `tests/` uses httpx `ASGITransport` + `@pytest.mark.asyncio`; METAR/network tests assert tolerant status codes (`200`/`404`), so failures don't depend on network.
+```
+server_MET/
+├── core/            # Settings (path.conf), constants (VAR_MAP, níveis, horas),
+│                    #   models Pydantic, logging_conf
+├── acquisition/     # [captação] grib_downloader (wget + registro em downloads),
+│                    #   grib_reader (pygrib), metar_client (aviationweather + parser)
+├── processing/      # [tratamento] processor (seleção, unidades, níveis, extração),
+│                    #   wind (cálculos centralizados), regions (Região + predefinidas)
+├── analysis/        # [análise] statistics, profiles, timeseries (statsmodels OLS), charts
+├── persistence/     # [persistência] database (sqlite3 WAL), schemas, repositories
+├── output/          # [resultados] maps (Cartopy/Basemap), matrices (+ BlueSky), base
+├── api/             # [servidor] app.py (lifespan) + dependencies + routers/
+│   └── routers/     # health, catalog, gribs, maps, matrices, analysis, metar, files, history
+└── METAR/           # parser PythonMETAR vendado (import from server_MET.METAR)
+```
 
-## Don't touch: legacy artifacts
+## Gotchas
 
-`legacy/`, `classes_MET/`, `METARpy/`, `bash/`, root scripts `goGribV2.sh`/`remove_GRIBS_antigos.sh`, text files `variables.txt`, `variable_inside_list.txt`, `varMET`, `varPythonGrib`, and the empty root dirs `gribs/`, `mapasGrib/`, `matrizGrib/` are old backups/artifacts (untracked and gitignored; kept on disk only). The live surface is `server_MET/`, `scripts/`, `environment/`, `tests/`.
+- `Settings` (server_MET/core/config.py) é singleton lendo `environment/path.conf` (`chave=valor`); caminhos relativos a `PROJECT_ROOT`. **Nunca hardcode `data/...`** — use `Settings`. `ensure_dirs()` roda no lifespan.
+- Diretórios de dados: `data/gribs`, `data/mapasGrib`, `data/matrizGrib/{predi,bluesky}`, `data/analise`, `data/tmp`. Banco: `data/met_server.db` (`db_file=` no path.conf).
+- GRIBs vivem em `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. `GribReader.find_grib_file` casa por `.f0{ff}` + resolução. Download usa o binário `wget` via subprocess (obrigatório; `check_url_exists` falha silenciosamente sem ele).
+- `VAR_MAP` está em `server_MET/core/constants.py` (não em processor). `wind`/`winds` são calculados (u/v, uSupe/vSupe) e **não** estão no VAR_MAP.
+- Níveis de pressão: clamp 150–1000 hPa com snap para `PRESSURE_LEVELS`. Variáveis de superfície esperam `level=None`.
+- **`load_gribs` retorna objetos `pygrib.open` (nível de arquivo), sem `.dataDate`/`.forecastTime`** — use as mensagens retornadas por `select_variable_from_gribs` para metadados de mensagem. Feche com `close_gribs()` ou `grb.close()`.
+- `Region.name` preserva o nome da região predefinida (ex.: `SP`) — usado em nomes de arquivos e no banco. Regiões por bbox geram nome descritivo.
+- Cálculo de vento apenas em `WindProcessor` (speed, nós, direção met/azimute, altitude). Unidades só em `DataProcessor.convert_units`.
+- Persistência: repos em `server_MET/persistence/repositories.py` (SQL parametrizado, nunca f-string). Conexão única com `check_same_thread=False` + RLock; WAL mode. `get_database()` cria schema no primeiro uso; `set_database()` é usado nos testes.
+- Análises persistidas em `analysis_results` e re-servidas com `"**cached"**: true` (não recomputa). Limpar registros para forçar recálculo.
+- METAR: API JSON nova (`https://aviationweather.gov/api/data/metar?ids={icao}&format=json&hours=2`); a antiga `adds/dataserver_current` está morta (403). Parsing offline com parser vendado.
+- API: `POST /gribs/download` usa **query params** (`date_str`, `analysis_hour`, `resolutions`, `force`) e retorna `task_id`; status em `GET /gribs/download/{task_id}` (persistente). `POST /maps/generate`, `/matrices/generate` e `/analysis/charts` retornam JSON com caminhos em `data/tmp/<uuid>`.
+- Servir arquivos: `GET /files/{kind}/{path}` com `safe_join` (anti path-traversal). Kinds: `mapas`, `matrizes`, `bluesky`, `analise`, `tmp`.
+- Mapas: matplotlib Agg + Cartopy (primário, está no venv); Basemap fallback. Feições geográficas degradam offline. `HAS_MAP_BACKEND` em `server_MET/output/maps.py`.
+- `tests/` usa httpx `ASGITransport`; conftest isola o SQLite em `tmp_path` por teste (`set_database`). Testes de rede toleram status variáveis.
+- Dockerfile precisa `wget` + `libgfortran5` + `libgomp1` (pygrib prebuilt); docker-compose monta volumes para dados + banco e `environment/` do host.
+
+## Não versionar
+
+`data/` inteiro é gitignored (GRIBs, saídas e o banco `met_server.db`). Artefatos legados (legacy/, classes_MET/, METARpy/, bash/, raiz gribs/ etc.) foram **deletados** na v3 — não recriar.
 
 ## Misc
 
-- Docs and user-facing strings are in Portuguese; keep that for user-facing output.
-- Dockerfile needs `wget` + `libgfortran5` + `libgomp1` on python:3.11-slim (pygrib comes prebuilt). For local installs, pygrib may require system eccodes libraries.
-- opencode MCP servers (context7, github) are configured in `opencode.json` — config is loaded at startup; remind the user to restart opencode after changing it.
-- The project venv is `~/envs/met`; it includes scipy (needed by Cartopy streamplot). If `scipy` is missing, wind maps fall back to `quiver`.
+- Docs e strings para o usuário são em português.
+- opencode MCP servers (context7, github) configurados em `opencode.json` — carregados no startup; reinicie o opencode após alterar.

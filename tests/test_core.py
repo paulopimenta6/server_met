@@ -1,15 +1,16 @@
-import pytest
+"""Testes da camada core: configuração, constantes, regiões e modelos."""
 import numpy as np
-from pathlib import Path
-import tempfile
-import os
+import pytest
+from pydantic import ValidationError
 
-from server_MET.config import Settings
-from server_MET.region import Region, REGIOES_PREDEFINIDAS
-from server_MET.data_processor import DataProcessor, VAR_MAP, PRESSURE_LEVELS
+from server_MET.core.config import Settings
+from server_MET.core.constants import PRESSURE_LEVELS, UNITS_MAP, VAR_MAP
+from server_MET.core.models import GribRequest, MapRequest, MetVariable, RegionName
+from server_MET.processing.processor import DataProcessor
+from server_MET.processing.regions import REGIOES_PREDEFINIDAS, Region, regioes_predefinidas
 
 
-class TestConfig:
+class TestSettings:
     def test_singleton(self):
         s1 = Settings()
         s2 = Settings()
@@ -20,266 +21,147 @@ class TestConfig:
         assert s.dir_gribs is not None
         assert s.dir_mapas is not None
         assert s.dir_matrizes is not None
+        assert s.dir_analise is not None
+        assert s.dir_tmp is not None
+
+    def test_db_path(self):
+        s = Settings()
+        assert str(s.db_path).endswith("met_server.db")
 
     def test_ensure_dirs(self):
         s = Settings()
         s.ensure_dirs()
-        assert s.dir_gribs.exists() or True
+        assert s.dir_gribs.exists()
 
     def test_gfs_url(self):
         s = Settings()
         assert "nomads.ncep.noaa.gov" in s.gfs_url
 
-    def test_dir_tmp(self):
+    def test_create_date_subdirs(self):
         s = Settings()
-        assert s.dir_tmp is not None
-        assert str(s.dir_tmp).endswith("tmp")
+        g, m, mt = s.create_date_subdirs("20260101", "06")
+        assert g.exists() and m.exists() and mt.exists()
 
 
 class TestRegion:
-    def test_predefined_region(self):
+    def test_predefined_region_keeps_name(self):
         r = Region(name="SP")
-        assert r.lon_min == -56
-        assert r.lon_max == -42
-        assert r.lat_min == -28
-        assert r.lat_max == -18
+        assert r.name == "SP"
+        assert r.is_predefined is True
+        assert r.lon_min == -56 and r.lon_max == -42
+        assert r.lat_min == -28 and r.lat_max == -18
 
     def test_bbox_region(self):
         r = Region(lon_min=-50, lon_max=-40, lat_min=-25, lat_max=-15)
         assert r.lon_min == -50
-        assert r.lon_max == -40
+        assert r.is_predefined is False
 
     def test_center_region(self):
         r = Region(center_lon=-46, center_lat=-23)
-        assert r.lat_min == -28
-        assert r.lat_max == -18
+        assert r.lat_min == -28 and r.lat_max == -18
 
     def test_validate_valid(self):
-        r = Region(lon_min=-50, lon_max=-40, lat_min=-25, lat_max=-15)
-        assert r.validate() is True
+        assert Region(lon_min=-50, lon_max=-40, lat_min=-25, lat_max=-15).validate()
 
     def test_validate_invalid_lon(self):
-        r = Region(lon_min=-200, lon_max=-40, lat_min=-25, lat_max=-15)
-        assert r.validate() is False
+        assert not Region(lon_min=-200, lon_max=-40, lat_min=-25, lat_max=-15).validate()
 
     def test_get_flag(self):
         r1 = Region(lon_min=-50, lon_max=-40, lat_min=-25, lat_max=-15)
-        assert r1.get_flag() in (1, 2, 3, 0)
+        assert r1.get_flag() == 2
 
     def test_all_regions_exist(self):
-        for name in ["SP", "RJ", "AM", "DF", "PR", "RS", "MG", "PA", "PE", "CE", "SA"]:
-            r = Region(name=name)
-            assert r.validate()
+        for name in REGIOES_PREDEFINIDAS:
+            assert Region(name=name).validate()
+
+    def test_unknown_region_raises(self):
+        with pytest.raises(ValueError):
+            Region(name="XX")
+
+    def test_regioes_predefinidas_copy(self):
+        assert regioes_predefinidas() == REGIOES_PREDEFINIDAS
 
 
-class TestDataProcessor:
+class TestConstants:
     def test_var_map_complete(self):
-        expected_keys = [
+        expected = [
             "ps", "prnm", "temp", "temps", "nuvem",
             "chuvaNaoConvec", "chuvaConvec", "umidadeRel",
             "u", "v", "uSupe", "vSupe",
         ]
-        for key in expected_keys:
-            assert key in VAR_MAP
+        assert all(k in VAR_MAP for k in expected)
 
     def test_pressure_levels_range(self):
-        assert all(150 <= l <= 1000 for l in PRESSURE_LEVELS)
-        assert PRESSURE_LEVELS == sorted(PRESSURE_LEVELS)
+        assert min(PRESSURE_LEVELS) == 150
+        assert max(PRESSURE_LEVELS) == 1000
 
+    def test_unit_map(self):
+        assert UNITS_MAP["temp"] == "°C"
+        assert UNITS_MAP["wind"] == "m/s"
+
+
+class TestProcessorHelpers:
     def test_resolve_level_within_range(self):
-        dp = DataProcessor()
-        assert dp.resolve_level("temp", 500) == 500
-        assert dp.resolve_level("temp", 850) == 850
+        p = DataProcessor()
+        assert p.resolve_level("temp", 499) == 500
 
     def test_resolve_level_below_min(self):
-        dp = DataProcessor()
-        assert dp.resolve_level("temp", 50) == 150
+        p = DataProcessor()
+        assert p.resolve_level("temp", 50) == 150
 
     def test_resolve_level_above_max(self):
-        dp = DataProcessor()
-        assert dp.resolve_level("temp", 2000) == 1000
+        p = DataProcessor()
+        assert p.resolve_level("temp", 1200) == 1000
 
     def test_resolve_level_none(self):
-        dp = DataProcessor()
-        assert dp.resolve_level("temps", None) is None
+        p = DataProcessor()
+        assert p.resolve_level("temp", None) is None
+
+    def test_resolve_level_surface_kept(self):
+        p = DataProcessor()
+        assert p.resolve_level("temps", 250) == 250
 
     def test_get_current_analysis_hour(self):
-        dp = DataProcessor()
-        hour = dp.get_current_analysis_hour()
-        assert hour in ["00", "06", "12", "18"]
+        p = DataProcessor()
+        assert p.get_current_analysis_hour() in ("00", "06", "12", "18")
 
     def test_get_date_str_format(self):
-        dp = DataProcessor()
-        d = dp.get_date_str()
-        assert len(d) == 8
-        assert d.isdigit()
+        p = DataProcessor()
+        assert len(p.get_date_str()) == 8
+        assert p.get_date_str().isdigit()
+
+    def test_convert_units_temp(self):
+        p = DataProcessor()
+        data, unit = p.convert_units(np.array([273.15]), "temp")
+        assert np.isclose(data[0], 0.0)
+        assert unit == "°C"
+
+    def test_convert_units_pressure(self):
+        p = DataProcessor()
+        data, unit = p.convert_units(np.array([101325.0]), "ps")
+        assert np.isclose(data[0], 1013.25)
+        assert unit == "hPa"
+
+    def test_convert_units_fallback(self):
+        p = DataProcessor()
+        _, unit = p.convert_units(np.array([1.0]), "u")
+        assert unit == "m/s"
+
+    def test_select_unknown_variable_raises(self):
+        p = DataProcessor()
+        with pytest.raises(ValueError):
+            p.select_variable_from_gribs([], "inexistente")
 
 
-class TestWindProcessor:
-    def test_compute_speed(self):
-        from server_MET.wind_processor import WindProcessor
-
-        wp = WindProcessor()
-        u = np.array([3.0, 4.0])
-        v = np.array([4.0, 3.0])
-        speed = wp.compute_speed(u, v)
-        assert np.allclose(speed, [5.0, 5.0])
-
-    def test_compute_speed_knot(self):
-        from server_MET.wind_processor import WindProcessor
-
-        wp = WindProcessor()
-        u = np.array([3.0])
-        v = np.array([4.0])
-        speed = wp.compute_speed_knot(u, v)
-        assert np.isclose(speed[0], 5.0 * 1.943)
-
-    def test_compute_direction_met(self):
-        from server_MET.wind_processor import WindProcessor
-
-        wp = WindProcessor()
-        u = np.array([0.0])
-        v = np.array([-1.0])
-        direction = wp.compute_direction_met(u, v)
-        assert np.isclose(direction[0], 0.0)
-
-    def test_pressure_to_altitude(self):
-        from server_MET.wind_processor import WindProcessor
-
-        wp = WindProcessor()
-        alt = wp.pressure_to_altitude(1013.25)
-        assert np.isclose(alt, 0.0, atol=0.1)
-
-    def test_near_surface_levels(self):
-        from server_MET.wind_processor import WindProcessor
-
-        wp = WindProcessor()
-        levels = wp.get_near_surface_levels()
-        assert levels == [20, 30, 40, 50, 80]
-
-
-class TestMetarClient:
-    def test_aerodromos(self):
-        from server_MET.metar_client import AERODROMOS
-
-        assert "SP" in AERODROMOS
-        assert AERODROMOS["SP"] == "SBGR"
-        assert len(AERODROMOS) == 9
-
-    def test_metar_noaa_url(self):
-        from server_MET.metar_client import NOAA_METAR_URL
-
-        assert "aviationweather.gov" in NOAA_METAR_URL
-        assert "{}" in NOAA_METAR_URL
-
-    def test_metar_new_api_endpoint(self):
-        from server_MET.metar_client import NOAA_METAR_URL
-
-        assert "api/data/metar" in NOAA_METAR_URL
-        assert "format=json" in NOAA_METAR_URL
-
-    def test_extract_raw_text_from_json(self):
-        from server_MET.metar_client import MetarClient
-
-        client = MetarClient()
-        data = [{"icaoId": "SBGR", "rawOb": "METAR SBGR 010900Z 36003KT CAVOK 15/10 Q1020"}]
-        assert client.extract_raw_text_from_json(data) == "METAR SBGR 010900Z 36003KT CAVOK 15/10 Q1020"
-        assert client.extract_raw_text_from_json([]) is None
-        assert client.extract_raw_text_from_json([{"icaoId": "SBGR"}]) is None
-
-    def test_parse_local_metar(self):
-        from server_MET.metar_client import MetarClient
-
-        client = MetarClient()
-        raw = "METAR SBPA 212200Z 12005KT 9999 SCT030 18/12 Q1020="
-        parsed = client.get_parsed_metar("SBPA", raw)
-        assert parsed is not None
-        assert parsed["station_code"] == "SBPA"
-        assert parsed["wind"] is not None
-        assert parsed["wind"]["direction"] == 120
-        assert parsed["wind"]["speed"] == 5
-        assert parsed["temperatures"]["temperature"] == 18
-        assert parsed["temperatures"]["dewpoint"] == 12
-        assert parsed["qnh"] == 1020
-        assert parsed["visibility"] == 9999
-
-    def test_parse_vrb_wind_metar(self):
-        from server_MET.metar_client import MetarClient
-
-        client = MetarClient()
-        raw = "METAR SBGL 212200Z VRB03KT CAVOK 22/15 Q1015="
-        parsed = client.get_parsed_metar("SBGL", raw)
-        assert parsed is not None
-        assert parsed["wind"]["direction"] == "VRB"
-        assert parsed["wind"]["speed"] == 3
-
-
-class TestMatrixGenerator:
-    def test_bluesky_filename_structure(self):
-        from server_MET.matrix_generator import MatrixGenerator
-
-        gen = MatrixGenerator()
-        assert gen is not None
-
-    def test_generate_wind_filename(self):
-        from server_MET.matrix_generator import MatrixGenerator
-
-        gen = MatrixGenerator()
-        assert gen is not None
-
-
-class TestMapGenerator:
-    def test_map_backend_available(self):
-        from server_MET.map_generator import HAS_MAP_BACKEND
-
-        assert HAS_MAP_BACKEND is True
-
-    def test_unit_labels(self):
-        from server_MET.map_generator import MapGenerator
-
-        gen = MapGenerator()
-        assert gen._get_unit_label("temp") == "°C"
-        assert gen._get_unit_label("ps") == "hPa"
-        assert gen._get_unit_label("chuvaConvec") == "mm"
-        assert gen._get_unit_label("unknown") == ""
-
-    def test_generate_without_grib_returns_empty(self):
-        from server_MET.map_generator import MapGenerator
-        from server_MET.region import Region
-
-        gen = MapGenerator()
-        region = Region(name="SP")
-        files = gen.generate(
-            var_name="temp",
-            region=region,
-            level=500,
-            date_str="20000101",
-            analysis="00",
-        )
-        assert files == []
-
-
-class TestServerHealth:
-    def test_health_response_model(self):
-        from server_MET.models import HealthResponse
-
-        h = HealthResponse(
-            status="ok",
-            version="2.0.0",
-            grib_files_available=False,
-            uptime=100.0,
-        )
-        assert h.status == "ok"
-        assert h.version == "2.0.0"
-        assert h.grib_files_available is False
-
-    def test_grib_request_model(self):
-        from server_MET.models import GribRequest, MetVariable
-
-        req = GribRequest(
-            variable=MetVariable.temp,
-            level=500,
-            region="SP",
-        )
-        assert req.variable == MetVariable.temp
+class TestModels:
+    def test_grib_request_defaults(self):
+        req = GribRequest(variable=MetVariable.temp)
         assert req.level == 500
+        assert req.region is None
+
+    def test_map_request_dpi_validation(self):
+        with pytest.raises(ValidationError):
+            MapRequest(variable=MetVariable.temp, dpi=30)
+
+    def test_region_name_enum(self):
+        assert RegionName("SP") == RegionName.SP

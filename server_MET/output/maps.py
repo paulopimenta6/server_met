@@ -1,15 +1,20 @@
+"""Geração de mapas meteorológicos (PNG) com Cartopy (fallback Basemap)."""
+from __future__ import annotations
+
 import logging
 from typing import Optional
 
-import numpy as np
 import matplotlib
-matplotlib.use("Agg")
-from matplotlib import rc
-import matplotlib.pyplot as plt
 
-from server_MET.config import Settings
-from server_MET.data_processor import DataProcessor, VAR_MAP
-from server_MET.region import Region
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+from server_MET.core.config import Settings
+from server_MET.core.constants import UNITS_MAP
+from server_MET.output.base import OutputGeneratorMixin
+from server_MET.processing.processor import DataProcessor
+from server_MET.processing.regions import Region
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +36,14 @@ except ImportError:
 HAS_MAP_BACKEND = HAS_CARTOPY or HAS_BASEMAP
 
 if not HAS_MAP_BACKEND:
-    logger.warning(
-        "Neither Cartopy nor Basemap installed. Map generation disabled."
-    )
+    logger.warning("Cartopy e Basemap ausentes. Geração de mapas desabilitada.")
 
 
-class MapGenerator:
-    def __init__(self) -> None:
+class MapGenerator(OutputGeneratorMixin):
+    def __init__(self, processor: Optional[DataProcessor] = None) -> None:
         self.settings = Settings()
-        self.processor = DataProcessor()
+        self.processor = processor or DataProcessor()
+        super().__init__("map")
 
     def _compute_intervals(self, data: np.ndarray) -> np.ndarray:
         min_var = float(data.min()) - 1
@@ -59,23 +63,6 @@ class MapGenerator:
             o = 500
         return np.linspace(int(min_var), int(max_var), o)
 
-    def _get_unit_label(self, var_name: str) -> str:
-        unit_map = {
-            "temp": "°C",
-            "temps": "°C",
-            "ps": "hPa",
-            "prnm": "hPa",
-            "nuvem": "%",
-            "umidadeRel": "%",
-            "chuvaNaoConvec": "mm",
-            "chuvaConvec": "mm",
-            "u": "m/s",
-            "v": "m/s",
-            "wind": "m/s",
-            "winds": "m/s",
-        }
-        return unit_map.get(var_name, "")
-
     def generate(
         self,
         var_name: str,
@@ -90,20 +77,21 @@ class MapGenerator:
     ) -> list[str]:
         if not HAS_MAP_BACKEND:
             logger.error(
-                "Map generation requires Cartopy or Basemap. "
-                "Install one of them (pip install cartopy)."
+                "Geração de mapas requer Cartopy ou Basemap (pip install cartopy)."
             )
             return []
 
         if var_name in ("wind", "winds"):
-            return self._generate_wind_maps(
+            files = self._generate_wind_maps(
                 var_name, region, level, date_str, analysis, output_dir, dpi, title
             )
-
-        return self._generate_variable_maps(
-            var_name, region, level, date_str, analysis, forecast_hours,
-            output_dir, dpi, title,
-        )
+        else:
+            files = self._generate_variable_maps(
+                var_name, region, level, date_str, analysis, forecast_hours,
+                output_dir, dpi, title,
+            )
+        self._register_outputs(files, var_name, level, region, date_str, analysis)
+        return files
 
     def _generate_variable_maps(
         self,
@@ -119,7 +107,7 @@ class MapGenerator:
     ) -> list[str]:
         grib_objs = self.processor.load_gribs(date_str, analysis, forecast_hours)
         if not grib_objs:
-            logger.error("No GRIB data loaded.")
+            logger.error("Nenhum dado GRIB carregado.")
             return []
 
         resolved_level = self.processor.resolve_level(var_name, level)
@@ -151,7 +139,6 @@ class MapGenerator:
 
             intervals = self._compute_intervals(data)
 
-            rc("font", weight="normal")
             fig = plt.figure(figsize=(18, 16))
 
             if HAS_CARTOPY:
@@ -195,10 +182,10 @@ class MapGenerator:
 
             default_title = (
                 f"GFS {msg.iDirectionIncrementInDegrees} - {region.name} "
-                f"{var_name} - Nivel: {resolved_level or level} "
+                f"{var_name} - Nível: {resolved_level or level} "
                 f"Data: {msg.dataDate} Prev: {ft_str}"
             )
-            plt.title(title or default_title, weight="normal", fontsize=12)
+            plt.title(title or default_title, fontsize=12)
 
             filename = (
                 f"GFS_{msg.iDirectionIncrementInDegrees}_{region.name}_"
@@ -208,7 +195,7 @@ class MapGenerator:
             plt.savefig(filepath, bbox_inches="tight", dpi=dpi)
             plt.close()
             saved_files.append(filepath)
-            logger.info("Map saved: %s", filepath)
+            logger.info("Mapa salvo: %s", filepath)
 
         return saved_files
 
@@ -227,9 +214,12 @@ class MapGenerator:
         if not grib_objs:
             return []
 
-        resolved_level = self.processor.resolve_level("u", level)
-        u_msgs = self.processor.select_variable_from_gribs(grib_objs, "u", resolved_level)
-        v_msgs = self.processor.select_variable_from_gribs(grib_objs, "v", resolved_level)
+        base_var = "uSupe" if var_name == "winds" else "u"
+        resolved_level = self.processor.resolve_level(base_var, level)
+        u_msgs = self.processor.select_variable_from_gribs(grib_objs, base_var, resolved_level)
+        v_msgs = self.processor.select_variable_from_gribs(
+            grib_objs, "vSupe" if var_name == "winds" else "v", resolved_level
+        )
 
         if output_dir is None:
             output_dir = str(self.settings.dir_mapas)
@@ -237,7 +227,7 @@ class MapGenerator:
         saved_files = []
         lon_min, lon_max, lat_min, lat_max = region.bounds
 
-        for i, (u_msg, v_msg) in enumerate(zip(u_msgs, v_msgs)):
+        for u_msg, v_msg in zip(u_msgs, v_msgs):
             data_u, lat_u, lon_u = self.processor.extract_data(
                 u_msg, lon_min, lon_max, lat_min, lat_max
             )
@@ -271,7 +261,7 @@ class MapGenerator:
                     sm = strm.lines
                 except ImportError:
                     logger.warning(
-                        "Cartopy streamplot requires scipy; falling back to quiver."
+                        "streamplot requer scipy; usando quiver."
                     )
                     step = max(1, lons.shape[0] // 8)
                     sm = ax.quiver(
@@ -289,7 +279,6 @@ class MapGenerator:
                     urcrnrlon=_lon_max,
                     resolution="i",
                 )
-                ax = fig1.add_axes([0.1, 0.1, 0.7, 0.7])
                 x, y = m(lons, lats)
                 self._draw_basemap_decorations(m, _lon_min, _lon_max, _lat_min, _lat_max)
                 speed = np.sqrt(data_u**2 + data_v**2)
@@ -304,10 +293,10 @@ class MapGenerator:
 
             default_title = (
                 f"GFS {u_msg.iDirectionIncrementInDegrees} - {region.name} "
-                f"Vento [m/s] - Nivel: {resolved_level or level} "
+                f"Vento [m/s] - Nível: {resolved_level or level} "
                 f"Data: {u_msg.dataDate} Prev: {ft_str}"
             )
-            plt.title(title or default_title, weight="normal", fontsize=12)
+            plt.title(title or default_title, fontsize=12)
 
             filename = (
                 f"GFS_{u_msg.iDirectionIncrementInDegrees}_{region.name}_"
@@ -317,7 +306,7 @@ class MapGenerator:
             plt.savefig(filepath, bbox_inches="tight", dpi=dpi)
             plt.close()
             saved_files.append(filepath)
-            logger.info("Wind map saved: %s", filepath)
+            logger.info("Mapa de vento salvo: %s", filepath)
 
         return saved_files
 
@@ -329,7 +318,7 @@ class MapGenerator:
             ax.add_feature(cfeature.BORDERS, linewidth=0.3)
             ax.add_feature(cfeature.STATES, linewidth=0.2)
         except Exception as e:
-            logger.warning("Could not draw Cartopy features (offline?): %s", e)
+            logger.warning("Falha ao desenhar feições Cartopy (offline?): %s", e)
         try:
             gl = ax.gridlines(
                 crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.3,
@@ -338,7 +327,7 @@ class MapGenerator:
             gl.top_labels = False
             gl.right_labels = False
         except Exception as e:
-            logger.warning("Could not draw gridlines: %s", e)
+            logger.warning("Falha ao desenhar gridlines: %s", e)
         return ax
 
     def _draw_basemap_decorations(self, m, lon_min, lon_max, lat_min, lat_max):
@@ -353,3 +342,6 @@ class MapGenerator:
         m.drawcoastlines(linewidth=0.5)
         m.drawcountries()
         m.drawstates()
+
+
+__all__ = ["MapGenerator"]

@@ -4,8 +4,8 @@ build-backend = "setuptools.backends._legacy:_Backend"
 
 [project]
 name = "server_MET"
-version = "2.0.0"
-description = "GFS meteorological data server - download, process, map and serve GRIB2 data from NOAA"
+version = "3.0.0"
+description = "Servidor meteorológico GFS - captação, tratamento, análise, persistência e distribuição de dados GRIB2 (NOAA)"
 authors = [{name = "Paulo Pimenta", email = "phpimenta@example.com"}]
 license = {text = "MIT"}
 readme = "README.md"
@@ -14,6 +14,9 @@ dependencies = [
     "pygrib>=2.1.0",
     "numpy>=1.24.0",
     "matplotlib>=3.7.0",
+    "scipy>=1.10.0",
+    "pandas>=2.0.0",
+    "statsmodels>=0.14.0",
     "fastapi>=0.100.0",
     "uvicorn[standard]>=0.22.0",
     "python-multipart>=0.0.6",

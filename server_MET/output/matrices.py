@@ -1,20 +1,35 @@
+"""Geração de matrizes CSV (variáveis e campo de vento) e matrizes BlueSky.
+
+Cálculos de vento centralizados em WindProcessor; artefatos registrados
+na tabela `outputs` do SQLite.
+"""
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 
-from server_MET.config import Settings
-from server_MET.data_processor import DataProcessor
-from server_MET.region import Region
+from server_MET.core.config import Settings
+from server_MET.output.base import OutputGeneratorMixin
+from server_MET.processing.processor import DataProcessor
+from server_MET.processing.regions import Region
+from server_MET.processing.wind import WindProcessor
 
 logger = logging.getLogger(__name__)
 
 
-class MatrixGenerator:
-    def __init__(self) -> None:
+class MatrixGenerator(OutputGeneratorMixin):
+    def __init__(
+        self,
+        processor: Optional[DataProcessor] = None,
+        wind: Optional[WindProcessor] = None,
+    ) -> None:
         self.settings = Settings()
-        self.processor = DataProcessor()
+        self.processor = processor or DataProcessor()
+        self.wind = wind or WindProcessor()
+        super().__init__("matrix")
 
     def generate(
         self,
@@ -27,13 +42,29 @@ class MatrixGenerator:
         output_dir: Optional[str] = None,
     ) -> list[str]:
         if var_name in ("wind", "winds"):
-            return self._generate_wind_matrices(
+            files = self._generate_wind_matrices(
                 var_name, region, level, date_str, analysis, output_dir
             )
+        else:
+            files = self._generate_variable_matrices(
+                var_name, region, level, date_str, analysis, forecast_hours, output_dir
+            )
+        self._register_outputs(files, var_name, level, region, date_str, analysis)
+        return files
 
+    def _generate_variable_matrices(
+        self,
+        var_name: str,
+        region: Region,
+        level: Optional[int] = None,
+        date_str: Optional[str] = None,
+        analysis: Optional[str] = None,
+        forecast_hours: Optional[list[str]] = None,
+        output_dir: Optional[str] = None,
+    ) -> list[str]:
         grib_objs = self.processor.load_gribs(date_str, analysis, forecast_hours)
         if not grib_objs:
-            logger.error("No GRIB data loaded.")
+            logger.error("Nenhum dado GRIB carregado.")
             return []
 
         resolved_level = self.processor.resolve_level(var_name, level)
@@ -73,7 +104,7 @@ class MatrixGenerator:
             )
 
             saved_files.append(filepath)
-            logger.info("Matrix saved: %s", filepath)
+            logger.info("Matriz salva: %s", filepath)
 
         return saved_files
 
@@ -90,9 +121,12 @@ class MatrixGenerator:
         if not grib_objs:
             return []
 
-        resolved_level = self.processor.resolve_level("u", level)
-        u_msgs = self.processor.select_variable_from_gribs(grib_objs, "u", resolved_level)
-        v_msgs = self.processor.select_variable_from_gribs(grib_objs, "v", resolved_level)
+        base_var = "uSupe" if var_name == "winds" else "u"
+        resolved_level = self.processor.resolve_level(base_var, level)
+        u_msgs = self.processor.select_variable_from_gribs(grib_objs, base_var, resolved_level)
+        v_msgs = self.processor.select_variable_from_gribs(
+            grib_objs, "vSupe" if var_name == "winds" else "v", resolved_level
+        )
 
         if output_dir is None:
             output_dir = str(self.settings.dir_matrizes)
@@ -100,7 +134,7 @@ class MatrixGenerator:
         saved_files = []
         lon_min, lon_max, lat_min, lat_max = region.bounds
 
-        for i, (u_msg, v_msg) in enumerate(zip(u_msgs, v_msgs)):
+        for u_msg, v_msg in zip(u_msgs, v_msgs):
             data_u, lat_u, lon_u = self.processor.extract_data(
                 u_msg, lon_min, lon_max, lat_min, lat_max
             )
@@ -112,8 +146,8 @@ class MatrixGenerator:
             ft_str = f"{ft:02d}"
 
             lon_grid, lat_grid = np.meshgrid(lon_u, lat_u)
-            speed = np.sqrt(data_u**2 + data_v**2)
-            direction = (180 / np.pi) * np.arctan2(-data_u, -data_v)
+            speed = self.wind.compute_speed(data_u, data_v)
+            direction = self.wind.compute_direction_met(data_u, data_v)
 
             filename = (
                 f"GFS_{u_msg.iDirectionIncrementInDegrees}_{region.name}_"
@@ -138,7 +172,7 @@ class MatrixGenerator:
             )
 
             saved_files.append(filepath)
-            logger.info("Wind matrix saved: %s", filepath)
+            logger.info("Matriz de vento salva: %s", filepath)
 
         return saved_files
 
@@ -173,9 +207,9 @@ class MatrixGenerator:
         )
 
         lon_grid, lat_grid = np.meshgrid(lon_u, lat_u)
-        speed_knot = np.sqrt(data_u**2 + data_v**2) * 1.943
-        direction = (180 / np.pi) * np.arctan2(-data_u, -data_v)
-        h_alt = (1 - (resolved_level / 1013.25) ** 0.190284) * 145366.45
+        speed_knot = self.wind.compute_speed_knot(data_u, data_v)
+        direction = self.wind.compute_direction_met(data_u, data_v)
+        h_alt = self.wind.pressure_to_altitude(resolved_level)
 
         filename = f"bluesky_wind_{region.name}_N{resolved_level}_{u_msg.dataDate}.csv"
         filepath = str(output_dir / filename)
@@ -195,5 +229,13 @@ class MatrixGenerator:
             comments="", fmt="%.6f",
         )
 
-        logger.info("Bluesky wind matrix saved: %s", filepath)
+        self._register_outputs(
+            [filepath], "wind", resolved_level, region, date_str, analysis,
+            kind="bluesky",
+        )
+
+        logger.info("Matriz BlueSky salva: %s", filepath)
         return filepath
+
+
+__all__ = ["MatrixGenerator"]

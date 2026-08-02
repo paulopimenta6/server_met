@@ -14,8 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN mkdir -p /app/data/gribs /app/data/mapasGrib /app/data/matrizGrib \
-    && mkdir -p /app/data/matrizGrib/predi /app/data/matrizGrib/bluesky
+    && mkdir -p /app/data/matrizGrib/predi /app/data/matrizGrib/bluesky \
+    && mkdir -p /app/data/analise /app/data/tmp
 
 EXPOSE 8000
 
-CMD ["uvicorn", "server_MET.server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "server_MET.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

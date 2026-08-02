@@ -8,23 +8,8 @@ __pycache__/
 venv/
 envs/
 
-# Runtime data (GRIBs, mapas, matrizes)
+# Runtime data (GRIBs, mapas, matrizes, banco SQLite, tmp)
 data/
-
-# Legacy artifacts (mantidos em disco apenas como backup, fora do versionamento)
-METARpy/
-classes_MET/
-legacy/
-bash/
-goGribV2.sh
-remove_GRIBS_antigos.sh
-variables.txt
-variable_inside_list.txt
-varMET
-varPythonGrib
-gribs/
-mapasGrib/
-matrizGrib/
 
 # Local config / secrets
 .env

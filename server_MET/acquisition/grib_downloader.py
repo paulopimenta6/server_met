@@ -1,37 +1,44 @@
-import logging
+"""Download de arquivos GFS GRIB2 do NOMADS (NOAA) + limpeza de dados antigos.
+
+Registra cada arquivo no banco SQLite (tabela `downloads`).
+"""
+from __future__ import annotations
+
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-from server_MET.config import Settings
+from server_MET.core.config import Settings
+from server_MET.core.constants import ANALYSIS_HOURS, FORECAST_HOURS, RESOLUTIONS
+from server_MET.core.logging_conf import get_logger
+from server_MET.persistence.repositories import DownloadRepository
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
-ANALYSIS_HOURS = ["00", "06", "12", "18"]
-FORECAST_HOURS = ["00", "06", "12", "18"]
-RESOLUTIONS = ["0p25", "0p50", "1p00"]
+
+def get_date_str(dt: Optional[datetime] = None) -> str:
+    if dt is None:
+        dt = datetime.now()
+    return dt.strftime("%Y%m%d")
+
+
+def get_current_analysis_hour() -> str:
+    """Hora de análise GFS mais próxima (00/06/12/18) baseada no horário atual."""
+    h = datetime.now().hour
+    if h < 6:
+        return "00"
+    if h < 12:
+        return "06"
+    if h < 18:
+        return "12"
+    return "18"
 
 
 class GribDownloader:
-    def __init__(self) -> None:
+    def __init__(self, repositories: Optional[DownloadRepository] = None) -> None:
         self.settings = Settings()
-
-    def get_current_analysis_hour(self) -> str:
-        now = datetime.now()
-        h = now.hour
-        if h < 6:
-            return "00"
-        elif h < 12:
-            return "06"
-        elif h < 18:
-            return "12"
-        return "18"
-
-    def get_date_str(self, dt: Optional[datetime] = None) -> str:
-        if dt is None:
-            dt = datetime.now()
-        return dt.strftime("%Y%m%d")
+        self.repo = repositories or DownloadRepository()
 
     def check_url_exists(self, url: str) -> bool:
         try:
@@ -42,12 +49,10 @@ class GribDownloader:
             )
             return result.returncode == 0
         except (subprocess.TimeoutExpired, FileNotFoundError):
-            logger.warning("wget not available or timeout checking URL: %s", url)
+            logger.warning("wget indisponível ou timeout ao verificar URL: %s", url)
             return False
 
-    def download_file(
-        self, url: str, dest_path: Path, timeout: int = 300
-    ) -> bool:
+    def download_file(self, url: str, dest_path: Path, timeout: int = 300) -> bool:
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             result = subprocess.run(
@@ -56,17 +61,15 @@ class GribDownloader:
                 timeout=timeout,
             )
             if result.returncode == 0:
-                logger.info("Downloaded: %s -> %s", url, dest_path)
+                logger.info("Baixado: %s -> %s", url, dest_path)
                 return True
-            logger.error(
-                "Failed to download %s: %s", url, result.stderr.decode()
-            )
+            logger.error("Falha ao baixar %s: %s", url, result.stderr.decode(errors="replace"))
             return False
         except subprocess.TimeoutExpired:
-            logger.error("Timeout downloading %s", url)
+            logger.error("Timeout ao baixar %s", url)
             return False
         except FileNotFoundError:
-            logger.error("wget not found. Install wget or use curl.")
+            logger.error("wget não encontrado. Instale wget ou use curl.")
             return False
 
     def download_gribs(
@@ -77,12 +80,9 @@ class GribDownloader:
         resolution: str = "0p25",
         force: bool = False,
     ) -> list[Path]:
-        if date_str is None:
-            date_str = self.get_date_str()
-        if analysis_hour is None:
-            analysis_hour = self.get_current_analysis_hour()
-        if forecast_hours is None:
-            forecast_hours = FORECAST_HOURS
+        date_str = date_str or get_date_str()
+        analysis_hour = analysis_hour or get_current_analysis_hour()
+        forecast_hours = forecast_hours or FORECAST_HOURS
 
         downloaded = []
         base_url = f"{self.settings.gfs_url}{date_str}/{analysis_hour}/atmos/"
@@ -93,20 +93,30 @@ class GribDownloader:
             filename = f"gfs.t{analysis_hour}z.pgrb2.{resolution}.f0{fh}"
             filepath = dest_dir / filename
 
+            self.repo.register(date_str, analysis_hour, resolution, fh, filepath)
+
             if filepath.exists() and not force:
-                logger.info("File already exists: %s", filepath)
+                logger.info("Arquivo já existe: %s", filepath)
+                self.repo.mark(date_str, analysis_hour, resolution, fh, "skipped",
+                               file_size=filepath.stat().st_size)
                 downloaded.append(filepath)
                 continue
 
             url = f"{base_url}{filename}"
-            logger.info("Checking URL: %s", url)
+            logger.info("Verificando URL: %s", url)
 
             if not self.check_url_exists(url):
-                logger.warning("URL not available: %s", url)
+                logger.warning("URL não disponível: %s", url)
+                self.repo.mark(date_str, analysis_hour, resolution, fh, "failed",
+                               error="URL não disponível")
                 continue
 
             if self.download_file(url, filepath):
+                self.repo.mark(date_str, analysis_hour, resolution, fh, "downloaded",
+                               file_size=filepath.stat().st_size)
                 downloaded.append(filepath)
+            else:
+                self.repo.mark(date_str, analysis_hour, resolution, fh, "failed")
 
         return downloaded
 
@@ -139,6 +149,7 @@ class GribDownloader:
             self.settings.dir_gribs,
             self.settings.dir_mapas,
             self.settings.dir_matrizes,
+            self.settings.dir_analise,
         ):
             for date_dir in data_dir.iterdir():
                 if not date_dir.is_dir():
@@ -151,12 +162,16 @@ class GribDownloader:
                     for ana_dir in date_dir.iterdir():
                         if ana_dir.is_dir():
                             for f in ana_dir.iterdir():
-                                f.unlink(missing_ok=True)
-                                removed += 1
+                                if f.is_file():
+                                    f.unlink(missing_ok=True)
+                                    removed += 1
                             ana_dir.rmdir()
                     date_dir.rmdir()
-                    logger.info("Removed old data dir: %s", date_dir)
+                    logger.info("Diretório antigo removido: %s", date_dir)
         return removed
 
     def clean_old_gribs(self, days_old: int = 2) -> int:
         return self.clean_old_data(days_old=days_old)
+
+
+__all__ = ["GribDownloader", "get_date_str", "get_current_analysis_hour"]

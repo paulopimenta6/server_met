@@ -1,17 +1,19 @@
+"""Leitura de arquivos GRIB2 com pygrib."""
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Optional
 
 import pygrib
 
-from server_MET.config import Settings
+from server_MET.core.config import Settings
+from server_MET.core.constants import RESOLUTIONS
 
 logger = logging.getLogger(__name__)
 
 
 class GribReader:
-    SUPPORTED_RESOLUTIONS = ["0p25", "0p50", "1p00"]
-
     def __init__(self) -> None:
         self.settings = Settings()
 
@@ -24,22 +26,16 @@ class GribReader:
     ) -> Optional[Path]:
         base_dir = self.settings.dir_gribs / date_str / analysis
         if not base_dir.exists():
-            logger.warning("Directory not found: %s", base_dir)
+            logger.warning("Diretório não encontrado: %s", base_dir)
             return None
 
-        resolutions = (
-            [resolution]
-            if resolution
-            else self.SUPPORTED_RESOLUTIONS
-        )
+        resolutions = [resolution] if resolution else RESOLUTIONS
         for res in resolutions:
             for f in base_dir.iterdir():
                 if f.is_file() and f.name.endswith(f".f0{forecast}") and res in f.name:
-                    logger.info("Found GRIB file: %s", f)
+                    logger.info("Arquivo GRIB encontrado: %s", f)
                     return f
-        logger.warning(
-            "No GRIB file found for %s %s f%02s", date_str, analysis, forecast
-        )
+        logger.warning("Nenhum arquivo GRIB para %s %s f%02s", date_str, analysis, int(forecast))
         return None
 
     def find_available_analyses(self, date_str: str) -> list[str]:
@@ -48,6 +44,19 @@ class GribReader:
             return []
         return sorted(d.name for d in base_dir.iterdir() if d.is_dir())
 
+    def find_available_resolutions(self, date_str: str, analysis: str) -> list[str]:
+        base_dir = self.settings.dir_gribs / date_str / analysis
+        if not base_dir.exists():
+            return []
+        found: set[str] = set()
+        for f in base_dir.iterdir():
+            if not f.is_file():
+                continue
+            for res in RESOLUTIONS:
+                if res in f.name:
+                    found.add(res)
+        return sorted(found)
+
     def find_all_grib_files(
         self,
         date_str: str,
@@ -55,7 +64,9 @@ class GribReader:
         forecast_hours: Optional[list[str]] = None,
     ) -> list[Path]:
         if forecast_hours is None:
-            forecast_hours = ["00", "06", "12", "18"]
+            from server_MET.core.constants import FORECAST_HOURS
+
+            forecast_hours = FORECAST_HOURS
         files = []
         for fh in forecast_hours:
             f = self.find_grib_file(date_str, analysis, fh)
@@ -67,7 +78,7 @@ class GribReader:
         try:
             return pygrib.open(str(filepath))
         except (OSError, ValueError) as e:
-            logger.error("Failed to open GRIB file %s: %s", filepath, e)
+            logger.error("Falha ao abrir GRIB %s: %s", filepath, e)
             return None
 
     def select_variable(
@@ -82,7 +93,7 @@ class GribReader:
                 return grb.select(name=name, typeOfLevel=type_of_level, level=level)
             return grb.select(name=name, typeOfLevel=type_of_level)
         except (ValueError, KeyError) as e:
-            logger.warning("Variable not found: %s at %s/%s", name, type_of_level, level)
+            logger.warning("Variável não encontrada: %s em %s/%s (%s)", name, type_of_level, level, e)
             return []
 
     def list_variables(self, filepath: Path) -> list[dict]:
@@ -106,12 +117,5 @@ class GribReader:
             grb.close()
         return variables
 
-    def get_data(
-        self,
-        grb: pygrib.gribmessage,
-        lat1: float,
-        lat2: float,
-        lon1: float,
-        lon2: float,
-    ) -> tuple:
-        return grb.data(lat1=lat1, lat2=lat2, lon1=lon1, lon2=lon2)
+
+__all__ = ["GribReader"]

@@ -1,6 +1,16 @@
+"""Configuração central (singleton) do servidor meteorológico.
+
+Lê `environment/path.conf` (formato `chave=valor`, sem seções) e resolve os
+caminhos relativos à raiz do projeto. NUNCA hardcode `data/...` no código —
+use sempre `Settings`.
+"""
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from typing import Optional
+
+from server_MET.core.constants import GFS_BASE_URL
 
 
 class Settings:
@@ -17,44 +27,50 @@ class Settings:
             return
         self._initialized = True
 
-        self.PROJECT_ROOT = Path(__file__).resolve().parent.parent
+        self.PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
         self.ENV_FILE = self.PROJECT_ROOT / "environment" / "path.conf"
         self._dir_gribs: Optional[str] = None
         self._dir_mapas: Optional[str] = None
         self._dir_matrizes: Optional[str] = None
         self._dir_matrizes_predi: Optional[str] = None
         self._dir_matrizes_bluesky: Optional[str] = None
+        self._dir_analise: Optional[str] = None
         self._dir_tmp: Optional[str] = None
+        self._db_file: Optional[str] = None
         self._parse_env_file()
 
     def _parse_env_file(self) -> None:
-        if self.ENV_FILE.exists():
-            with open(self.ENV_FILE) as f:
-                for line in f:
-                    line = line.strip()
-                    if "=" in line:
-                        key, value = line.split("=", 1)
-                        key = key.strip()
-                        value = value.strip()
-                        if key == "dir_gribs":
-                            self._dir_gribs = value
-                        elif key == "dir_mapas":
-                            self._dir_mapas = value
-                        elif key == "dir_matrizes":
-                            self._dir_matrizes = value
-                        elif key == "dir_matrizes_predi":
-                            self._dir_matrizes_predi = value
-                        elif key == "dir_matrizes_bluesky":
-                            self._dir_matrizes_bluesky = value
-                        elif key == "dir_tmp":
-                            self._dir_tmp = value
+        if not self.ENV_FILE.exists():
+            return
+        with open(self.ENV_FILE) as f:
+            for line in f:
+                line = line.strip()
+                if "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+                if key == "dir_gribs":
+                    self._dir_gribs = value
+                elif key == "dir_mapas":
+                    self._dir_mapas = value
+                elif key == "dir_matrizes":
+                    self._dir_matrizes = value
+                elif key == "dir_matrizes_predi":
+                    self._dir_matrizes_predi = value
+                elif key == "dir_matrizes_bluesky":
+                    self._dir_matrizes_bluesky = value
+                elif key == "dir_analise":
+                    self._dir_analise = value
+                elif key == "dir_tmp":
+                    self._dir_tmp = value
+                elif key == "db_file":
+                    self._db_file = value
 
     def _resolve_dir(self, path_str: Optional[str], default_subdir: str) -> Path:
         if path_str:
             p = Path(path_str)
-            if p.is_absolute():
-                return p
-            return self.PROJECT_ROOT / p
+            return p if p.is_absolute() else self.PROJECT_ROOT / p
         return self.PROJECT_ROOT / default_subdir
 
     @property
@@ -78,12 +94,20 @@ class Settings:
         return self._resolve_dir(self._dir_matrizes_bluesky, "data/matrizGrib/bluesky")
 
     @property
+    def dir_analise(self) -> Path:
+        return self._resolve_dir(self._dir_analise, "data/analise")
+
+    @property
     def dir_tmp(self) -> Path:
         return self._resolve_dir(self._dir_tmp, "data/tmp")
 
     @property
+    def db_path(self) -> Path:
+        return self._resolve_dir(self._db_file, "data/met_server.db")
+
+    @property
     def gfs_url(self) -> str:
-        return "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs."
+        return GFS_BASE_URL
 
     def ensure_dirs(self) -> None:
         for d in [
@@ -92,9 +116,11 @@ class Settings:
             self.dir_matrizes,
             self.dir_matrizes_predi,
             self.dir_matrizes_bluesky,
+            self.dir_analise,
             self.dir_tmp,
         ]:
             d.mkdir(parents=True, exist_ok=True)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
     def create_date_subdirs(self, date_str: str, hour: str) -> tuple[Path, Path, Path]:
         grib_dir = self.dir_gribs / date_str / hour
@@ -107,3 +133,6 @@ class Settings:
         mat_dir.mkdir(parents=True, exist_ok=True)
 
         return grib_dir, map_dir, mat_dir
+
+
+__all__ = ["Settings"]
