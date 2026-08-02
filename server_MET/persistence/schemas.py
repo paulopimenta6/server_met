@@ -79,6 +79,22 @@ TABLES_DDL: list[str] = [
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS grid_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        variable TEXT NOT NULL,
+        level INTEGER,
+        region TEXT NOT NULL,
+        date_str TEXT NOT NULL,
+        analysis TEXT NOT NULL,
+        forecast INTEGER,
+        resolution TEXT,
+        lat REAL NOT NULL,
+        lon REAL NOT NULL,
+        value REAL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+    """,
 ]
 
 INDEXES_DDL: list[str] = [
@@ -87,6 +103,7 @@ INDEXES_DDL: list[str] = [
     "CREATE INDEX IF NOT EXISTS idx_metar_icao ON metar_obs (icao)",
     "CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks (status)",
     "CREATE INDEX IF NOT EXISTS idx_analysis_lookup ON analysis_results (kind, region, date_str, variable)",
+    "CREATE INDEX IF NOT EXISTS idx_grid_lookup ON grid_data (variable, region, date_str, analysis, forecast)",
 ]
 
 __all__ = ["SCHEMA_VERSION", "TABLES_DDL", "INDEXES_DDL"]

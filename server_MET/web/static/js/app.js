@@ -61,73 +61,164 @@ document.querySelectorAll(".tab").forEach((tab) => {
 });
 
 /* ---------------------------------------------------------------- dados */
-const REGIONS = [
-  { value: "SP", label: "São Paulo" },
-  { value: "RJ", label: "Rio de Janeiro" },
-  { value: "AM", label: "Amazonas" },
-  { value: "DF", label: "Distrito Federal" },
-  { value: "PR", label: "Paraná" },
-  { value: "RS", label: "Rio Grande do Sul" },
-  { value: "MG", label: "Minas Gerais" },
-  { value: "PA", label: "Pará" },
-  { value: "PE", label: "Pernambuco" },
-  { value: "CE", label: "Ceará" },
-  { value: "SA", label: "América do Sul" },
-  { value: "SP-CIDADE", label: "São Paulo (cidade)" },
-  { value: "RJ-CIDADE", label: "Rio de Janeiro (cidade)" },
-  { value: "AM-CIDADE", label: "Manaus (cidade)" },
-  { value: "DF-CIDADE", label: "Brasília (cidade)" },
-  { value: "PR-CIDADE", label: "Curitiba (cidade)" },
-  { value: "RS-CIDADE", label: "Porto Alegre (cidade)" },
-  { value: "MG-CIDADE", label: "Belo Horizonte (cidade)" },
-  { value: "PA-CIDADE", label: "Belém (cidade)" },
-  { value: "PE-CIDADE", label: "Recife (cidade)" },
-  { value: "CE-CIDADE", label: "Fortaleza (cidade)" },
+const REGION_GROUPS = [
+  {
+    label: "Estados (Brasil)",
+    options: [
+      { value: "SP", label: "São Paulo" },
+      { value: "RJ", label: "Rio de Janeiro" },
+      { value: "AM", label: "Amazonas" },
+      { value: "DF", label: "Distrito Federal" },
+      { value: "PR", label: "Paraná" },
+      { value: "RS", label: "Rio Grande do Sul" },
+      { value: "MG", label: "Minas Gerais" },
+      { value: "PA", label: "Pará" },
+      { value: "PE", label: "Pernambuco" },
+      { value: "CE", label: "Ceará" },
+    ],
+  },
+  {
+    label: "América do Sul",
+    options: [
+      { value: "SA", label: "América do Sul (visão geral)" },
+      { value: "BR", label: "Brasil" },
+      { value: "AR", label: "Argentina" },
+      { value: "BO", label: "Bolívia" },
+      { value: "CL", label: "Chile" },
+      { value: "CO", label: "Colômbia" },
+      { value: "EC", label: "Equador" },
+      { value: "GY", label: "Guiana" },
+      { value: "PY", label: "Paraguai" },
+      { value: "PEU", label: "Peru" },
+      { value: "SR", label: "Suriname" },
+      { value: "UY", label: "Uruguai" },
+      { value: "VE", label: "Venezuela" },
+    ],
+  },
+  {
+    label: "Cidades",
+    options: [
+      { value: "SP-CIDADE", label: "São Paulo (cidade)" },
+      { value: "RJ-CIDADE", label: "Rio de Janeiro (cidade)" },
+      { value: "AM-CIDADE", label: "Manaus (cidade)" },
+      { value: "DF-CIDADE", label: "Brasília (cidade)" },
+      { value: "PR-CIDADE", label: "Curitiba (cidade)" },
+      { value: "RS-CIDADE", label: "Porto Alegre (cidade)" },
+      { value: "MG-CIDADE", label: "Belo Horizonte (cidade)" },
+      { value: "PA-CIDADE", label: "Belém (cidade)" },
+      { value: "PE-CIDADE", label: "Recife (cidade)" },
+      { value: "CE-CIDADE", label: "Fortaleza (cidade)" },
+    ],
+  },
 ];
 
-const VARIABLES = [
-  { value: "temp", label: "Temperatura (nível)" },
-  { value: "temps", label: "Temperatura (superfície)" },
-  { value: "umidadeRel", label: "Umidade relativa" },
-  { value: "nuvem", label: "Nebulosidade" },
-  { value: "chuvaNaoConvec", label: "Chuva acumulada" },
-  { value: "chuvaConvec", label: "Chuva convectiva" },
-  { value: "ps", label: "Pressão na superfície" },
-  { value: "prnm", label: "Pressão ao nível do mar" },
-  { value: "wind", label: "Vento (nível)" },
-  { value: "winds", label: "Vento (superfície)" },
+const VARIABLE_GROUPS = [
+  {
+    label: "Temperatura e umidade",
+    options: [
+      { value: "temp", label: "Temperatura (nível de pressão)" },
+      { value: "temps2m", label: "Temperatura a 2 m" },
+      { value: "temps", label: "Temperatura na superfície" },
+      { value: "dewpoint2m", label: "Ponto de orvalho a 2 m" },
+      { value: "aparente", label: "Temperatura aparente" },
+      { value: "rh2m", label: "Umidade relativa a 2 m" },
+      { value: "umidadeRel", label: "Umidade relativa (nível)" },
+    ],
+  },
+  {
+    label: "Vento",
+    options: [
+      { value: "wind", label: "Vento (nível de pressão)" },
+      { value: "winds", label: "Vento na superfície (10 m)" },
+      { value: "vento10u", label: "Vento U a 10 m" },
+      { value: "vento10v", label: "Vento V a 10 m" },
+      { value: "vento100u", label: "Vento U a 100 m" },
+      { value: "vento100v", label: "Vento V a 100 m" },
+      { value: "rajada", label: "Rajada de vento" },
+    ],
+  },
+  {
+    label: "Precipitação e nuvens",
+    options: [
+      { value: "chuvaNaoConvec", label: "Chuva acumulada" },
+      { value: "chuvaConvec", label: "Chuva convectiva" },
+      { value: "precipitacao", label: "Taxa de precipitação" },
+      { value: "nuvem", label: "Nebulosidade (nível)" },
+      { value: "nuvemTot", label: "Nebulosidade total" },
+      { value: "aguaPrecipitavel", label: "Água precipitável" },
+      { value: "neve", label: "Profundidade de neve" },
+    ],
+  },
+  {
+    label: "Pressão e visibilidade",
+    options: [
+      { value: "ps", label: "Pressão na superfície" },
+      { value: "prnm", label: "Pressão ao nível do mar" },
+      { value: "visibilidade", label: "Visibilidade" },
+      { value: "ventilacao", label: "Ventilação" },
+    ],
+  },
+  {
+    label: "Instabilidade e severidade",
+    options: [
+      { value: "cape", label: "CAPE (energia potencial)" },
+      { value: "cin", label: "CIN (inibição convectiva)" },
+      { value: "indiceLift", label: "Índice de levantamento" },
+      { value: "helicidade", label: "Helicidade relativa à tempestade" },
+      { value: "indiceHaines", label: "Índice de Haines" },
+    ],
+  },
+  {
+    label: "Poluição do ar",
+    options: [
+      { value: "ozonio", label: "Ozônio (nível)" },
+      { value: "ozonioTot", label: "Ozônio total (coluna)" },
+    ],
+  },
 ];
 
-function fillSelect(select, options) {
+function fillSelect(select, groups, withEmpty) {
   select.innerHTML = "";
-  options.forEach((o) => {
+  if (withEmpty) {
     const opt = document.createElement("option");
-    opt.value = o.value;
-    opt.textContent = o.label;
+    opt.value = "";
+    opt.textContent = withEmpty === true ? "—" : withEmpty;
     select.appendChild(opt);
+  }
+  groups.forEach((g) => {
+    const group = document.createElement("optgroup");
+    group.label = g.label;
+    g.options.forEach((o) => {
+      const opt = document.createElement("option");
+      opt.value = o.value;
+      opt.textContent = o.label;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
   });
 }
 
-["anim-region", "stat-region"].forEach((id) => fillSelect(el(id), REGIONS));
-fillSelect(el("anim-variable"), VARIABLES);
-fillSelect(el("stat-variable"), VARIABLES);
+["map-region", "anim-region", "stat-region"].forEach((id) => fillSelect(el(id), REGION_GROUPS));
+["map-variable", "anim-variable", "stat-variable"].forEach((id) => fillSelect(el(id), VARIABLE_GROUPS));
 
 /* ------------------------------------------------- mapa interativo */
-const map = L.map("interactive-map").setView([-15, -52], 4);
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 18,
-  attribution: "© OpenStreetMap",
-}).addTo(map);
-
-let pickMarker = null;
 let picked = null;
-map.on("click", (e) => {
-  picked = { lon: e.latlng.lng, lat: e.latlng.lat };
-  el("pick-lat").textContent = picked.lat.toFixed(4);
-  el("pick-lon").textContent = picked.lon.toFixed(4);
-  if (pickMarker) pickMarker.setLatLng(e.latlng);
-  else pickMarker = L.marker(e.latlng).addTo(map);
-});
+if (document.getElementById("interactive-map") && typeof L !== "undefined") {
+  const map = L.map("interactive-map").setView([-15, -52], 4);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: "© OpenStreetMap",
+  }).addTo(map);
+
+  let pickMarker = null;
+  map.on("click", (e) => {
+    picked = { lon: e.latlng.lng, lat: e.latlng.lat };
+    el("pick-lat").textContent = picked.lat.toFixed(4);
+    el("pick-lon").textContent = picked.lon.toFixed(4);
+    if (pickMarker) pickMarker.setLatLng(e.latlng);
+    else pickMarker = L.marker(e.latlng).addTo(map);
+  });
+}
 
 /* ------------------------------------------------------------ mapas */
 el("btn-generate-map").addEventListener("click", async () => {
@@ -245,7 +336,6 @@ el("btn-generate-stats").addEventListener("click", async () => {
     const common = { region, variable, level, date };
 
     const summary = await apiPost("/analysis/summary", common);
-    const series = await apiPost("/analysis/timeseries", common);
     const charts = await apiPost("/analysis/charts", {
       ...common,
       dpi: 130,
@@ -262,17 +352,23 @@ el("btn-generate-stats").addEventListener("click", async () => {
       )
       .join("");
 
-    const trend = series.trend || {};
-    const trendText = trend.slope !== undefined
-      ? `<div class="msg info">
+    let trendText = "";
+    try {
+      const series = await apiPost("/analysis/timeseries", common);
+      const trend = series.trend || {};
+      if (trend.slope !== undefined) {
+        trendText = `<div class="msg info">
            <strong>Tendência:</strong> ${trend.direction === "crescente" ? "subindo" :
              trend.direction === "decrescente" ? "caindo" : "estável"}
            (${trend.slope > 0 ? "+" : ""}${Number(trend.slope).toFixed(4)} un/hora).
            Confiança estatística: p-valor ${Number(trend.p_value).toFixed(4)} —
            ${trend.p_value < 0.05 ? "há indício forte de tendência" : "pouco indício"}.
            Qualidade do ajuste: R² ${Number(trend.r_squared).toFixed(3)}.
-         </div>`
-      : "";
+         </div>`;
+      }
+    } catch (e) {
+      trendText = `<div class="msg err">Série temporal indisponível: ${e.message}</div>`;
+    }
 
     const chartFigs = (charts.charts || [])
       .map((p) => tmpUrl(p))

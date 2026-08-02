@@ -42,6 +42,7 @@ class Settings:
         self._scheduler_metar_interval_min: Optional[str] = None
         self._scheduler_auto_pipeline: Optional[str] = None
         self._forecast_hours: Optional[str] = None
+        self._pipeline_levels: Optional[str] = None
         self._parse_env_file()
 
     def _parse_env_file(self) -> None:
@@ -81,6 +82,8 @@ class Settings:
                     self._scheduler_auto_pipeline = value
                 elif key == "forecast_hours":
                     self._forecast_hours = value
+                elif key == "pipeline_levels":
+                    self._pipeline_levels = value
 
     def _resolve_dir(self, path_str: Optional[str], default_subdir: str) -> Path:
         if path_str:
@@ -162,6 +165,19 @@ class Settings:
             if hours:
                 return hours
         return list(FORECAST_HOURS)
+
+    @property
+    def pipeline_levels(self) -> list[int]:
+        """Níveis (hPa) gerados no pipeline automático (vazio = todos os GRIB)."""
+        if self._pipeline_levels:
+            levels = []
+            for h in self._pipeline_levels.split(","):
+                h = h.strip()
+                if h.isdigit():
+                    levels.append(int(h))
+            if levels:
+                return levels
+        return []
 
     def ensure_dirs(self) -> None:
         for d in [

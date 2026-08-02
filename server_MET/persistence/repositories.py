@@ -9,6 +9,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+import numpy as np
+
 from server_MET.core.logging_conf import get_logger
 from server_MET.persistence.database import Database, get_database
 
@@ -347,6 +349,110 @@ class AnalysisRepository:
         return int(row["n"]) if row else 0
 
 
+class GridDataRepository:
+    """Dados de grade (matrizes) persistidos também no SQLite.
+
+    Complementa os arquivos CSV (persistência dupla): cada ponto da matriz
+    é inserido como uma linha, permitindo consultas programáticas sem
+    depender de arquivos.
+    """
+
+    def __init__(self, db: Optional[Database] = None) -> None:
+        self.db = db or get_database()
+
+    def save_region(
+        self,
+        variable: str,
+        region: str,
+        date_str: str,
+        analysis: str,
+        forecast: Optional[int],
+        resolution: Optional[str],
+        level: Optional[int],
+        lat: Any,
+        lon: Any,
+        values: Any,
+    ) -> int:
+        """Insere a grade de uma região/variável/forecast num único commit."""
+        lat_arr = list(lat)
+        lon_arr = list(lon)
+        val_flat = np.ravel(np.asarray(values, dtype=float))
+        rows = []
+        for j in range(len(lat_arr)):
+            for i in range(len(lon_arr)):
+                idx = j * len(lon_arr) + i
+                v = float(val_flat[idx]) if idx < val_flat.size else None
+                rows.append(
+                    (
+                        variable, level, region, date_str, analysis,
+                        forecast, resolution, float(lat_arr[j]), float(lon_arr[i]), v,
+                    )
+                )
+        self.db.executemany(
+            """
+            INSERT INTO grid_data
+                (variable, level, region, date_str, analysis, forecast, resolution,
+                 lat, lon, value)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            rows,
+        )
+        return len(rows)
+
+    def delete_region(
+        self,
+        variable: str,
+        region: str,
+        date_str: str,
+        analysis: str,
+        forecast: Optional[int] = None,
+        level: Optional[int] = None,
+    ) -> int:
+        sql = (
+            "DELETE FROM grid_data WHERE variable = ? AND region = ? "
+            "AND date_str = ? AND analysis = ?"
+        )
+        params: list[Any] = [variable, region, date_str, analysis]
+        if forecast is not None:
+            sql += " AND forecast = ?"
+            params.append(forecast)
+        if level is not None:
+            sql += " AND level = ?"
+            params.append(level)
+        cur = self.db.execute(sql, params)
+        return cur.rowcount if cur else 0
+
+    def query(
+        self,
+        variable: str,
+        region: str,
+        date_str: str,
+        analysis: str,
+        forecast: Optional[int] = None,
+        level: Optional[int] = None,
+        limit: int = 100000,
+    ) -> list[dict]:
+        sql = (
+            "SELECT variable, level, region, date_str, analysis, forecast, "
+            "resolution, lat, lon, value FROM grid_data "
+            "WHERE variable = ? AND region = ? AND date_str = ? AND analysis = ?"
+        )
+        params: list[Any] = [variable, region, date_str, analysis]
+        if forecast is not None:
+            sql += " AND forecast = ?"
+            params.append(forecast)
+        if level is not None:
+            sql += " AND level = ?"
+            params.append(level)
+        sql += " ORDER BY lat DESC, lon ASC LIMIT ?"
+        params.append(limit)
+        return self.db.fetchall(sql, params)
+
+    def count(self) -> int:
+        row = self.db.fetchone("SELECT COUNT(*) AS n FROM grid_data")
+        return int(row["n"]) if row else 0
+
+
 class IngestStateRepository:
     """Estado da captação contínua (chave/valor persistido no SQLite)."""
 
@@ -392,5 +498,6 @@ __all__ = [
     "MetarRepository",
     "TaskRepository",
     "AnalysisRepository",
+    "GridDataRepository",
     "IngestStateRepository",
 ]

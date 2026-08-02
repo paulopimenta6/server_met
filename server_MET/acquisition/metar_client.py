@@ -12,19 +12,14 @@ from typing import Optional
 from server_MET.METAR import Metar
 from server_MET.core.constants import NOAA_METAR_URL
 from server_MET.persistence.repositories import MetarRepository
+from server_MET.processing.regions import REGIOES_ICAO
 
 logger = logging.getLogger(__name__)
 
+#: Região (estado/cidade/país) -> aeródromo de referência (ICAO).
+#: Derivado de `REGIOES_ICAO` (regions.py) para manter fonte única.
 AERODROMOS: dict[str, str] = {
-    "SP": "SBGR",
-    "RJ": "SBGL",
-    "CW": "SBCT",
-    "PA": "SBPA",
-    "BH": "SBCF",
-    "BE": "SBBE",
-    "MA": "SBEG",
-    "RF": "SBRF",
-    "FZ": "SBFZ",
+    k: v for k, v in REGIOES_ICAO.items() if v
 }
 
 
@@ -64,7 +59,7 @@ class MetarClient:
         try:
             metar_obj = Metar(icao, text=raw_text)
             props = metar_obj.getAll()
-            return {
+            result = {
                 "station": icao,
                 "station_code": icao,
                 "observation": props.get("dateTime"),
@@ -77,10 +72,38 @@ class MetarClient:
                 "temperatures": props.get("temperatures"),
                 "qnh": props.get("qnh"),
                 "changements": props.get("changements"),
+                "vmc": props.get("vmc"),
             }
+            self._enrich_derived_fields(result)
+            return result
         except Exception as e:
             logger.error("Falha ao decodificar METAR de %s: %s", icao, e)
             return None
+
+    @staticmethod
+    def _enrich_derived_fields(parsed: dict) -> None:
+        """Adiciona campos derivados (conversões) ao dict já decodificado."""
+        wind = parsed.get("wind")
+        if isinstance(wind, dict) and wind.get("speed") is not None:
+            speed_kt = wind["speed"]
+            wind["speed_kmh"] = round(speed_kt * 1.852, 1)
+            if wind.get("gust") is not None:
+                wind["gust_kmh"] = round(wind["gust"] * 1.852, 1)
+
+        temps = parsed.get("temperatures")
+        if isinstance(temps, dict):
+            try:
+                t = float(temps.get("temp", 0))
+                d = float(temps.get("dewpoint", 0))
+                temps["humidity"] = round(
+                    100 * (1 - (t - d) / (273.15 + t)), 1
+                ) if (273.15 + t) else None
+            except (TypeError, ValueError):
+                pass
+
+        visibility = parsed.get("visibility")
+        if isinstance(visibility, int):
+            parsed["visibility_km"] = round(visibility / 1000, 1) if visibility else None
 
     def _extract_metadata(self, data: Optional[list[dict]]) -> Optional[dict]:
         if not data:

@@ -24,6 +24,22 @@ REGIOES_PREDEFINIDAS: dict[str, tuple[float, float, float, float]] = {
     "SA": (-100.00, -20.00, -60.00, 25.00),
 }
 
+#: Países da América do Sul: chave -> bbox (lon_min, lon_max, lat_min, lat_max).
+PAISES_AMERICA_DO_SUL: dict[str, tuple[float, float, float, float]] = {
+    "AR": (-73.50, -53.60, -55.10, -21.80),
+    "BO": (-69.60, -57.50, -22.90, -9.70),
+    "BR": (-74.00, -34.80, -33.80, 5.30),
+    "CL": (-75.60, -66.90, -56.00, -17.50),
+    "CO": (-79.10, -66.90, -4.20, 12.50),
+    "EC": (-81.00, -75.20, -5.00, 1.40),
+    "GY": (-61.40, -56.50, 1.10, 8.60),
+    "PY": (-62.60, -54.20, -27.60, -19.30),
+    "PEU": (-81.30, -68.70, -18.40, -0.03),
+    "SR": (-58.10, -53.90, 1.80, 6.00),
+    "UY": (-58.40, -53.10, -34.90, -30.10),
+    "VE": (-73.40, -59.80, 0.60, 12.20),
+}
+
 #: Raio (graus) da caixa em torno do centro da capital para o mapa da cidade.
 CIDADE_RAIO_GRAUS: float = 0.5
 
@@ -55,6 +71,18 @@ REGIOES_DESCRICOES: dict[str, str] = {
     "PE": "Estado de Pernambuco",
     "CE": "Estado do Ceará",
     "SA": "América do Sul (visão geral)",
+    "AR": "Argentina",
+    "BO": "Bolívia",
+    "BR": "Brasil",
+    "CL": "Chile",
+    "CO": "Colômbia",
+    "EC": "Equador",
+    "GY": "Guiana",
+    "PY": "Paraguai",
+    "PEU": "Peru",
+    "SR": "Suriname",
+    "UY": "Uruguai",
+    "VE": "Venezuela",
     "SP-CIDADE": "Cidade de São Paulo",
     "RJ-CIDADE": "Cidade do Rio de Janeiro",
     "AM-CIDADE": "Cidade de Manaus",
@@ -80,6 +108,18 @@ REGIOES_ICAO: dict[str, str] = {
     "PE": "SBRF",
     "CE": "SBFZ",
     "SA": None,
+    "AR": "SAEZ",
+    "BO": "SLLP",
+    "BR": "SBGR",
+    "CL": "SCEL",
+    "CO": "SKBO",
+    "EC": "SEQM",
+    "GY": "SYCJ",
+    "PY": "SGAS",
+    "PEU": "SPIM",
+    "SR": "SMJP",
+    "UY": "SUMU",
+    "VE": "SVMI",
 }
 
 
@@ -138,10 +178,19 @@ class Region:
                 lon, lat
             )
             return
+        if name in PAISES_AMERICA_DO_SUL:
+            self._name = name
+            self._kind = "pais"
+            lon_min, lon_max, lat_min, lat_max = PAISES_AMERICA_DO_SUL[name]
+            self.lon_min = lon_min
+            self.lon_max = lon_max
+            self.lat_min = lat_min
+            self.lat_max = lat_max
+            return
         if name not in REGIOES_PREDEFINIDAS:
             raise ValueError(
                 f"Região desconhecida: {name}. Opções: "
-                f"{list(REGIOES_PREDEFINIDAS) + list(CIDADES_PREDEFINIDAS)}"
+                f"{list(REGIOES_PREDEFINIDAS) + list(PAISES_AMERICA_DO_SUL) + list(CIDADES_PREDEFINIDAS)}"
             )
         self._name = name
         self._kind = "estado" if name != "SA" else "visao_geral"
@@ -221,8 +270,9 @@ def cidades_predefinidas() -> dict:
 
 
 def todas_as_regioes() -> dict[str, tuple[float, float, float, float]]:
-    """Estado + cidades com as respectivas bboxes."""
+    """Estados + países da América do Sul + cidades com as respectivas bboxes."""
     result = dict(REGIOES_PREDEFINIDAS)
+    result.update(PAISES_AMERICA_DO_SUL)
     for key, (city_name, lon, lat) in CIDADES_PREDEFINIDAS.items():
         result[key] = _cidade_bbox(lon, lat)
     return result
@@ -231,6 +281,7 @@ def todas_as_regioes() -> dict[str, tuple[float, float, float, float]]:
 __all__ = [
     "Region",
     "REGIOES_PREDEFINIDAS",
+    "PAISES_AMERICA_DO_SUL",
     "CIDADES_PREDEFINIDAS",
     "CIDADE_RAIO_GRAUS",
     "REGIOES_DESCRICOES",

@@ -1,4 +1,4 @@
-# Servidor Meteorológico — MET Server (v4.0.0)
+# Servidor Meteorológico — MET Server (v4.1.0)
 
 Servidor que **capta, organiza, analisa e mostra** dados de previsão do tempo do modelo
 **GFS** (da NOAA, agência meteorológica dos EUA), com **mapas, animações, estatísticas**
@@ -90,10 +90,9 @@ O site tem 5 abas:
 | **METAR** | Últimas observações reais dos aeroportos | Clique em "Atualizar" |
 | **Ajuda** | Este guia em linguagem simples | — |
 
-### Regiões: cidades e estados
+### Regiões: cidades, estados e países da América do Sul
 
-Cada localidade tem dois níveis de enquadramento (as coordenadas já vêm
-corretas e a cidade inteira aparece no mapa):
+Cada localidade tem enquadramento preciso (as coordenadas já vêm corretas):
 
 | Código | Estado (região) | Código | Cidade (centro ±0.5°) |
 |---|---|---|---|
@@ -108,6 +107,17 @@ corretas e a cidade inteira aparece no mapa):
 | `PE` | Pernambuco | `PE-CIDADE` | Recife |
 | `CE` | Ceará | `CE-CIDADE` | Fortaleza |
 | `SA` | América do Sul (visão geral) | — | — |
+
+Além dos estados, há **países da América do Sul** prontos (bboxes precisas):
+
+| Código | País | Código | País |
+|---|---|---|---|
+| `BR` | Brasil | `PY` | Paraguai |
+| `AR` | Argentina | `UY` | Uruguai |
+| `BO` | Bolívia | `VE` | Venezuela |
+| `CL` | Chile | `GY` | Guiana |
+| `CO` | Colômbia | `SR` | Suriname |
+| `EC` | Equador | `PEU` | Peru |
 
 Na API também é possível escolher qualquer ponto: envie `lon`/`lat` (o sistema
 monta uma caixa de ±5°) ou uma caixa própria com `lon_min/lon_max/lat_min/lat_max`.
@@ -134,6 +144,7 @@ scheduler_grib_interval_min=60            # a cada X min verifica novo ciclo GFS
 scheduler_metar_interval_min=30           # a cada X min busca METARs
 # scheduler_auto_pipeline=SP,SP-CIDADE    # (opcional) só estas regiões no pipeline
 # forecast_hours=00,06,12,18              # (opcional) horas de previsão a capturar
+# pipeline_levels=500,700,850,925,1000    # (opcional) níveis do pipeline automático
 ```
 
 No código, use sempre o singleton `Settings` (nunca `data/...` direto):
@@ -154,9 +165,14 @@ servidor (ou avulso com `./scripts/run.sh scheduler`):
 1. **GRIB**: a cada `scheduler_grib_interval_min` verifica o ciclo GFS mais
    recente que já deveria estar publicado (o NOMADS publica ~5h após o início
    do ciclo). Se ainda não baixado:
-   - baixa as resoluções 0.25°/0.50°/1.00° (horas 00–18 de previsão);
-   - roda o **pipeline automático**: mapas, matrizes (incl. BlueSky) e análises
-     (resumo, perfil, série com tendência) para todas as regiões predefinidas;
+   - baixa as resoluções 0.25°/0.50°/1.00° (horas de previsão configuradas);
+   - valida cada arquivo em subprocesso (pygrib com timeout) e descarta
+     corrompidos antes de usá-los no pipeline;
+   - roda o **pipeline automático**: mapas e matrizes CSV (persistidas também
+     no SQLite) por nível para todas as regiões predefinidas — Estados,
+     países da América do Sul e cidades;
+   - gera o **perfil vertical** por região (as análises de resumo e série
+     ficam sob demanda pela API);
    - registra o ciclo em `ingest_state` para não repetir.
 2. **METAR**: a cada `scheduler_metar_interval_min` busca os boletins de todas
    as estações e guarda o histórico.
@@ -169,23 +185,73 @@ Acompanhe pelo navegador ou API: `GET /scheduler/status` (ou
 
 ## Variáveis disponíveis
 
+### Temperatura e umidade
+
 | Chave | Significado | Unidade exibida |
 |---|---|---|
 | `temp` | Temperatura (nível de pressão) | °C |
 | `temps` | Temperatura (superfície) | °C |
-| `ps` | Pressão na superfície | hPa |
-| `prnm` | Pressão ao nível do mar | hPa |
-| `nuvem` | Nebulosidade | % |
-| `chuvaNaoConvec` | Chuva acumulada | mm |
-| `chuvaConvec` | Chuva convectiva | mm |
-| `umidadeRel` | Umidade relativa | % |
-| `u` / `v` | Componentes do vento | m/s |
-| `uSupe` / `vSupe` | Componentes do vento na superfície | m/s |
+| `temps2m` | Temperatura a 2 m | °C |
+| `dewpoint2m` | Ponto de orvalho a 2 m | °C |
+| `aparente` | Temperatura aparente (2 m) | °C |
+| `rh2m` | Umidade relativa a 2 m | % |
+| `umidadeRel` | Umidade relativa (nível de pressão) | % |
+
+### Vento
+
+| Chave | Significado | Unidade exibida |
+|---|---|---|
+| `u` / `v` | Componentes do vento (nível de pressão) | m/s |
+| `uSupe` / `vSupe` | Componentes do vento a 10 m | m/s |
+| `vento10u` / `vento10v` | Vento U/V a 10 m | m/s |
+| `vento100u` / `vento100v` | Vento U/V a 100 m | m/s |
+| `rajada` | Rajada de vento | m/s |
 | `wind` / `winds` | **Calculados** a partir de u/v (não são GRIB) | m/s |
 
-Níveis de pressão: 150–1000 hPa (passo de 50, mais 925/950/975). Níveis fora
-do intervalo são ajustados para o mais próximo. Variáveis de superfície usam
-`level` vazio/nulo.
+### Precipitação e nuvens
+
+| Chave | Significado | Unidade exibida |
+|---|---|---|
+| `chuvaNaoConvec` | Chuva acumulada | mm |
+| `chuvaConvec` | Chuva convectiva | mm |
+| `precipitacao` | Taxa de precipitação | mm/h |
+| `nuvem` | Nebulosidade (nível de pressão) | % |
+| `nuvemTot` | Nebulosidade total | % |
+| `aguaPrecipitavel` | Água precipitável | mm |
+| `neve` | Profundidade de neve | cm |
+
+### Pressão e visibilidade
+
+| Chave | Significado | Unidade exibida |
+|---|---|---|
+| `ps` | Pressão na superfície | hPa |
+| `prnm` | Pressão ao nível do mar | hPa |
+| `visibilidade` | Visibilidade | km |
+| `ventilacao` | Ventilação | m²/s |
+
+### Instabilidade e severidade
+
+| Chave | Significado | Unidade exibida |
+|---|---|---|
+| `cape` | CAPE (energia potencial disponível) | J/kg |
+| `cin` | CIN (inibição convectiva) | J/kg |
+| `indiceLift` | Índice de levantamento (Best 4-layer) | K |
+| `helicidade` | Helicidade relativa à tempestade | m²/s² |
+| `indiceHaines` | Índice de Haines | — |
+
+### Poluição do ar
+
+| Chave | Significado | Unidade exibida |
+|---|---|---|
+| `ozonio` | Razão de mistura de ozônio (nível de pressão) | ppb |
+| `ozonioTot` | Ozônio total (coluna) | DU |
+
+**Níveis de pressão**: 1–1000 hPa — o conjunto completo de níveis isobáricos
+do GFS 0.25° (1, 2, 3, 5, 7, 10, 20, 30, 40, 50, 70, 100, 150, 200, 250, 300,
+350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 925, 950, 975, 1000).
+Níveis fora do intervalo são ajustados para o mais próximo disponível.
+Variáveis de superfície (nível fixo, ex.: 2 m/10 m/100 m) ignoram o nível pedido.
+`GribReader.available_levels()` descobre os níveis presentes no arquivo.
 
 ---
 
@@ -201,8 +267,12 @@ Arquivo padrão: **`data/met_server.db`** (`db_file=` no path.conf), modo WAL
 | `metar_obs` | observações METAR (histórico) | `MetarClient` |
 | `tasks` | tarefas em segundo plano (download) | API |
 | `analysis_results` | análises (cache + histórico) | API / pipeline |
+| `grid_data` | pontos de grade (matrizes) — **persistência dupla** dos CSVs | `MatrixGenerator` |
 | `ingest_state` | estado da captação contínua (ciclos processados, horários) | scheduler |
 
+- **Persistência dupla**: cada matriz gerada é salva como CSV em
+  `data/matrizGrib` **e** ponto a ponto na tabela `grid_data`. Consulte sem
+  depender de arquivos via `GET /matrices/data`.
 - **Cache**: repetir a mesma análise não recalcula — responde do banco com a
   marca `"**cached**": true`.
 - **Backup**: basta copiar `data/met_server.db`.
@@ -264,7 +334,7 @@ Base: `http://localhost:8000` · Docs interativas: `/docs`
 | GET | `/info` | Informações da API (JSON) |
 | GET | `/health` | Status, versão, GRIBs disponíveis, uptime |
 | GET | `/variables` | Variáveis (inclui rótulo em português) |
-| GET | `/regions` | Regiões (estados, cidades com centro, bboxes) |
+| GET | `/regions` | Regiões (estados, países da América do Sul, cidades com centro, bboxes) |
 | GET | `/catalog` | Datas/análises/resoluções GRIB disponíveis |
 | GET | `/db/status` | Tabelas do banco e contagens |
 
@@ -286,17 +356,18 @@ Base: `http://localhost:8000` · Docs interativas: `/docs`
 
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/maps/generate` | Mapas PNG (JSON com caminhos em `data/tmp/<uuid>/`) |
+| POST | `/maps/generate` | Mapas PNG (JSON com caminhos em `data/tmp/<uuid>/`; `forecast` filtra a hora de previsão) |
 | POST | `/maps/animate?duration_ms=…` | **GIF animado** das previsões f00–f18 |
 | POST | `/matrices/generate` | Matrizes CSV |
 | POST | `/bluesky/wind` | Matriz BlueSky |
+| GET | `/matrices/data?variable=&region=&date=&analysis=&forecast=&level=` | Consulta pontos de grade do SQLite (persistência dupla) |
 | GET | `/files/{kind}/{path}` | Baixa artefato (`mapas`, `matrizes`, `bluesky`, `analise`, `tmp`) — anti path-traversal |
 
 ```bash
 curl -X POST http://localhost:8000/maps/generate \
   -H "Content-Type: application/json" \
-  -d '{"variable":"temp","level":500,"region":"SP-CIDADE","date":"20260731","analysis":"06"}'
-# → {"maps": ["…/data/tmp/<uuid>/GFS_0.25_Cidade_de_Sao_Paulo_N500_temp_20260731_06_00.png"], "count": 1}
+  -d '{"variable":"ozonio","level":500,"region":"BR","date":"20260801","analysis":"18","forecast":"06"}'
+# → {"maps": ["…/data/tmp/<uuid>/GFS_0.25_Brasil_N500_ozonio_20260801_18_06.png"], "count": 1}
 ```
 
 ### Análises (estatísticas)
@@ -304,7 +375,7 @@ curl -X POST http://localhost:8000/maps/generate \
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/analysis/summary` | Resumo: min, max, média, mediana, DP, percentis p1–p99 |
-| POST | `/analysis/profile` | Perfil vertical em todos os níveis 150–1000 hPa |
+| POST | `/analysis/profile` | Perfil vertical em todos os níveis 1–1000 hPa |
 | POST | `/analysis/timeseries` | Série nas previsões + tendência (slope, p-valor, R²) |
 | POST | `/analysis/charts` | Gráficos PNG (perfil, série, histograma) |
 | GET | `/analysis/regions/{region}` | Estado consolidado da região |
@@ -346,6 +417,19 @@ curl -X POST http://localhost:8000/maps/generate \
 
 ## Changelog
 
+- **v4.1.0** — variáveis profissionais: superfície/próximas da superfície
+  (2 m/10 m/100 m, CAPE, CIN, índice de levantamento, helicidade, rajada,
+  visibilidade, neve, precipitação, vento em 80 m/100 m) e **poluição**
+  (ozônio por nível e ozônio total); **todos os níveis isobáricos do GFS**
+  (1–1000 hPa) com descoberta automática via subprocesso (`available_levels`);
+  **países da América do Sul** como regiões (+ `RegionName`/catálogo/site);
+  **persistência dupla** das matrizes (CSV + tabela `grid_data` e
+  `GET /matrices/data`); pipeline automático expandido (mapas + matrizes por
+  nível, perfil por região, summary/timeseries sob demanda); validação de
+  GRIBs corrompidos no carregamento (subprocesso com timeout); `/maps/generate`
+  e `/matrices/generate` respeitam `forecast`; **METAR primoroso** (estações
+  alinhadas às regiões, VMC, conversões vento/km/h e umidade); site com
+  selects dinâmicos agrupados, guard do Leaflet e estatísticas parciais.
 - **v4.0.0** — mapas corrigidos com **regiões cidade/estado** (bboxes precisas,
   flip de latitude consertado, títulos e legendas completos em português);
   **site interativo** (Leaflet, escolha por latitude/longitude, abas de mapas,

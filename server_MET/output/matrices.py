@@ -13,6 +13,7 @@ import numpy as np
 
 from server_MET.core.config import Settings
 from server_MET.output.base import OutputGeneratorMixin
+from server_MET.persistence.repositories import GridDataRepository
 from server_MET.processing.processor import DataProcessor
 from server_MET.processing.regions import Region
 from server_MET.processing.wind import WindProcessor
@@ -20,15 +21,27 @@ from server_MET.processing.wind import WindProcessor
 logger = logging.getLogger(__name__)
 
 
+def _slugify(text: str) -> str:
+    """Nome seguro para valores (sem acentos, espaços nem pontuação)."""
+    import re
+    import unicodedata
+
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", text).strip("_")
+
+
 class MatrixGenerator(OutputGeneratorMixin):
     def __init__(
         self,
         processor: Optional[DataProcessor] = None,
         wind: Optional[WindProcessor] = None,
+        grid_repo: Optional[GridDataRepository] = None,
     ) -> None:
         self.settings = Settings()
         self.processor = processor or DataProcessor()
         self.wind = wind or WindProcessor()
+        self.grid_repo = grid_repo or GridDataRepository()
         super().__init__("matrix")
 
     def generate(
@@ -105,6 +118,26 @@ class MatrixGenerator(OutputGeneratorMixin):
 
             saved_files.append(filepath)
             logger.info("Matriz salva: %s", filepath)
+
+            try:
+                self.grid_repo.delete_region(
+                    var_name, region.name, msg.dataDate, analysis,
+                    forecast=int(ft), level=resolved_level,
+                )
+                self.grid_repo.save_region(
+                    variable=var_name,
+                    region=region.name,
+                    date_str=msg.dataDate,
+                    analysis=analysis or "",
+                    forecast=int(ft),
+                    resolution=_slugify(str(msg.iDirectionIncrementInDegrees)),
+                    level=resolved_level,
+                    lat=lat,
+                    lon=lon,
+                    values=np.asarray(data),
+                )
+            except Exception as e:
+                logger.warning("Falha ao persistir %s no SQLite: %s", var_name, e)
 
         return saved_files
 

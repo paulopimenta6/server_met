@@ -31,12 +31,14 @@ async def generate_map(
     output_dir = str(settings.dir_tmp / uuid.uuid4().hex)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
+    fhs = [request.forecast] if request.forecast else None
     files = map_generator.generate(
         var_name=request.variable.value,
         region=region,
         level=request.level,
         date_str=date_str,
         analysis=ana,
+        forecast_hours=fhs,
         output_dir=output_dir,
         dpi=request.dpi,
         title=request.title,

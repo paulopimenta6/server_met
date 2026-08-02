@@ -38,47 +38,12 @@
         <div class="grid">
           <div class="controls card">
             <label>Região
-              <select id="map-region">
-                <optgroup label="Estados">
-                  <option value="SP">São Paulo</option>
-                  <option value="RJ">Rio de Janeiro</option>
-                  <option value="AM">Amazonas</option>
-                  <option value="DF">Distrito Federal</option>
-                  <option value="PR">Paraná</option>
-                  <option value="RS">Rio Grande do Sul</option>
-                  <option value="MG">Minas Gerais</option>
-                  <option value="PA">Pará</option>
-                  <option value="PE">Pernambuco</option>
-                  <option value="CE">Ceará</option>
-                  <option value="SA">América do Sul</option>
-                </optgroup>
-                <optgroup label="Cidades">
-                  <option value="SP-CIDADE">São Paulo (cidade)</option>
-                  <option value="RJ-CIDADE">Rio de Janeiro (cidade)</option>
-                  <option value="AM-CIDADE">Manaus (cidade)</option>
-                  <option value="DF-CIDADE">Brasília (cidade)</option>
-                  <option value="PR-CIDADE">Curitiba (cidade)</option>
-                  <option value="RS-CIDADE">Porto Alegre (cidade)</option>
-                  <option value="MG-CIDADE">Belo Horizonte (cidade)</option>
-                  <option value="PA-CIDADE">Belém (cidade)</option>
-                  <option value="PE-CIDADE">Recife (cidade)</option>
-                  <option value="CE-CIDADE">Fortaleza (cidade)</option>
-                </optgroup>
-              </select>
+              <select id="map-region"></select>
             </label>
             <label>Variável
-              <select id="map-variable">
-                <option value="temp">Temperatura (nível)</option>
-                <option value="temps">Temperatura (superfície)</option>
-                <option value="umidadeRel">Umidade relativa</option>
-                <option value="nuvem">Nebulosidade</option>
-                <option value="chuvaNaoConvec">Chuva acumulada</option>
-                <option value="ps">Pressão na superfície</option>
-                <option value="wind">Vento (nível)</option>
-                <option value="winds">Vento (superfície)</option>
-              </select>
+              <select id="map-variable"></select>
             </label>
-            <label>Nível (hPa) <input type="number" id="map-level" value="500" min="150" max="1000"></label>
+            <label>Nível (hPa) <input type="number" id="map-level" value="500" min="1" max="1000"></label>
             <label>Data <input type="date" id="map-date"></label>
             <label>Análise (hora Z)
               <select id="map-analysis">
@@ -125,7 +90,7 @@
         <div class="controls card">
           <label>Região <select id="anim-region"></select></label>
           <label>Variável <select id="anim-variable"></select></label>
-          <label>Nível (hPa) <input type="number" id="anim-level" value="500" min="150" max="1000"></label>
+          <label>Nível (hPa) <input type="number" id="anim-level" value="500" min="1" max="1000"></label>
           <label>Data <input type="date" id="anim-date"></label>
           <label>Análise (hora Z)
             <select id="anim-analysis">
@@ -160,7 +125,7 @@
         <div class="controls card">
           <label>Região <select id="stat-region"></select></label>
           <label>Variável <select id="stat-variable"></select></label>
-          <label>Nível (hPa) <input type="number" id="stat-level" value="500" min="150" max="1000"></label>
+          <label>Nível (hPa) <input type="number" id="stat-level" value="500" min="1" max="1000"></label>
           <label>Data <input type="date" id="stat-date"></label>
           <button id="btn-generate-stats" class="btn primary">Ver estatísticas</button>
         </div>
@@ -246,7 +211,7 @@
 
   <footer>
     <p>
-      MET Server v4 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
+      MET Server v4.1 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
     </p>
   </footer>
 

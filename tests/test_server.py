@@ -9,7 +9,7 @@ async def test_health_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert data["version"] == "4.0.0"
+    assert data["version"] == "4.1.0"
     assert "grib_files_available" in data
 
 
@@ -26,7 +26,7 @@ async def test_info_endpoint(client):
     response = await client.get("/info")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "4.0.0"
+    assert data["version"] == "4.1.0"
     assert "/docs" in data["docs"]
 
 
@@ -158,7 +158,7 @@ async def test_bluesky_wind_missing_grib(client):
 async def test_metar_stations(client):
     response = await client.get("/metar/stations")
     assert response.status_code == 200
-    assert len(response.json()["stations"]) == 9
+    assert len(response.json()["stations"]) == 22
 
 
 @pytest.mark.asyncio
@@ -223,7 +223,7 @@ async def test_db_status(client, isolated_db):
     data = response.json()
     assert set(data["tables"]) == {
         "downloads", "outputs", "metar_obs", "tasks", "analysis_results",
-        "ingest_state",
+        "ingest_state", "grid_data",
     }
 
 

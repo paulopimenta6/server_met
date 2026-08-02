@@ -29,12 +29,49 @@ logger = get_logger(__name__)
 PUBLISH_DELAY_HOURS = 5
 
 #: (variável, nível) gerados automaticamente pelo pipeline por região.
+#: Para variáveis com nível `None` usa-se superfície/nível fixo; variáveis
+#: com nível na lista expandem para todos os níveis disponíveis no GRIB
+#: (limitados por `Settings.pipeline_levels`, se configurado).
 PIPELINE_VARS: list[tuple[str, Optional[int]]] = [
     ("temp", 500),
     ("temp", 850),
     ("umidadeRel", 850),
+    ("nuvem", 850),
+    ("ozonio", 500),
     ("winds", None),
+    ("uSupe", 10),
+    ("vSupe", 10),
+    ("temps2m", 2),
+    ("dewpoint2m", 2),
+    ("rh2m", 2),
+    ("aparente", 2),
+    ("nuvemTot", None),
     ("chuvaNaoConvec", None),
+    ("chuvaConvec", None),
+    ("precipitacao", None),
+    ("ps", None),
+    ("prnm", None),
+    ("rajada", None),
+    ("neve", None),
+    ("visibilidade", None),
+    ("cape", None),
+    ("cin", None),
+    ("indiceLift", None),
+    ("helicidade", 3000),
+    ("indiceHaines", None),
+    ("aguaPrecipitavel", None),
+    ("ozonioTot", None),
+    ("ventilacao", None),
+]
+
+#: Variáveis do pipeline cujo nível é variável e deve ser expandido
+#: para todos os níveis disponíveis no GRIB (exceto quando fixado em
+#: `PIPELINE_VARS` ou em `Settings.pipeline_levels`).
+PIPELINE_LEVELED_VARS: tuple[str, ...] = ("temp", "umidadeRel", "nuvem", "ozonio", "u", "v")
+
+#: Níveis comuns (hPa) usados quando a descoberta automática falha.
+PIPELINE_DEFAULT_LEVELS: list[int] = [
+    200, 250, 300, 400, 500, 700, 850, 925, 1000,
 ]
 
 
@@ -105,10 +142,12 @@ class SchedulerRunner:
                 return
 
     def _run_pipeline(self, date_str: str, ana: str) -> None:
-        """Gera mapas, matrizes e análises das regiões predefinidas."""
+        """Gera mapas e matrizes CSV das regiões predefinidas (por nível).
+
+        Análises (summary/timeseries) ficam sob demanda; profile é gerado
+        para cada variável com nível (percorre os níveis internamente).
+        """
         from server_MET.analysis.profiles import ProfileAnalyzer
-        from server_MET.analysis.statistics import StatisticsAnalyzer
-        from server_MET.analysis.timeseries import TimeSeriesAnalyzer
         from server_MET.output.maps import MapGenerator
         from server_MET.output.matrices import MatrixGenerator
         from server_MET.persistence.repositories import AnalysisRepository
@@ -126,17 +165,17 @@ class SchedulerRunner:
                 allowed = set(self.settings.scheduler_auto_pipeline)
                 regions = [r for r in regions if r in allowed]
 
+            combos = self._expand_pipeline_combos(date_str, ana)
+
             map_gen = MapGenerator()
             matrix_gen = MatrixGenerator()
-            stats = StatisticsAnalyzer()
             profiles = ProfileAnalyzer()
-            series = TimeSeriesAnalyzer()
             analysis_repo = AnalysisRepository()
 
             total = 0
             for region_name in regions:
                 region = Region(name=region_name)
-                for var_name, level in PIPELINE_VARS:
+                for var_name, level in combos:
                     try:
                         total += len(map_gen.generate(
                             var_name, region, level, date_str, ana,
@@ -144,27 +183,13 @@ class SchedulerRunner:
                         matrix_gen.generate(
                             var_name, region, level, date_str, ana,
                         )
-                        rows = stats.summarize(var_name, region, level, date_str, ana)
-                        if rows:
-                            analysis_repo.save(
-                                "summary",
-                                {"variable": var_name, "region": region.name,
-                                 "date": date_str, "analysis": ana,
-                                 "results": rows},
-                                var_name, level, region.name, date_str, ana,
-                            )
-                        prof = profiles.profile(var_name, region, date_str, ana)
-                        if prof.get("profile"):
-                            analysis_repo.save(
-                                "profile", prof, var_name, None,
-                                region.name, date_str, ana,
-                            )
-                        ts = series.timeseries(var_name, region, level, date_str, ana)
-                        if ts.get("series"):
-                            analysis_repo.save(
-                                "timeseries", ts, var_name, level,
-                                region.name, date_str, ana,
-                            )
+                        if var_name in PIPELINE_LEVELED_VARS and level is None:
+                            prof = profiles.profile(var_name, region, date_str, ana)
+                            if prof.get("profile"):
+                                analysis_repo.save(
+                                    "profile", prof, var_name, None,
+                                    region.name, date_str, ana,
+                                )
                     except Exception as e:
                         logger.warning(
                             "Pipeline: falha em %s/%s/%s: %s",
@@ -174,6 +199,31 @@ class SchedulerRunner:
                         date_str, ana, total)
         finally:
             self.pipeline_running = False
+
+    def _expand_pipeline_combos(
+        self, date_str: str, ana: str
+    ) -> list[tuple[str, Optional[int]]]:
+        """Expande PIPELINE_VARS: níveis None de variáveis com nível viram
+        todos os níveis disponíveis no GRIB (ou `Settings.pipeline_levels`)."""
+        if not self.settings.pipeline_levels:
+            from server_MET.acquisition.grib_reader import GribReader
+
+            reader = GribReader()
+            forecast = self.settings.forecast_hours[0] if self.settings.forecast_hours else "00"
+            available = reader.available_levels(date_str, ana, forecast)
+            if not available:
+                available = PIPELINE_DEFAULT_LEVELS
+            levels = available
+        else:
+            levels = self.settings.pipeline_levels
+
+        combos: list[tuple[str, Optional[int]]] = []
+        for var_name, level in PIPELINE_VARS:
+            if level is None and var_name in PIPELINE_LEVELED_VARS:
+                combos.extend((var_name, lvl) for lvl in levels)
+            else:
+                combos.append((var_name, level))
+        return combos
 
     # ------------------------------------------------------------ METAR
     async def _metar_loop(self) -> None:
@@ -248,4 +298,6 @@ __all__ = [
     "latest_published_cycle",
     "previous_cycle",
     "PIPELINE_VARS",
+    "PIPELINE_LEVELED_VARS",
+    "PIPELINE_DEFAULT_LEVELS",
 ]

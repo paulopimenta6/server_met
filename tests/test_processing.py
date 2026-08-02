@@ -44,7 +44,8 @@ class TestMetarClient:
     def test_aerodromos(self):
         assert "SP" in AERODROMOS
         assert AERODROMOS["SP"] == "SBGR"
-        assert len(AERODROMOS) == 9
+        assert AERODROMOS["AR"] == "SAEZ"
+        assert len(AERODROMOS) == 22
 
     def test_metar_url(self):
         assert "aviationweather.gov" in NOAA_METAR_URL

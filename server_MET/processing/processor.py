@@ -10,12 +10,17 @@ import pygrib
 from server_MET.acquisition.grib_downloader import get_current_analysis_hour, get_date_str
 from server_MET.acquisition.grib_reader import GribReader
 from server_MET.core.config import Settings
-from server_MET.core.constants import PRESSURE_LEVELS, UNITS_MAP, VAR_MAP
+from server_MET.core.constants import (
+    PRESSURE_LEVELS,
+    UNITS_MAP,
+    VAR_FIXED_LEVEL,
+    VAR_MAP,
+)
 
 logger = logging.getLogger(__name__)
 
 #: Variáveis com nível de pressão (passíveis de snap de nível).
-LEVELED_VARIABLES = ("temp", "nuvem", "umidadeRel", "u", "v")
+LEVELED_VARIABLES = ("temp", "nuvem", "umidadeRel", "u", "v", "ozonio")
 
 
 class DataProcessor:
@@ -33,8 +38,10 @@ class DataProcessor:
         if requested_level is None:
             return None
         if var_name in LEVELED_VARIABLES:
-            requested_level = int(min(1000, max(150, requested_level)))
+            requested_level = int(min(1000, max(1, requested_level)))
             return min(PRESSURE_LEVELS, key=lambda x: abs(x - requested_level))
+        if var_name in VAR_FIXED_LEVEL:
+            return VAR_FIXED_LEVEL[var_name]
         return requested_level
 
     def load_gribs(
@@ -61,6 +68,8 @@ class DataProcessor:
                     )
                     break
 
+        files = self.reader.filter_healthy(files)
+
         grib_objs = []
         for f in files:
             grb = self.reader.open_grib(f)
@@ -81,6 +90,10 @@ class DataProcessor:
 
         name, type_of_level = VAR_MAP[var_name]
         results = []
+
+        # Variáveis com nível fixo (2 m, 10 m, 100 m etc.) ignoram o nível pedido.
+        if level is None and var_name in VAR_FIXED_LEVEL:
+            level = VAR_FIXED_LEVEL[var_name]
 
         for grb in grib_objs:
             try:
@@ -187,12 +200,22 @@ class DataProcessor:
         self, data: np.ndarray, var_name: str
     ) -> tuple[np.ndarray, str]:
         """Converte unidades GRIB para as unidades de exibição internas."""
-        if var_name in ("temp", "temps"):
+        if var_name in ("temp", "temps", "temps2m", "dewpoint2m", "aparente"):
             return data - 273.15, "°C"
         if var_name in ("ps", "prnm"):
             return data / 100, "hPa"
         if var_name in ("chuvaNaoConvec", "chuvaConvec"):
             return data, "mm"
+        if var_name in ("precipitacao",):
+            # GRIB em kg/m²/s -> mm/h (1 kg/m² = 1 mm).
+            return data * 3600, "mm/h"
+        if var_name == "neve":
+            return data * 100, "cm"
+        if var_name == "visibilidade":
+            return data / 1000, "km"
+        if var_name == "ozonio":
+            # Razão de mistura em massa (kg/kg) -> ppb (volume).
+            return data * 6.0e8, "ppb"
         return data, UNITS_MAP.get(var_name, "units")
 
     def close_gribs(self, grib_objs: list[pygrib.gribmessage]) -> None:
@@ -203,4 +226,4 @@ class DataProcessor:
                 pass
 
 
-__all__ = ["DataProcessor", "VAR_MAP", "PRESSURE_LEVELS"]
+__all__ = ["DataProcessor", "VAR_MAP", "PRESSURE_LEVELS", "VAR_FIXED_LEVEL"]

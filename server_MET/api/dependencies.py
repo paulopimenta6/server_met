@@ -21,6 +21,7 @@ from server_MET.output.matrices import MatrixGenerator
 from server_MET.persistence.repositories import (
     AnalysisRepository,
     DownloadRepository,
+    GridDataRepository,
     MetarRepository,
     OutputRepository,
     TaskRepository,
@@ -111,6 +112,10 @@ def get_analysis_repo() -> AnalysisRepository:
     return _get("analysis_repo", AnalysisRepository)
 
 
+def get_grid_repo() -> GridDataRepository:
+    return _get("grid_repo", GridDataRepository)
+
+
 def build_region(req) -> Region:
     """Constrói uma Region a partir de um modelo com campos de seleção."""
     if req.region:
@@ -176,6 +181,7 @@ __all__ = [
     "get_metar_repo",
     "get_task_repo",
     "get_analysis_repo",
+    "get_grid_repo",
     "build_region",
     "resolve_path",
     "safe_join",

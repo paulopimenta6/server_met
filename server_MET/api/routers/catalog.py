@@ -11,9 +11,9 @@ from server_MET.core.constants import COMPUTED_VARIABLES, VAR_MAP, var_label
 from server_MET.core.models import MetVariable
 from server_MET.processing.regions import (
     CIDADES_PREDEFINIDAS,
+    PAISES_AMERICA_DO_SUL,
     REGIOES_DESCRICOES,
     REGIOES_PREDEFINIDAS,
-    todas_as_regioes,
 )
 
 router = APIRouter(tags=["catalog"])
@@ -48,6 +48,15 @@ async def list_regions():
             {
                 "name": k,
                 "kind": "estado" if k != "SA" else "visao_geral",
+                "bounds": list(v),
+                "description": REGIOES_DESCRICOES.get(k, ""),
+            }
+        )
+    for k, v in PAISES_AMERICA_DO_SUL.items():
+        regions.append(
+            {
+                "name": k,
+                "kind": "pais",
                 "bounds": list(v),
                 "description": REGIOES_DESCRICOES.get(k, ""),
             }

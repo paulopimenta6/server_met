@@ -128,7 +128,7 @@ class TestConstants:
         assert all(k in VAR_MAP for k in expected)
 
     def test_pressure_levels_range(self):
-        assert min(PRESSURE_LEVELS) == 150
+        assert min(PRESSURE_LEVELS) == 1
         assert max(PRESSURE_LEVELS) == 1000
 
     def test_unit_map(self):
@@ -143,7 +143,7 @@ class TestProcessorHelpers:
 
     def test_resolve_level_below_min(self):
         p = DataProcessor()
-        assert p.resolve_level("temp", 50) == 150
+        assert p.resolve_level("temp", -5) == 1
 
     def test_resolve_level_above_max(self):
         p = DataProcessor()
