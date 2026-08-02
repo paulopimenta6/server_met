@@ -1,36 +1,70 @@
-"""Regiões predefinidas e seleção de região (nome, bbox ou centro)."""
+"""Regiões predefinidas e seleção de região (nome, bbox ou centro).
+
+Desde a v4, cada localidade tem dois níveis de enquadramento:
+- **Estado** (chave como ``SP``): caixa que cobre o estado inteiro.
+- **Cidade** (chave como ``SP-CIDADE``): caixa pequena (±0.5°) em torno da
+  capital, de modo que a cidade inteira fique visível no mapa.
+"""
 from __future__ import annotations
 
 from typing import Optional
 
-#: (lon_min, lon_max, lat_min, lat_max)
+#: (lon_min, lon_max, lat_min, lat_max) — bboxes precisas dos ESTADOS.
 REGIOES_PREDEFINIDAS: dict[str, tuple[float, float, float, float]] = {
-    "SP": (-56, -42, -28, -18),
-    "RJ": (-46, -36, -27, -17),
-    "AM": (-65, -55, -7, 7),
-    "DF": (-54, -44, -20, -10),
-    "PR": (-54, -44, -30, -20),
-    "RS": (-56, -46, -34, -24),
-    "MG": (-48, -38, -24, -14),
-    "PA": (-53, -43, -6, 4),
-    "PE": (-39, -29, -13, -3),
-    "CE": (-43, -33, -8, 2),
-    "SA": (-100, -20, -60, 25),
+    "SP": (-53.10, -44.10, -25.30, -19.70),
+    "RJ": (-45.00, -40.80, -23.40, -20.70),
+    "AM": (-73.80, -56.00, -9.20, 4.50),
+    "DF": (-48.30, -47.30, -16.10, -15.50),
+    "PR": (-54.60, -48.00, -26.70, -22.50),
+    "RS": (-57.60, -49.60, -33.70, -27.00),
+    "MG": (-51.00, -39.80, -22.90, -14.20),
+    "PA": (-58.90, -46.00, -9.80, 2.40),
+    "PE": (-41.40, -34.80, -9.50, -7.10),
+    "CE": (-41.40, -37.20, -7.90, -2.40),
+    "SA": (-100.00, -20.00, -60.00, 25.00),
+}
+
+#: Raio (graus) da caixa em torno do centro da capital para o mapa da cidade.
+CIDADE_RAIO_GRAUS: float = 0.5
+
+#: Cidades predefinidas: chave -> (nome da cidade, lon, lat).
+#: A caixa do mapa é calculada como centro ± CIDADE_RAIO_GRAUS.
+CIDADES_PREDEFINIDAS: dict[str, tuple[str, float, float]] = {
+    "SP-CIDADE": ("São Paulo", -46.6333, -23.5505),
+    "RJ-CIDADE": ("Rio de Janeiro", -43.1964, -22.9068),
+    "AM-CIDADE": ("Manaus", -60.0258, -3.1019),
+    "DF-CIDADE": ("Brasília", -47.9297, -15.7801),
+    "PR-CIDADE": ("Curitiba", -49.2733, -25.4284),
+    "RS-CIDADE": ("Porto Alegre", -51.2253, -30.0346),
+    "MG-CIDADE": ("Belo Horizonte", -43.9378, -19.9167),
+    "PA-CIDADE": ("Belém", -48.5044, -1.4558),
+    "PE-CIDADE": ("Recife", -34.8778, -8.0476),
+    "CE-CIDADE": ("Fortaleza", -38.5428, -3.7187),
 }
 
 #: Descrições amigáveis por região (exibição e documentação).
 REGIOES_DESCRICOES: dict[str, str] = {
-    "SP": "São Paulo e entorno",
-    "RJ": "Rio de Janeiro e entorno",
-    "AM": "Amazonas (região de Manaus)",
-    "DF": "Distrito Federal / Centro-Oeste",
-    "PR": "Paraná",
-    "RS": "Rio Grande do Sul",
-    "MG": "Minas Gerais",
-    "PA": "Pará (região de Belém)",
-    "PE": "Pernambuco (região de Recife)",
-    "CE": "Ceará (região de Fortaleza)",
+    "SP": "Estado de São Paulo",
+    "RJ": "Estado do Rio de Janeiro",
+    "AM": "Estado do Amazonas",
+    "DF": "Distrito Federal",
+    "PR": "Estado do Paraná",
+    "RS": "Estado do Rio Grande do Sul",
+    "MG": "Estado de Minas Gerais",
+    "PA": "Estado do Pará",
+    "PE": "Estado de Pernambuco",
+    "CE": "Estado do Ceará",
     "SA": "América do Sul (visão geral)",
+    "SP-CIDADE": "Cidade de São Paulo",
+    "RJ-CIDADE": "Cidade do Rio de Janeiro",
+    "AM-CIDADE": "Cidade de Manaus",
+    "DF-CIDADE": "Cidade de Brasília",
+    "PR-CIDADE": "Cidade de Curitiba",
+    "RS-CIDADE": "Cidade de Porto Alegre",
+    "MG-CIDADE": "Cidade de Belo Horizonte",
+    "PA-CIDADE": "Cidade de Belém",
+    "PE-CIDADE": "Cidade de Recife",
+    "CE-CIDADE": "Cidade de Fortaleza",
 }
 
 #: Aeródromo de referência por região (para METAR).
@@ -49,11 +83,21 @@ REGIOES_ICAO: dict[str, str] = {
 }
 
 
+def _cidade_bbox(lon: float, lat: float, raio: float = CIDADE_RAIO_GRAUS):
+    return (
+        max(-180, lon - raio),
+        min(180, lon + raio),
+        max(-90, lat - raio),
+        min(90, lat + raio),
+    )
+
+
 class Region:
     """Região geográfica com nome preservado (quando predefinida).
 
-    Aceita: nome predefinido, bbox (lon_min/lon_max/lat_min/lat_max) ou
-    centro (lon/lat com raio padrão de ±5°).
+    Aceita: nome predefinido (estado como ``SP`` ou cidade como ``SP-CIDADE``),
+    bbox (lon_min/lon_max/lat_min/lat_max) ou centro (lon/lat com raio padrão
+    de ±5°).
     """
 
     def __init__(
@@ -67,6 +111,8 @@ class Region:
         center_lat: Optional[float] = None,
     ) -> None:
         self._name: Optional[str] = None
+        self._kind: str = "bbox"
+        self._city_name: Optional[str] = None
         if name:
             self._load_predefined(name)
         elif all(v is not None for v in [lon_min, lon_max, lat_min, lat_max]):
@@ -83,11 +129,22 @@ class Region:
 
     def _load_predefined(self, name: str) -> None:
         name = name.upper()
+        if name in CIDADES_PREDEFINIDAS:
+            city_name, lon, lat = CIDADES_PREDEFINIDAS[name]
+            self._name = name
+            self._kind = "cidade"
+            self._city_name = city_name
+            self.lon_min, self.lon_max, self.lat_min, self.lat_max = _cidade_bbox(
+                lon, lat
+            )
+            return
         if name not in REGIOES_PREDEFINIDAS:
             raise ValueError(
-                f"Região desconhecida: {name}. Opções: {list(REGIOES_PREDEFINIDAS)}"
+                f"Região desconhecida: {name}. Opções: "
+                f"{list(REGIOES_PREDEFINIDAS) + list(CIDADES_PREDEFINIDAS)}"
             )
         self._name = name
+        self._kind = "estado" if name != "SA" else "visao_geral"
         lon_min, lon_max, lat_min, lat_max = REGIOES_PREDEFINIDAS[name]
         self.lon_min = lon_min
         self.lon_max = lon_max
@@ -95,6 +152,7 @@ class Region:
         self.lat_max = lat_max
 
     def _from_center(self, lon: float, lat: float) -> None:
+        self._kind = "centro"
         self.lat_min = max(-85, lat - 5)
         self.lat_max = min(85, lat + 5)
         self.lon_min = max(-180, lon - 5)
@@ -113,6 +171,22 @@ class Region:
             f"LonMin:{self.lon_min}_LonMax:{self.lon_max}"
             f"_LatMin:{self.lat_min}_LatMax:{self.lat_max}"
         )
+
+    @property
+    def kind(self) -> str:
+        """Tipo da região: estado, cidade, visao_geral, bbox ou centro."""
+        return self._kind
+
+    @property
+    def city_name(self) -> Optional[str]:
+        return self._city_name
+
+    @property
+    def full_name(self) -> str:
+        """Nome completo exibido em títulos e arquivos (ex.: 'Cidade de São Paulo')."""
+        if self._name:
+            return REGIOES_DESCRICOES.get(self._name, self._name)
+        return self.name
 
     @property
     def is_predefined(self) -> bool:
@@ -141,4 +215,27 @@ def regioes_predefinidas() -> dict:
     return REGIOES_PREDEFINIDAS.copy()
 
 
-__all__ = ["Region", "REGIOES_PREDEFINIDAS", "REGIOES_DESCRICOES", "REGIOES_ICAO", "regioes_predefinidas"]
+def cidades_predefinidas() -> dict:
+    """Retorna o centro (lon, lat) de cada cidade predefinida."""
+    return {k: (v[1], v[2]) for k, v in CIDADES_PREDEFINIDAS.items()}
+
+
+def todas_as_regioes() -> dict[str, tuple[float, float, float, float]]:
+    """Estado + cidades com as respectivas bboxes."""
+    result = dict(REGIOES_PREDEFINIDAS)
+    for key, (city_name, lon, lat) in CIDADES_PREDEFINIDAS.items():
+        result[key] = _cidade_bbox(lon, lat)
+    return result
+
+
+__all__ = [
+    "Region",
+    "REGIOES_PREDEFINIDAS",
+    "CIDADES_PREDEFINIDAS",
+    "CIDADE_RAIO_GRAUS",
+    "REGIOES_DESCRICOES",
+    "REGIOES_ICAO",
+    "regioes_predefinidas",
+    "cidades_predefinidas",
+    "todas_as_regioes",
+]

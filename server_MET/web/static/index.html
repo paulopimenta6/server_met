@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MET Server — Mapas do Tempo</title>
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🌦</span>
+      <div>
+        <h1>MET Server</h1>
+        <p class="subtitle">Mapas e dados meteorológicos do modelo GFS (NOAA)</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="mapas">Mapas</button>
+      <button class="tab" data-tab="animacoes">Animações</button>
+      <button class="tab" data-tab="estatisticas">Estatísticas</button>
+      <button class="tab" data-tab="metar">METAR</button>
+      <button class="tab" data-tab="ajuda">Ajuda</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ ABA: MAPAS ============ -->
+    <section id="tab-mapas" class="tab-content active">
+      <div class="panel">
+        <h2>Mapas meteorológicos</h2>
+        <p class="hint">
+          Escolha uma cidade ou estado pronto, ou clique no mapa para escolher
+          uma região pela latitude e longitude. Depois clique em
+          <strong>Gerar mapa</strong>.
+        </p>
+        <div class="grid">
+          <div class="controls card">
+            <label>Região
+              <select id="map-region">
+                <optgroup label="Estados">
+                  <option value="SP">São Paulo</option>
+                  <option value="RJ">Rio de Janeiro</option>
+                  <option value="AM">Amazonas</option>
+                  <option value="DF">Distrito Federal</option>
+                  <option value="PR">Paraná</option>
+                  <option value="RS">Rio Grande do Sul</option>
+                  <option value="MG">Minas Gerais</option>
+                  <option value="PA">Pará</option>
+                  <option value="PE">Pernambuco</option>
+                  <option value="CE">Ceará</option>
+                  <option value="SA">América do Sul</option>
+                </optgroup>
+                <optgroup label="Cidades">
+                  <option value="SP-CIDADE">São Paulo (cidade)</option>
+                  <option value="RJ-CIDADE">Rio de Janeiro (cidade)</option>
+                  <option value="AM-CIDADE">Manaus (cidade)</option>
+                  <option value="DF-CIDADE">Brasília (cidade)</option>
+                  <option value="PR-CIDADE">Curitiba (cidade)</option>
+                  <option value="RS-CIDADE">Porto Alegre (cidade)</option>
+                  <option value="MG-CIDADE">Belo Horizonte (cidade)</option>
+                  <option value="PA-CIDADE">Belém (cidade)</option>
+                  <option value="PE-CIDADE">Recife (cidade)</option>
+                  <option value="CE-CIDADE">Fortaleza (cidade)</option>
+                </optgroup>
+              </select>
+            </label>
+            <label>Variável
+              <select id="map-variable">
+                <option value="temp">Temperatura (nível)</option>
+                <option value="temps">Temperatura (superfície)</option>
+                <option value="umidadeRel">Umidade relativa</option>
+                <option value="nuvem">Nebulosidade</option>
+                <option value="chuvaNaoConvec">Chuva acumulada</option>
+                <option value="ps">Pressão na superfície</option>
+                <option value="wind">Vento (nível)</option>
+                <option value="winds">Vento (superfície)</option>
+              </select>
+            </label>
+            <label>Nível (hPa) <input type="number" id="map-level" value="500" min="150" max="1000"></label>
+            <label>Data <input type="date" id="map-date"></label>
+            <label>Análise (hora Z)
+              <select id="map-analysis">
+                <option value="">Automática</option>
+                <option value="00">00</option>
+                <option value="06">06</option>
+                <option value="12">12</option>
+                <option value="18">18</option>
+              </select>
+            </label>
+            <label>Previsão (+h)
+              <select id="map-forecast">
+                <option value="">Todas (00/06/12/18)</option>
+                <option value="00">+00h (agora)</option>
+                <option value="06">+06h</option>
+                <option value="12">+12h</option>
+                <option value="18">+18h</option>
+              </select>
+            </label>
+            <button id="btn-generate-map" class="btn primary">Gerar mapa</button>
+            <div class="coord-info card">
+              <strong>Escolha no mapa ao lado:</strong>
+              <div>Latitude: <span id="pick-lat">—</span></div>
+              <div>Longitude: <span id="pick-lon">—</span></div>
+              <button id="btn-use-coords" class="btn">Usar este ponto</button>
+            </div>
+          </div>
+          <div class="card map-wrap">
+            <div id="interactive-map"></div>
+          </div>
+        </div>
+        <div id="map-results" class="results"></div>
+      </div>
+    </section>
+
+    <!-- ============ ABA: ANIMAÇÕES ============ -->
+    <section id="tab-animacoes" class="tab-content">
+      <div class="panel">
+        <h2>Animações (GIF)</h2>
+        <p class="hint">
+          Gera um GIF animado com a evolução da variável nas horas de previsão
+          (agora, +6h, +12h e +18h) — um quadro para cada previsão.
+        </p>
+        <div class="controls card">
+          <label>Região <select id="anim-region"></select></label>
+          <label>Variável <select id="anim-variable"></select></label>
+          <label>Nível (hPa) <input type="number" id="anim-level" value="500" min="150" max="1000"></label>
+          <label>Data <input type="date" id="anim-date"></label>
+          <label>Análise (hora Z)
+            <select id="anim-analysis">
+              <option value="">Automática</option>
+              <option value="00">00</option>
+              <option value="06">06</option>
+              <option value="12">12</option>
+              <option value="18">18</option>
+            </select>
+          </label>
+          <label>Velocidade do GIF
+            <select id="anim-speed">
+              <option value="700">Normal</option>
+              <option value="400">Rápida</option>
+              <option value="1200">Lenta</option>
+            </select>
+          </label>
+          <button id="btn-generate-anim" class="btn primary">Gerar animação</button>
+        </div>
+        <div id="anim-results" class="results"></div>
+      </div>
+    </section>
+
+    <!-- ============ ABA: ESTATÍSTICAS ============ -->
+    <section id="tab-estatisticas" class="tab-content">
+      <div class="panel">
+        <h2>Estatísticas da região</h2>
+        <p class="hint">
+          Resumo numérico (mínimo, máximo, média, mediana, desvio padrão e
+          percentis) e gráficos da variável escolhida sobre a região.
+        </p>
+        <div class="controls card">
+          <label>Região <select id="stat-region"></select></label>
+          <label>Variável <select id="stat-variable"></select></label>
+          <label>Nível (hPa) <input type="number" id="stat-level" value="500" min="150" max="1000"></label>
+          <label>Data <input type="date" id="stat-date"></label>
+          <button id="btn-generate-stats" class="btn primary">Ver estatísticas</button>
+        </div>
+        <div id="stat-results"></div>
+      </div>
+    </section>
+
+    <!-- ============ ABA: METAR ============ -->
+    <section id="tab-metar" class="tab-content">
+      <div class="panel">
+        <h2>Observações METAR (aeroportos)</h2>
+        <p class="hint">
+          Observações reais das estações meteorológicas dos aeroportos, lidas
+          automaticamente a cada poucos minutos.
+        </p>
+        <button id="btn-refresh-metar" class="btn">Atualizar</button>
+        <div id="metar-results" class="results"></div>
+      </div>
+    </section>
+
+    <!-- ============ ABA: AJUDA ============ -->
+    <section id="tab-ajuda" class="tab-content">
+      <div class="panel ajuda">
+        <h2>Ajuda — em linguagem simples</h2>
+
+        <h3>O que é este site?</h3>
+        <p>
+          Este site mostra <strong>mapas do tempo</strong> gerados com dados do
+          modelo <strong>GFS</strong>, um modelo matemático usado pela NOAA
+          (agência meteorológica dos Estados Unidos) para prever o tempo em
+          todo o mundo, incluindo o Brasil.
+        </p>
+
+        <h3>O que é cada termo?</h3>
+        <ul>
+          <li><strong>GFS</strong> — o "previsor". A cada 6 horas ele calcula
+              como o tempo deve estar nas próximas horas.</li>
+          <li><strong>Previsão (+6h, +12h, +18h)</strong> — o quanto de tempo
+              à frente o modelo está olhando. "+00h" é o "agora", "+06h" é
+              daqui a 6 horas, e assim por diante.</li>
+          <li><strong>Análise (00, 06, 12, 18 Z)</strong> — o horário em que o
+              modelo "rodou". A letra Z indica o horário de Londres (UTC).
+              Escolha "Automática" e o sistema escolhe o mais recente.</li>
+          <li><strong>Nível (hPa)</strong> — a altitude do mapa. Valores altos
+              (500) são o meio da atmosfera; valores baixos (850, 925) são
+              próximos do chão.</li>
+          <li><strong>METAR</strong> — o "boletim" real enviado pelos
+              aeroportos: vento, visibilidade, nuvens e temperatura medidos na
+              hora.</li>
+        </ul>
+
+        <h3>Como ver um mapa da minha cidade?</h3>
+        <ol>
+          <li>Na aba <strong>Mapas</strong>, abra a lista de regiões e escolha,
+              por exemplo, "São Paulo (cidade)".</li>
+          <li>Escolha a variável (ex.: Temperatura) e clique em
+              <strong>Gerar mapa</strong>.</li>
+          <li>O mapa aparece abaixo com a legenda de cores, a data, a variável
+              e a região escritas no próprio mapa.</li>
+        </ol>
+        <p>
+          Também dá para clicar em qualquer ponto do mapa interativo ao lado —
+          a latitude e longitude são preenchidas sozinhas.
+        </p>
+
+        <h3>O que são as animações?</h3>
+        <p>
+          Um <strong>GIF animado</strong> mostra a evolução do tempo: o primeiro
+          quadro é o "agora" e os seguintes são +6h, +12h e +18h. Assim você
+          "assiste" a previsão se desenrolar.
+        </p>
+
+        <h3>Os dados chegam sozinhos?</h3>
+        <p>
+          Sim. O servidor verifica a cada poucos minutos se há uma nova
+          previsão do GFS ou um novo boletim METAR e baixa automaticamente.
+          Depois do download, ele mesmo gera os mapas, matrizes e análises das
+          regiões predefinidas.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      MET Server v4 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
+    </p>
+  </footer>
+
+  <script src="/static/vendor/leaflet/leaflet.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

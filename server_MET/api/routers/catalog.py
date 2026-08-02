@@ -7,9 +7,14 @@ from fastapi import APIRouter, Depends
 
 from server_MET.api.dependencies import get_processor, get_reader, get_settings
 from server_MET.core.config import Settings
-from server_MET.core.constants import COMPUTED_VARIABLES, VAR_MAP
+from server_MET.core.constants import COMPUTED_VARIABLES, VAR_MAP, var_label
 from server_MET.core.models import MetVariable
-from server_MET.processing.regions import REGIOES_DESCRICOES, REGIOES_PREDEFINIDAS
+from server_MET.processing.regions import (
+    CIDADES_PREDEFINIDAS,
+    REGIOES_DESCRICOES,
+    REGIOES_PREDEFINIDAS,
+    todas_as_regioes,
+)
 
 router = APIRouter(tags=["catalog"])
 
@@ -17,7 +22,7 @@ router = APIRouter(tags=["catalog"])
 @router.get("/variables")
 async def list_variables():
     variables = [
-        {"key": k, "name": v[0], "level_type": v[1]}
+        {"key": k, "name": v[0], "level_type": v[1], "label": var_label(k)}
         for k, v in VAR_MAP.items()
     ]
     variables += [
@@ -25,6 +30,7 @@ async def list_variables():
             "key": key,
             "name": name,
             "level_type": level_type,
+            "label": var_label(key),
         }
         for key, name, level_type in [
             ("wind", "Wind speed (computed from u/v)", "pressure"),
@@ -36,16 +42,26 @@ async def list_variables():
 
 @router.get("/regions")
 async def list_regions():
-    return {
-        "regions": [
+    regions = []
+    for k, v in REGIOES_PREDEFINIDAS.items():
+        regions.append(
             {
                 "name": k,
+                "kind": "estado" if k != "SA" else "visao_geral",
                 "bounds": list(v),
                 "description": REGIOES_DESCRICOES.get(k, ""),
             }
-            for k, v in REGIOES_PREDEFINIDAS.items()
-        ]
-    }
+        )
+    for k, (city_name, lon, lat) in CIDADES_PREDEFINIDAS.items():
+        regions.append(
+            {
+                "name": k,
+                "kind": "cidade",
+                "center": {"lon": lon, "lat": lat},
+                "description": REGIOES_DESCRICOES.get(k, city_name),
+            }
+        )
+    return {"regions": regions}
 
 
 @router.get("/catalog")

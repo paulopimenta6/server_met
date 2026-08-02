@@ -5,7 +5,7 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 echo "=========================================="
-echo "  MET Server v3 - Quick Start"
+echo "  MET Server v4 - Quick Start"
 echo "=========================================="
 
 case "${1:-help}" in
@@ -79,6 +79,23 @@ removed = d.clean_old_data(days_old=$DAYS)
 print(f'Removidos {removed} arquivos')
 "
         ;;
+    scheduler)
+        echo "Executando UMA verificação de novo ciclo GFS (worker avulso)..."
+        python3 -c "
+import asyncio
+from server_MET.acquisition.scheduler import SchedulerRunner
+asyncio.run(SchedulerRunner()._process_new_cycles())
+print('Verificação concluída.')
+"
+        ;;
+    scheduler-status)
+        echo "Status da captação contínua..."
+        python3 -c "
+from server_MET.acquisition.scheduler import get_scheduler_runner
+import json
+print(json.dumps(get_scheduler_runner().status(), indent=2, ensure_ascii=False))
+"
+        ;;
     docker-build)
         docker compose build
         ;;
@@ -89,17 +106,19 @@ print(f'Removidos {removed} arquivos')
         docker compose down
         ;;
     *)
-        echo "Uso: $0 {install|server|download|analysis|db-status|test|clean|docker-build|docker-up|docker-down|help}"
+        echo "Uso: $0 {install|server|download|analysis|db-status|test|clean|scheduler|scheduler-status|docker-build|docker-up|docker-down|help}"
         echo ""
-        echo "  install      Instala dependências e prepara o ambiente"
-        echo "  server       Inicia o servidor de desenvolvimento em :8000"
-        echo "  download     Baixa GFS GRIB (opcional: YYYYMMDD, hora de análise, resolução 0p25|0p50|1p00)"
-        echo "  analysis     Gera análises de exemplo (resumo, perfil, série) para SP"
-        echo "  db-status    Mostra o estado do banco SQLite"
-        echo "  test         Executa a suíte de testes"
-        echo "  clean [N]    Remove dados antigos (default: 2 dias)"
-        echo "  docker-build Build da imagem Docker"
-        echo "  docker-up    Sobe o Docker Compose"
-        echo "  docker-down  Para o Docker Compose"
+        echo "  install          Instala dependências e prepara o ambiente"
+        echo "  server           Inicia o servidor de desenvolvimento em :8000 (com captação contínua)"
+        echo "  download         Baixa GFS GRIB (opcional: YYYYMMDD, hora de análise, resolução 0p25|0p50|1p00)"
+        echo "  analysis         Gera análises de exemplo (resumo, perfil, série) para SP"
+        echo "  db-status        Mostra o estado do banco SQLite"
+        echo "  test             Executa a suíte de testes"
+        echo "  clean [N]        Remove dados antigos (default: 2 dias)"
+        echo "  scheduler        Executa uma verificação de novo ciclo GFS (worker avulso)"
+        echo "  scheduler-status Mostra o estado da captação contínua"
+        echo "  docker-build     Build da imagem Docker"
+        echo "  docker-up        Sobe o Docker Compose"
+        echo "  docker-down      Para o Docker Compose"
         ;;
 esac

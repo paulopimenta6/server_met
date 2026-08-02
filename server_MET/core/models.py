@@ -36,6 +36,16 @@ class RegionName(str, Enum):
     PE = "PE"
     CE = "CE"
     SA = "SA"
+    SP_CIDADE = "SP-CIDADE"
+    RJ_CIDADE = "RJ-CIDADE"
+    AM_CIDADE = "AM-CIDADE"
+    DF_CIDADE = "DF-CIDADE"
+    PR_CIDADE = "PR-CIDADE"
+    RS_CIDADE = "RS-CIDADE"
+    MG_CIDADE = "MG-CIDADE"
+    PA_CIDADE = "PA-CIDADE"
+    PE_CIDADE = "PE-CIDADE"
+    CE_CIDADE = "CE-CIDADE"
 
 
 class OutputFormat(str, Enum):

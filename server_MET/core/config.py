@@ -37,6 +37,10 @@ class Settings:
         self._dir_analise: Optional[str] = None
         self._dir_tmp: Optional[str] = None
         self._db_file: Optional[str] = None
+        self._scheduler_enabled: Optional[str] = None
+        self._scheduler_grib_interval_min: Optional[str] = None
+        self._scheduler_metar_interval_min: Optional[str] = None
+        self._scheduler_auto_pipeline: Optional[str] = None
         self._parse_env_file()
 
     def _parse_env_file(self) -> None:
@@ -66,6 +70,14 @@ class Settings:
                     self._dir_tmp = value
                 elif key == "db_file":
                     self._db_file = value
+                elif key == "scheduler_enabled":
+                    self._scheduler_enabled = value
+                elif key == "scheduler_grib_interval_min":
+                    self._scheduler_grib_interval_min = value
+                elif key == "scheduler_metar_interval_min":
+                    self._scheduler_metar_interval_min = value
+                elif key == "scheduler_auto_pipeline":
+                    self._scheduler_auto_pipeline = value
 
     def _resolve_dir(self, path_str: Optional[str], default_subdir: str) -> Path:
         if path_str:
@@ -108,6 +120,36 @@ class Settings:
     @property
     def gfs_url(self) -> str:
         return GFS_BASE_URL
+
+    @property
+    def scheduler_enabled(self) -> bool:
+        """Captação contínua ligada? Padrão: sim."""
+        if self._scheduler_enabled is None:
+            return True
+        return self._scheduler_enabled.strip().lower() in ("1", "true", "yes", "sim", "on")
+
+    @property
+    def scheduler_grib_interval_min(self) -> int:
+        """Intervalo (min) entre verificações de novo ciclo GFS. Padrão: 60."""
+        try:
+            return max(10, int(self._scheduler_grib_interval_min))
+        except (TypeError, ValueError):
+            return 60
+
+    @property
+    def scheduler_metar_interval_min(self) -> int:
+        """Intervalo (min) entre buscas de METAR. Padrão: 30."""
+        try:
+            return max(5, int(self._scheduler_metar_interval_min))
+        except (TypeError, ValueError):
+            return 30
+
+    @property
+    def scheduler_auto_pipeline(self) -> list[str]:
+        """Regiões do pipeline automático (vazio = todas predefinidas)."""
+        if not self._scheduler_auto_pipeline:
+            return []
+        return [r.strip().upper() for r in self._scheduler_auto_pipeline.split(",") if r.strip()]
 
     def ensure_dirs(self) -> None:
         for d in [

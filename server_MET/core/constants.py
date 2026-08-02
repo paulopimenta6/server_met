@@ -65,6 +65,30 @@ UNITS_MAP: dict[str, str] = {
     "winds": "m/s",
 }
 
+#: Nome amigável em português por chave de variável (títulos e legendas).
+VAR_LABELS_PT: dict[str, str] = {
+    "ps": "Pressão na superfície",
+    "prnm": "Pressão ao nível do mar",
+    "temp": "Temperatura",
+    "temps": "Temperatura na superfície",
+    "nuvem": "Nebulosidade",
+    "chuvaNaoConvec": "Chuva acumulada",
+    "chuvaConvec": "Chuva convectiva",
+    "umidadeRel": "Umidade relativa",
+    "u": "Vento componente U",
+    "v": "Vento componente V",
+    "uSupe": "Vento componente U (superfície)",
+    "vSupe": "Vento componente V (superfície)",
+    "wind": "Vento",
+    "winds": "Vento na superfície",
+}
+
+
+def var_label(var_name: str) -> str:
+    """Rótulo amigável da variável; fallback para a própria chave."""
+    return VAR_LABELS_PT.get(var_name, var_name)
+
+
 __all__ = [
     "VAR_MAP",
     "COMPUTED_VARIABLES",
@@ -76,4 +100,6 @@ __all__ = [
     "GFS_BASE_URL",
     "NOAA_METAR_URL",
     "UNITS_MAP",
+    "VAR_LABELS_PT",
+    "var_label",
 ]

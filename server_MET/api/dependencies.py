@@ -15,6 +15,7 @@ from server_MET.analysis.statistics import StatisticsAnalyzer
 from server_MET.analysis.summary import RegionSummary
 from server_MET.analysis.timeseries import TimeSeriesAnalyzer
 from server_MET.core.config import Settings
+from server_MET.output.animation import AnimationGenerator
 from server_MET.output.maps import MapGenerator
 from server_MET.output.matrices import MatrixGenerator
 from server_MET.persistence.repositories import (
@@ -56,6 +57,10 @@ def get_downloader() -> GribDownloader:
 
 def get_map_generator() -> MapGenerator:
     return _get("map_generator", MapGenerator)
+
+
+def get_animation_generator() -> AnimationGenerator:
+    return _get("animation_generator", AnimationGenerator)
 
 
 def get_matrix_generator() -> MatrixGenerator:
@@ -158,6 +163,7 @@ __all__ = [
     "get_processor",
     "get_downloader",
     "get_map_generator",
+    "get_animation_generator",
     "get_matrix_generator",
     "get_metar_client",
     "get_statistics",

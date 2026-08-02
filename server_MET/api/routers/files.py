@@ -30,6 +30,7 @@ async def get_artifact(kind: str, file_path: str):
 def _guess_media_type(suffix: str) -> str:
     return {
         ".png": "image/png",
+        ".gif": "image/gif",
         ".csv": "text/csv",
         ".json": "application/json",
         ".txt": "text/plain",

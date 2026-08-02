@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 DOWNLOAD_STATUSES = ("pending", "downloaded", "skipped", "failed")
 TASK_STATUSES = ("pending", "running", "done", "failed")
-OUTPUT_KINDS = ("map", "matrix", "bluesky", "chart")
+OUTPUT_KINDS = ("map", "matrix", "bluesky", "chart", "gif")
 
 
 def _now() -> str:
@@ -270,6 +270,13 @@ class AnalysisRepository:
     ) -> None:
         self.db.execute(
             """
+            DELETE FROM analysis_results
+            WHERE kind = ? AND variable IS ? AND level IS ? AND region IS ? AND date_str IS ?
+            """,
+            (kind, variable, level, region, date_str),
+        )
+        self.db.execute(
+            """
             INSERT INTO analysis_results (kind, variable, level, region, date_str, analysis, result_json)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
@@ -340,10 +347,50 @@ class AnalysisRepository:
         return int(row["n"]) if row else 0
 
 
+class IngestStateRepository:
+    """Estado da captação contínua (chave/valor persistido no SQLite)."""
+
+    def __init__(self, db: Optional[Database] = None) -> None:
+        self.db = db or get_database()
+
+    def get(self, key: str) -> Optional[str]:
+        row = self.db.fetchone(
+            "SELECT value FROM ingest_state WHERE key = ?", (key,)
+        )
+        return row["value"] if row else None
+
+    def set(self, key: str, value: str) -> None:
+        self.db.execute(
+            """
+            INSERT INTO ingest_state (key, value) VALUES (?, ?)
+            ON CONFLICT (key) DO UPDATE SET value = excluded.value,
+                                            updated_at = datetime('now')
+            """,
+            (key, value),
+        )
+
+    def get_json(self, key: str, default=None):
+        raw = self.get(key)
+        if raw is None:
+            return default
+        try:
+            return json.loads(raw)
+        except (TypeError, ValueError):
+            return default
+
+    def set_json(self, key: str, value) -> None:
+        self.set(key, json.dumps(value, ensure_ascii=False, default=str))
+
+    def all(self) -> dict[str, str]:
+        rows = self.db.fetchall("SELECT key, value FROM ingest_state")
+        return {r["key"]: r["value"] for r in rows}
+
+
 __all__ = [
     "DownloadRepository",
     "OutputRepository",
     "MetarRepository",
     "TaskRepository",
     "AnalysisRepository",
+    "IngestStateRepository",
 ]

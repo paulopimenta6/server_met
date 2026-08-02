@@ -19,6 +19,7 @@ from server_MET.analysis.profiles import ProfileAnalyzer
 from server_MET.analysis.statistics import StatisticsAnalyzer
 from server_MET.analysis.timeseries import TimeSeriesAnalyzer
 from server_MET.core.config import Settings
+from server_MET.core.constants import var_label
 from server_MET.core.logging_conf import get_logger
 from server_MET.processing.processor import DataProcessor
 from server_MET.processing.regions import Region
@@ -74,13 +75,13 @@ class AnalysisCharts:
 
         fig, ax = plt.subplots(figsize=(7, 10))
         ax.plot(values, levels, marker="o", color=C_PRIMARY, linewidth=2,
-                label=f"{data['variable']} ({units})")
+                label=f"{var_label(data['variable'])} ({units})")
         ax.set_ylim(150, 1000)
         ax.set_yscale("log")
         ax.invert_yaxis()
         ax.set_xlabel(f"Valor ({units})")
         ax.set_ylabel("Nível de pressão (hPa)")
-        ax.set_title(title or f"Perfil vertical de {data['variable']} — região {data['region']}",
+        ax.set_title(title or f"Perfil vertical de {var_label(data['variable'])} — {data['region']}",
                      fontweight="bold")
         ax.grid(alpha=0.3)
         ax.legend()
@@ -104,7 +105,7 @@ class AnalysisCharts:
 
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(xs, ys, marker="o", color=C_PRIMARY, linewidth=2,
-                label=f"{data['variable']} ({units})")
+                label=f"{var_label(data['variable'])} ({units})")
         trend = data.get("trend") or {}
         if trend.get("slope") is not None and trend.get("intercept") is not None:
             xfit = np.array(xs, dtype=float)
@@ -114,7 +115,7 @@ class AnalysisCharts:
         ax.set_xlabel("Hora de previsão (h)")
         ax.set_ylabel(f"Valor ({units})")
         ax.set_xticks(xs)
-        ax.set_title(title or f"Série temporal de {data['variable']} — região {data['region']}",
+        ax.set_title(title or f"Série temporal de {var_label(data['variable'])} — {data['region']}",
                      fontweight="bold")
         ax.grid(alpha=0.3)
         ax.legend()
@@ -152,9 +153,9 @@ class AnalysisCharts:
                    label=f"Média: {mean_val:.2f}")
         ax.axvline(median_val, color="#009E73", linestyle=":", linewidth=1.5,
                    label=f"Mediana: {median_val:.2f}")
-        ax.set_xlabel(f"{variable} ({unit})")
+        ax.set_xlabel(f"{var_label(variable)} ({unit})")
         ax.set_ylabel("Frequência")
-        ax.set_title(title or f"Distribuição de {variable} — região {region.name}", fontweight="bold")
+        ax.set_title(title or f"Distribuição de {var_label(variable)} — {region.full_name}", fontweight="bold")
         ax.legend()
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)

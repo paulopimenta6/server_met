@@ -11,12 +11,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from server_MET.core.config import Settings
-from server_MET.core.constants import UNITS_MAP
+from server_MET.core.constants import UNITS_MAP, var_label
 from server_MET.output.base import OutputGeneratorMixin
 from server_MET.processing.processor import DataProcessor
 from server_MET.processing.regions import Region
 
 logger = logging.getLogger(__name__)
+
+
+def _slugify(text: str) -> str:
+    """Nome seguro para arquivo: sem acentos, espaços nem pontuação."""
+    import re
+    import unicodedata
+
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    text = re.sub(r"[^A-Za-z0-9_.-]+", "_", text)
+    return text.strip("_")
 
 try:
     import cartopy.crs as ccrs
@@ -125,6 +136,17 @@ class MapGenerator(OutputGeneratorMixin):
             data, lat, lon = self.processor.extract_data(
                 msg, lon_min, lon_max, lat_min, lat_max
             )
+            data = np.asarray(data)
+            if data.ndim > 2:
+                data = data[0]
+            if data.ndim < 2 or min(data.shape) < 2:
+                logger.warning(
+                    "Resolução GRIB %s° insuficiente para %s (%s) — "
+                    "use 0p25/0p50 para mapas de cidade.",
+                    msg.iDirectionIncrementInDegrees, region.full_name,
+                    data.shape,
+                )
+                continue
             data, unit = self.processor.convert_units(data, var_name)
 
             ft = msg.forecastTime
@@ -178,18 +200,30 @@ class MapGenerator(OutputGeneratorMixin):
                 plt.clabel(cs1, fmt="%d", fontsize=8)
                 cbar = m.colorbar(contourf, location="right", pad="1%")
 
-            cbar.set_label(unit if unit != "units" else msg.units)
+            unit_label = unit if unit != "units" else msg.units
+            cbar.set_label(unit_label)
 
+            resolution = _slugify(str(msg.iDirectionIncrementInDegrees))
+            region_slug = _slugify(region.full_name)
             default_title = (
-                f"GFS {msg.iDirectionIncrementInDegrees} - {region.name} "
-                f"{var_name} - Nível: {resolved_level or level} "
-                f"Data: {msg.dataDate} Prev: {ft_str}"
+                f"GFS {msg.iDirectionIncrementInDegrees}° - "
+                f"{var_label(var_name)} ({unit_label}) - "
+                f"{region.full_name} - Nível: {resolved_level or level} hPa - "
+                f"{msg.dataDate} {analysis}Z - Previsão +{ft_str}h"
             )
-            plt.title(title or default_title, fontsize=12)
+            plt.title(title or default_title, fontsize=13, fontweight="bold")
+            fig.text(
+                0.01, 0.01,
+                self._info_text(
+                    msg, region, var_name, resolved_level, analysis, ft_str
+                ),
+                fontsize=10, color="#333333", ha="left", va="bottom",
+                bbox=dict(boxstyle="round", facecolor="white", alpha=0.7),
+            )
 
             filename = (
-                f"GFS_{msg.iDirectionIncrementInDegrees}_{region.name}_"
-                f"N{resolved_level or level}_{var_name}_{msg.dataDate}_{ft_str}.png"
+                f"GFS_{resolution}_{region_slug}_"
+                f"N{resolved_level or level}_{var_name}_{msg.dataDate}_{analysis}_{ft_str}.png"
             )
             filepath = f"{output_dir}/{filename}"
             plt.savefig(filepath, bbox_inches="tight", dpi=dpi)
@@ -234,6 +268,18 @@ class MapGenerator(OutputGeneratorMixin):
             data_v, _, _ = self.processor.extract_data(
                 v_msg, lon_min, lon_max, lat_min, lat_max
             )
+            data_u = np.asarray(data_u)
+            data_v = np.asarray(data_v)
+            if data_u.ndim > 2:
+                data_u = data_u[0]
+            if data_v.ndim > 2:
+                data_v = data_v[0]
+            if min(data_u.shape) < 2 or min(data_v.shape) < 2:
+                logger.warning(
+                    "Resolução GRIB %s° insuficiente para o campo de vento em %s.",
+                    u_msg.iDirectionIncrementInDegrees, region.full_name,
+                )
+                continue
 
             ft = u_msg.forecastTime
             ft_str = f"{ft:02d}"
@@ -291,16 +337,27 @@ class MapGenerator(OutputGeneratorMixin):
 
             cb.ax.set_ylabel("Vento m/s", fontsize=14)
 
+            region_slug = _slugify(region.full_name)
             default_title = (
-                f"GFS {u_msg.iDirectionIncrementInDegrees} - {region.name} "
-                f"Vento [m/s] - Nível: {resolved_level or level} "
-                f"Data: {u_msg.dataDate} Prev: {ft_str}"
+                f"GFS {u_msg.iDirectionIncrementInDegrees}° - "
+                f"{var_label(var_name)} [m/s] - {region.full_name} - "
+                f"Nível: {resolved_level or level} hPa - "
+                f"{u_msg.dataDate} {analysis}Z - Previsão +{ft_str}h"
             )
-            plt.title(title or default_title, fontsize=12)
+            plt.title(title or default_title, fontsize=13, fontweight="bold")
+            fig1.text(
+                0.01, 0.01,
+                self._info_text(
+                    u_msg, region, var_name, resolved_level, analysis, ft_str
+                ),
+                fontsize=10, color="#333333", ha="left", va="bottom",
+                bbox=dict(boxstyle="round", facecolor="white", alpha=0.7),
+            )
 
             filename = (
-                f"GFS_{u_msg.iDirectionIncrementInDegrees}_{region.name}_"
-                f"N{resolved_level or level}_CampoVento_{u_msg.dataDate}_{ft_str}.png"
+                f"GFS_{_slugify(str(u_msg.iDirectionIncrementInDegrees))}_"
+                f"{region_slug}_N{resolved_level or level}_CampoVento_"
+                f"{u_msg.dataDate}_{analysis}_{ft_str}.png"
             )
             filepath = f"{output_dir}/{filename}"
             plt.savefig(filepath, bbox_inches="tight", dpi=dpi)
@@ -309,6 +366,17 @@ class MapGenerator(OutputGeneratorMixin):
             logger.info("Mapa de vento salvo: %s", filepath)
 
         return saved_files
+
+    def _info_text(
+        self, msg, region: Region, var_name: str, level, analysis: str, ft_str: str
+    ) -> str:
+        """Texto de legenda com os metadados do mapa (data, variável, região...)."""
+        nivel = f"{level} hPa" if level else "Superfície"
+        return (
+            f"Variável: {var_label(var_name)}  |  Região: {region.full_name}  |  "
+            f"Nível: {nivel}  |  Data: {msg.dataDate}  |  Análise: {analysis}Z  |  "
+            f"Previsão: +{ft_str}h  |  Fonte: GFS (NOAA) {msg.iDirectionIncrementInDegrees}°"
+        )
 
     def _setup_cartopy_axis(self, fig, lon_min, lon_max, lat_min, lat_max):
         ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())

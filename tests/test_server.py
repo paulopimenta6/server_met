@@ -9,7 +9,7 @@ async def test_health_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert data["version"] == "3.0.0"
+    assert data["version"] == "4.0.0"
     assert "grib_files_available" in data
 
 
@@ -17,9 +17,26 @@ async def test_health_endpoint(client):
 async def test_root_endpoint(client):
     response = await client.get("/")
     assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "MET Server" in response.text
+
+
+@pytest.mark.asyncio
+async def test_info_endpoint(client):
+    response = await client.get("/info")
+    assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "3.0.0"
+    assert data["version"] == "4.0.0"
     assert "/docs" in data["docs"]
+
+
+@pytest.mark.asyncio
+async def test_static_assets(client):
+    response = await client.get("/static/js/app.js")
+    assert response.status_code == 200
+    assert "javascript" in response.headers["content-type"]
+    response = await client.get("/static/vendor/leaflet/leaflet.js")
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio
@@ -97,6 +114,25 @@ async def test_generate_map_missing_grib(client):
               "date": "20990101", "analysis": "06"},
     )
     assert response.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_animate_map_missing_grib(client):
+    response = await client.post(
+        "/maps/animate?duration_ms=500",
+        json={"variable": "temp", "level": 500, "region": "SP",
+              "date": "20990101", "analysis": "06"},
+    )
+    assert response.status_code == 500
+
+
+@pytest.mark.asyncio
+async def test_scheduler_status(client):
+    response = await client.get("/scheduler/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["enabled"] is True
+    assert "grib_interval_min" in data
 
 
 @pytest.mark.asyncio
@@ -187,6 +223,7 @@ async def test_db_status(client, isolated_db):
     data = response.json()
     assert set(data["tables"]) == {
         "downloads", "outputs", "metar_obs", "tasks", "analysis_results",
+        "ingest_state",
     }
 
 

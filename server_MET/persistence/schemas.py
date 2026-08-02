@@ -1,7 +1,7 @@
 """DDL (esquema) do banco de dados SQLite do servidor meteorológico."""
 from __future__ import annotations
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 TABLES_DDL: list[str] = [
     """
@@ -70,6 +70,13 @@ TABLES_DDL: list[str] = [
         analysis TEXT,
         result_json TEXT NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS ingest_state (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
 ]

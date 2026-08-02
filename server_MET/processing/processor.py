@@ -108,6 +108,20 @@ class DataProcessor:
 
         return results
 
+    @staticmethod
+    def _normalize_lat(data: np.ndarray, lat: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """Deixa latitude crescente (S->N) junto com os dados.
+
+        O pygrib devolve linhas do norte (topo) para o sul (base). Para os
+        mapas, invertemos ambos (dados e latitude) mantendo-os consistentes —
+        sem isso a imagem ficaria com norte/sul trocados em relação ao
+        litoral desenhado pelo Cartopy.
+        """
+        if lat.shape[0] > 1 and lat[0, 0] > lat[-1, 0]:
+            data = data[::-1, :]
+            lat = lat[::-1, :]
+        return data, lat
+
     def extract_data(
         self,
         grb_msg: pygrib.gribmessage,
@@ -134,8 +148,9 @@ class DataProcessor:
         if lon_min < 0 and lon_max < 0:
             lon = lon - 360
 
+        data, lat = self._normalize_lat(data, lat)
         lon = lon[0, :]
-        lat = lat[:, 0][::-1]
+        lat = lat[:, 0]
 
         return data, lat, lon
 
@@ -151,15 +166,15 @@ class DataProcessor:
             lat1=lats1, lat2=lats2, lon1=lons1 + 360, lon2=360.0
         )
         lon_ini = lon_ini[0, :] - 360
-        lat_ini = lat_ini[:, 0][::-1]
+        data_ini, lat_ini = self._normalize_lat(data_ini, lat_ini)
 
         data_fim, lat_fim, lon_fim = grb_msg.data(
             lat1=lats1, lat2=lats2, lon1=0.0, lon2=lons2
         )
         lon_fim = lon_fim[0, :]
-        lat_fim = lat_fim[:, 0][::-1]
+        data_fim, lat_fim = self._normalize_lat(data_fim, lat_fim)
 
-        lat = lat_ini
+        lat = lat_ini[:, 0]
         lon = np.append(lon_ini, lon_fim)
         data = np.zeros((data_ini.shape[0], data_ini.shape[1] + data_fim.shape[1]))
         if data_ini.shape[0] == data_fim.shape[0]:

@@ -48,8 +48,44 @@ class TestRegion:
         r = Region(name="SP")
         assert r.name == "SP"
         assert r.is_predefined is True
-        assert r.lon_min == -56 and r.lon_max == -42
-        assert r.lat_min == -28 and r.lat_max == -18
+        assert r.kind == "estado"
+        assert r.lon_min == -53.1 and r.lon_max == -44.1
+        assert r.lat_min == -25.3 and r.lat_max == -19.7
+
+    def test_city_region_bounds(self):
+        r = Region(name="SP-CIDADE")
+        assert r.name == "SP-CIDADE"
+        assert r.kind == "cidade"
+        assert r.city_name == "São Paulo"
+        assert r.full_name == "Cidade de São Paulo"
+        assert r.lon_min == -47.1333 and r.lon_max == -46.1333
+        assert r.lat_min == -24.0505 and r.lat_max == -23.0505
+        assert r.validate()
+
+    def test_city_contains_capital(self):
+        for key in ("SP-CIDADE", "RJ-CIDADE", "AM-CIDADE", "DF-CIDADE",
+                    "PR-CIDADE", "RS-CIDADE", "MG-CIDADE", "PA-CIDADE",
+                    "PE-CIDADE", "CE-CIDADE"):
+            r = Region(name=key)
+            assert r.validate(), f"{key} inválida"
+
+    def test_state_contains_capital(self):
+        capitals = {
+            "SP": (-46.6333, -23.5505),
+            "RJ": (-43.1964, -22.9068),
+            "AM": (-60.0258, -3.1019),
+            "DF": (-47.9297, -15.7801),
+            "PR": (-49.2733, -25.4284),
+            "RS": (-51.2253, -30.0346),
+            "MG": (-43.9378, -19.9167),
+            "PA": (-48.5044, -1.4558),
+            "PE": (-34.8778, -8.0476),
+            "CE": (-38.5428, -3.7187),
+        }
+        for name, (lon, lat) in capitals.items():
+            r = Region(name=name)
+            assert r.lon_min < lon < r.lon_max, name
+            assert r.lat_min < lat < r.lat_max, name
 
     def test_bbox_region(self):
         r = Region(lon_min=-50, lon_max=-40, lat_min=-25, lat_max=-15)

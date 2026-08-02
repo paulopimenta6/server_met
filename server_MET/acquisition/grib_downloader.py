@@ -5,6 +5,7 @@ Registra cada arquivo no banco SQLite (tabela `downloads`).
 from __future__ import annotations
 
 import subprocess
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
@@ -72,6 +73,33 @@ class GribDownloader:
             logger.error("wget não encontrado. Instale wget ou use curl.")
             return False
 
+    def validate_grib(self, filepath: Path, timeout: int = 90) -> bool:
+        """Valida um arquivo GRIB em subprocesso (com timeout).
+
+        pygrib/eccodes podem travar em loop infinito ao ler arquivos
+        corrompidos (download interrompido etc.); a validação em subprocesso
+        permite abortar e descartar o arquivo antes que trave o pipeline.
+        """
+        script = (
+            "import sys, pygrib\n"
+            "g = pygrib.open(sys.argv[1])\n"
+            "sel = g.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)\n"
+            "if not sel:\n"
+            "    sys.exit(2)\n"
+            "sel[0].values\n"
+            "print('OK')\n"
+        )
+        try:
+            result = subprocess.run(
+                [sys.executable, "-c", script, str(filepath)],
+                capture_output=True,
+                timeout=timeout,
+            )
+            return result.returncode == 0 and b"OK" in result.stdout
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            logger.error("Validação GRIB falhou para %s: %s", filepath, e)
+            return False
+
     def download_gribs(
         self,
         date_str: Optional[str] = None,
@@ -112,6 +140,20 @@ class GribDownloader:
                 continue
 
             if self.download_file(url, filepath):
+                if not self.validate_grib(filepath):
+                    logger.error(
+                        "Arquivo GRIB corrompido (%s); removendo para novo download.",
+                        filepath,
+                    )
+                    try:
+                        filepath.unlink(missing_ok=True)
+                    except OSError as e:
+                        logger.error("Não foi possível remover %s: %s", filepath, e)
+                    self.repo.mark(
+                        date_str, analysis_hour, resolution, fh, "failed",
+                        error="arquivo corrompido",
+                    )
+                    continue
                 self.repo.mark(date_str, analysis_hour, resolution, fh, "downloaded",
                                file_size=filepath.stat().st_size)
                 downloaded.append(filepath)
