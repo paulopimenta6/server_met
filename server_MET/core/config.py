@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from server_MET.core.constants import GFS_BASE_URL
+from server_MET.core.constants import FORECAST_HOURS, GFS_BASE_URL
 
 
 class Settings:
@@ -41,6 +41,7 @@ class Settings:
         self._scheduler_grib_interval_min: Optional[str] = None
         self._scheduler_metar_interval_min: Optional[str] = None
         self._scheduler_auto_pipeline: Optional[str] = None
+        self._forecast_hours: Optional[str] = None
         self._parse_env_file()
 
     def _parse_env_file(self) -> None:
@@ -78,6 +79,8 @@ class Settings:
                     self._scheduler_metar_interval_min = value
                 elif key == "scheduler_auto_pipeline":
                     self._scheduler_auto_pipeline = value
+                elif key == "forecast_hours":
+                    self._forecast_hours = value
 
     def _resolve_dir(self, path_str: Optional[str], default_subdir: str) -> Path:
         if path_str:
@@ -150,6 +153,15 @@ class Settings:
         if not self._scheduler_auto_pipeline:
             return []
         return [r.strip().upper() for r in self._scheduler_auto_pipeline.split(",") if r.strip()]
+
+    @property
+    def forecast_hours(self) -> list[str]:
+        """Horas de previsão (f00–f18) capturadas e processadas. Padrão: todas."""
+        if self._forecast_hours:
+            hours = [h.strip() for h in self._forecast_hours.split(",") if h.strip()]
+            if hours:
+                return hours
+        return list(FORECAST_HOURS)
 
     def ensure_dirs(self) -> None:
         for d in [

@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Optional
 
 from server_MET.core.config import Settings
-from server_MET.core.constants import FORECAST_HOURS
 from server_MET.core.logging_conf import get_logger
 from server_MET.output.base import OutputGeneratorMixin
 from server_MET.output.maps import MapGenerator
@@ -52,7 +51,7 @@ class AnimationGenerator(OutputGeneratorMixin):
             logger.error("GIF requer Pillow (pip install pillow).")
             return None
 
-        forecast_hours = forecast_hours or list(FORECAST_HOURS)
+        forecast_hours = forecast_hours or self.settings.forecast_hours
         if output_dir is None:
             output_dir = str(self.settings.dir_tmp)
         out_dir = Path(output_dir)

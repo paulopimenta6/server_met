@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 from server_MET.core.config import Settings
-from server_MET.core.constants import ANALYSIS_HOURS, FORECAST_HOURS, RESOLUTIONS
+from server_MET.core.constants import ANALYSIS_HOURS, RESOLUTIONS
 from server_MET.core.logging_conf import get_logger
 from server_MET.persistence.repositories import DownloadRepository
 
@@ -110,7 +110,7 @@ class GribDownloader:
     ) -> list[Path]:
         date_str = date_str or get_date_str()
         analysis_hour = analysis_hour or get_current_analysis_hour()
-        forecast_hours = forecast_hours or FORECAST_HOURS
+        forecast_hours = forecast_hours or self.settings.forecast_hours
 
         downloaded = []
         base_url = f"{self.settings.gfs_url}{date_str}/{analysis_hour}/atmos/"

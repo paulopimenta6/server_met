@@ -133,6 +133,7 @@ scheduler_enabled=true                    # liga/desliga a captação automátic
 scheduler_grib_interval_min=60            # a cada X min verifica novo ciclo GFS
 scheduler_metar_interval_min=30           # a cada X min busca METARs
 # scheduler_auto_pipeline=SP,SP-CIDADE    # (opcional) só estas regiões no pipeline
+# forecast_hours=00,06,12,18              # (opcional) horas de previsão a capturar
 ```
 
 No código, use sempre o singleton `Settings` (nunca `data/...` direto):

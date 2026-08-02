@@ -51,7 +51,7 @@ server_MET/
 
 ## Gotchas
 
-- `Settings` (server_MET/core/config.py) é singleton lendo `environment/path.conf` (`chave=valor`); caminhos relativos a `PROJECT_ROOT`. **Nunca hardcode `data/...`** — use `Settings`. `ensure_dirs()` roda no lifespan. Novas chaves: `scheduler_enabled`, `scheduler_grib_interval_min`, `scheduler_metar_interval_min`, `scheduler_auto_pipeline`.
+- `Settings` (server_MET/core/config.py) é singleton lendo `environment/path.conf` (`chave=valor`); caminhos relativos a `PROJECT_ROOT`. **Nunca hardcode `data/...`** — use `Settings`. `ensure_dirs()` roda no lifespan. Novas chaves: `scheduler_enabled`, `scheduler_grib_interval_min`, `scheduler_metar_interval_min`, `scheduler_auto_pipeline`, `forecast_hours` (CSV `00,06,12,18`; limita horas de previsão capturadas/processadas).
 - Diretórios de dados: `data/gribs`, `data/mapasGrib`, `data/matrizGrib/{predi,bluesky}`, `data/analise`, `data/tmp`. Banco: `data/met_server.db`.
 - GRIBs vivem em `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. Download usa o binário `wget` via subprocess (obrigatório; `check_url_exists` falha silenciosamente sem ele).
 - **Arquivos baixados são validados** (`GribDownloader.validate_grib`): subprocesso pygrib com timeout (leitura + `select`); corrompido → removido e marcado `failed` (pygrib/eccodes podem **travar em loop infinito** lendo arquivo corrompido — não dá para usar try/except no mesmo processo; validação em subprocesso é obrigatória).

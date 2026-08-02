@@ -64,9 +64,7 @@ class GribReader:
         forecast_hours: Optional[list[str]] = None,
     ) -> list[Path]:
         if forecast_hours is None:
-            from server_MET.core.constants import FORECAST_HOURS
-
-            forecast_hours = FORECAST_HOURS
+            forecast_hours = self.settings.forecast_hours
         files = []
         for fh in forecast_hours:
             f = self.find_grib_file(date_str, analysis, fh)
