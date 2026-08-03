@@ -133,7 +133,6 @@ Arquivo simples `chave=valor`. Todos os caminhos são relativos à raiz do proje
 dir_gribs=data/gribs                      # arquivos GRIB baixados
 dir_mapas=data/mapasGrib                  # mapas PNG
 dir_matrizes=data/matrizGrib              # matrizes CSV
-dir_matrizes_predi=data/matrizGrib/predi
 dir_matrizes_bluesky=data/matrizGrib/bluesky
 dir_analise=data/analise                  # análises
 dir_tmp=data/tmp                          # saídas temporárias (mapas/gerações)
@@ -143,6 +142,7 @@ db_file=data/met_server.db                # banco SQLite
 scheduler_enabled=true                    # liga/desliga a captação automática
 scheduler_grib_interval_min=60            # a cada X min verifica novo ciclo GFS
 scheduler_metar_interval_min=30           # a cada X min busca METARs
+scheduler_resolution=0p25                 # resolução GFS baixada pelo scheduler (0p25|0p50|1p00)
 # scheduler_auto_pipeline=SP,SP-CIDADE    # (opcional) só estas regiões no pipeline
 # forecast_hours=00,06,12,18              # (opcional) horas de previsão a capturar
 # pipeline_levels=500,700,850,925,1000    # (opcional) níveis do pipeline automático
@@ -166,15 +166,24 @@ servidor (ou avulso com `./scripts/run.sh scheduler`):
 1. **GRIB**: a cada `scheduler_grib_interval_min` verifica o ciclo GFS mais
    recente que já deveria estar publicado (o NOMADS publica ~5h após o início
    do ciclo). Se ainda não baixado:
-   - baixa as resoluções 0.25°/0.50°/1.00° (horas de previsão configuradas);
+   - baixa a resolução configurada em `scheduler_resolution` (padrão 0.25°),
+     apenas nas horas de previsão configuradas;
    - valida cada arquivo em subprocesso (pygrib com timeout) e descarta
      corrompidos antes de usá-los no pipeline;
+   - **só marca o ciclo como processado quando todas as horas de previsão
+     configuradas existem e estão saudáveis** — se alguma faltar, ele não é
+     marcado e é re-verificado no próximo ciclo (o re-download é barato, pois
+     arquivos válidos já existentes são pulados);
    - roda o **pipeline automático**: mapas e matrizes CSV (persistidas também
      no SQLite) por nível para todas as regiões predefinidas — Estados,
      países da América do Sul e cidades;
    - gera o **perfil vertical** por região (as análises de resumo e série
      ficam sob demanda pela API);
    - registra o ciclo em `ingest_state` para não repetir.
+
+> O GRIB **não é baixado no momento de uma requisição**: ele sempre **pré-existe**
+> no disco, baixado pela captação contínua acima, para que o site e a API REST
+> respondam com dados já prontos (sem lentidão por download).
 2. **METAR**: a cada `scheduler_metar_interval_min` busca os boletins de todas
    as estações e guarda o histórico.
 

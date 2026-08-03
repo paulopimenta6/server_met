@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from server_MET.core.constants import FORECAST_HOURS, GFS_BASE_URL
+from server_MET.core.constants import FORECAST_HOURS, GFS_BASE_URL, RESOLUTIONS
 
 
 class Settings:
@@ -32,7 +32,6 @@ class Settings:
         self._dir_gribs: Optional[str] = None
         self._dir_mapas: Optional[str] = None
         self._dir_matrizes: Optional[str] = None
-        self._dir_matrizes_predi: Optional[str] = None
         self._dir_matrizes_bluesky: Optional[str] = None
         self._dir_analise: Optional[str] = None
         self._dir_tmp: Optional[str] = None
@@ -42,6 +41,7 @@ class Settings:
         self._scheduler_metar_interval_min: Optional[str] = None
         self._scheduler_auto_pipeline: Optional[str] = None
         self._scheduler_auto_statistics: Optional[str] = None
+        self._scheduler_resolution: Optional[str] = None
         self._forecast_hours: Optional[str] = None
         self._pipeline_levels: Optional[str] = None
         self._parse_env_file()
@@ -63,8 +63,6 @@ class Settings:
                     self._dir_mapas = value
                 elif key == "dir_matrizes":
                     self._dir_matrizes = value
-                elif key == "dir_matrizes_predi":
-                    self._dir_matrizes_predi = value
                 elif key == "dir_matrizes_bluesky":
                     self._dir_matrizes_bluesky = value
                 elif key == "dir_analise":
@@ -83,6 +81,8 @@ class Settings:
                     self._scheduler_auto_pipeline = value
                 elif key == "scheduler_auto_statistics":
                     self._scheduler_auto_statistics = value
+                elif key == "scheduler_resolution":
+                    self._scheduler_resolution = value
                 elif key == "forecast_hours":
                     self._forecast_hours = value
                 elif key == "pipeline_levels":
@@ -105,10 +105,6 @@ class Settings:
     @property
     def dir_matrizes(self) -> Path:
         return self._resolve_dir(self._dir_matrizes, "data/matrizGrib")
-
-    @property
-    def dir_matrizes_predi(self) -> Path:
-        return self._resolve_dir(self._dir_matrizes_predi, "data/matrizGrib/predi")
 
     @property
     def dir_matrizes_bluesky(self) -> Path:
@@ -168,6 +164,15 @@ class Settings:
         return self._scheduler_auto_statistics.strip().lower() in ("1", "true", "yes", "sim", "on")
 
     @property
+    def scheduler_resolution(self) -> str:
+        """Resolução GFS baixada pelo scheduler (padrão: 0p25)."""
+        if self._scheduler_resolution:
+            res = self._scheduler_resolution.strip().lower()
+            if res in RESOLUTIONS:
+                return res
+        return "0p25"
+
+    @property
     def forecast_hours(self) -> list[str]:
         """Horas de previsão (f00–f18) capturadas e processadas. Padrão: todas."""
         if self._forecast_hours:
@@ -194,7 +199,6 @@ class Settings:
             self.dir_gribs,
             self.dir_mapas,
             self.dir_matrizes,
-            self.dir_matrizes_predi,
             self.dir_matrizes_bluesky,
             self.dir_analise,
             self.dir_tmp,

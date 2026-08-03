@@ -133,6 +133,8 @@ class SchedulerRunner:
             await asyncio.sleep(self.settings.scheduler_grib_interval_min * 60)
 
     async def _process_new_cycles(self) -> None:
+        from server_MET.processing.processor import DataProcessor
+
         async with self._grib_lock:
             self.state.set("last_grib_check", _now_iso())
             processed = self.state.get_json("processed_cycles", []) or []
@@ -148,17 +150,56 @@ class SchedulerRunner:
                     self.downloader.download_gribs_all_resolutions,
                     date_str=date_str,
                     analysis_hour=ana,
+                    resolutions=[self.settings.scheduler_resolution],
                 )
                 if not files:
                     logger.info("Ciclo %s %sZ ainda não disponível.", date_str, ana)
                     continue
-                await asyncio.to_thread(self._run_pipeline, date_str, ana)
+
+                processor = DataProcessor()
+                complete, missing = await asyncio.to_thread(
+                    self._cycle_has_complete_forecast, date_str, ana, processor
+                )
+                if not complete:
+                    logger.warning(
+                        "Ciclo %s %sZ incompleto (horas faltando/inválidas: %s). "
+                        "Não será marcado como processado; re-verificando depois.",
+                        date_str, ana, ", ".join(missing),
+                    )
+                    continue
+
+                await asyncio.to_thread(self._run_pipeline, date_str, ana, processor)
                 processed = [key] + [p for p in processed if p != key]
                 self.state.set_json("processed_cycles", processed[:10])
                 self.state.set("last_pipeline_cycle", key)
                 return
 
-    def _run_pipeline(self, date_str: str, ana: str) -> None:
+    def _cycle_has_complete_forecast(
+        self, date_str: str, ana: str, processor=None
+    ) -> tuple[bool, list[str]]:
+        """Verifica se todas as horas de `Settings.forecast_hours` do ciclo
+        existem no disco e estão saudáveis (resolução primária do scheduler).
+
+        A validação usa o `GribReader` compartilhado do `DataProcessor`, então
+        o resultado fica em cache e o pipeline não re-valida os mesmos GRIBs.
+        """
+        from server_MET.processing.processor import DataProcessor
+
+        processor = processor or DataProcessor()
+        resolution = self.settings.scheduler_resolution
+        missing = []
+        for fh in self.settings.forecast_hours:
+            f = processor.reader.find_grib_file(date_str, ana, fh, resolution)
+            if (
+                f is None
+                or not f.exists()
+                or f.stat().st_size == 0
+                or not processor.reader.is_healthy(f)
+            ):
+                missing.append(fh)
+        return not missing, missing
+
+    def _run_pipeline(self, date_str: str, ana: str, processor=None) -> None:
         """Gera mapas e matrizes CSV das regiões predefinidas (por nível).
 
         Análises (summary/timeseries) ficam sob demanda; profile é gerado
@@ -168,6 +209,7 @@ class SchedulerRunner:
         from server_MET.output.maps import MapGenerator
         from server_MET.output.matrices import MatrixGenerator
         from server_MET.persistence.repositories import AnalysisRepository
+        from server_MET.processing.processor import DataProcessor
         from server_MET.processing.regions import (
             CIDADES_PREDEFINIDAS,
             REGIOES_PREDEFINIDAS,
@@ -184,9 +226,12 @@ class SchedulerRunner:
 
             combos = self._expand_pipeline_combos(date_str, ana)
 
-            map_gen = MapGenerator()
-            matrix_gen = MatrixGenerator()
-            profiles = ProfileAnalyzer()
+            # Processador (e GribReader) compartilhado: validação dos GRIBs
+            # ocorre 1x por ciclo (cache em `GribReader._healthy_cache`).
+            processor = processor or DataProcessor()
+            map_gen = MapGenerator(processor=processor)
+            matrix_gen = MatrixGenerator(processor=processor)
+            profiles = ProfileAnalyzer(processor=processor)
             analysis_repo = AnalysisRepository()
 
             total = 0
@@ -215,7 +260,7 @@ class SchedulerRunner:
 
             if self.settings.scheduler_auto_statistics:
                 try:
-                    self._run_statistics(regions, date_str, ana)
+                    self._run_statistics(regions, date_str, ana, processor)
                 except Exception as e:
                     logger.warning("Pipeline: falha nas estatísticas: %s", e)
 
@@ -224,15 +269,23 @@ class SchedulerRunner:
         finally:
             self.pipeline_running = False
 
-    def _run_statistics(self, regions: list[str], date_str: str, ana: str) -> None:
+    def _run_statistics(
+        self,
+        regions: list[str],
+        date_str: str,
+        ana: str,
+        processor=None,
+    ) -> None:
         """Gera estatísticas (tabela `statistics` + CSV) das variáveis do
         pipeline para as regiões — dashboard fica sob demanda via API."""
         from server_MET.analysis.statistics import StatisticsAnalyzer
         from server_MET.output.statistics import StatisticsCSVGenerator
         from server_MET.persistence.repositories import StatisticsRepository
+        from server_MET.processing.processor import DataProcessor
         from server_MET.processing.regions import Region
 
-        stats = StatisticsAnalyzer()
+        processor = processor or DataProcessor()
+        stats = StatisticsAnalyzer(processor=processor)
         stats_repo = StatisticsRepository()
         csv_gen = StatisticsCSVGenerator()
 

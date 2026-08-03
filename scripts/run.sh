@@ -15,7 +15,7 @@ case "${1:-help}" in
 
         echo "[2/4] Garantindo diretórios de dados..."
         mkdir -p data/gribs data/mapasGrib data/matrizGrib
-        mkdir -p data/matrizGrib/predi data/matrizGrib/bluesky
+        mkdir -p data/matrizGrib/bluesky
         mkdir -p data/analise data/tmp
 
         echo "[3/4] Testando instalação..."

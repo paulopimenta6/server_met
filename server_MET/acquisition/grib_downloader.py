@@ -4,6 +4,7 @@ Registra cada arquivo no banco SQLite (tabela `downloads`).
 """
 from __future__ import annotations
 
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -124,11 +125,36 @@ class GribDownloader:
             self.repo.register(date_str, analysis_hour, resolution, fh, filepath)
 
             if filepath.exists() and not force:
-                logger.info("Arquivo já existe: %s", filepath)
-                self.repo.mark(date_str, analysis_hour, resolution, fh, "skipped",
-                               file_size=filepath.stat().st_size)
-                downloaded.append(filepath)
-                continue
+                record = self.repo.get(date_str, analysis_hour, resolution, fh)
+                already_validated = bool(
+                    record
+                    and record.get("status") == "downloaded"
+                    and filepath.stat().st_size > 0
+                )
+                if already_validated:
+                    logger.info("Arquivo já existe e foi validado: %s", filepath)
+                    self.repo.mark(date_str, analysis_hour, resolution, fh, "skipped",
+                                   file_size=filepath.stat().st_size)
+                    downloaded.append(filepath)
+                    continue
+                if self.validate_grib(filepath):
+                    logger.info("Arquivo existente validado: %s", filepath)
+                    self.repo.mark(date_str, analysis_hour, resolution, fh, "downloaded",
+                                   file_size=filepath.stat().st_size)
+                    downloaded.append(filepath)
+                    continue
+                logger.error(
+                    "Arquivo existente corrompido/parcial (%s); removendo para re-download.",
+                    filepath,
+                )
+                try:
+                    filepath.unlink(missing_ok=True)
+                except OSError as e:
+                    logger.error("Não foi possível remover %s: %s", filepath, e)
+                self.repo.mark(
+                    date_str, analysis_hour, resolution, fh, "failed",
+                    error="arquivo existente corrompido",
+                )
 
             url = f"{base_url}{filename}"
             logger.info("Verificando URL: %s", url)
@@ -210,6 +236,31 @@ class GribDownloader:
                             ana_dir.rmdir()
                     date_dir.rmdir()
                     logger.info("Diretório antigo removido: %s", date_dir)
+
+        removed += self._clean_old_tmp_dir(cutoff)
+        return removed
+
+    def clean_old_tmp(self, days_old: int = 2) -> int:
+        """Remove subpastas `data/tmp/<uuid>` mais antigas que N dias."""
+        cutoff = datetime.now() - timedelta(days=days_old)
+        return self._clean_old_tmp_dir(cutoff)
+
+    def _clean_old_tmp_dir(self, cutoff: datetime) -> int:
+        removed = 0
+        tmp_dir = self.settings.dir_tmp
+        if not tmp_dir.is_dir():
+            return removed
+        for d in tmp_dir.iterdir():
+            if not d.is_dir():
+                continue
+            try:
+                mtime = datetime.fromtimestamp(d.stat().st_mtime)
+            except OSError:
+                continue
+            if mtime < cutoff:
+                removed += sum(1 for _ in d.rglob("*") if _.is_file())
+                shutil.rmtree(d, ignore_errors=True)
+                logger.info("Diretório temporário antigo removido: %s", d)
         return removed
 
     def clean_old_gribs(self, days_old: int = 2) -> int:

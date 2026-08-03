@@ -42,6 +42,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     db = get_database()
     db.migrate()
 
+    try:
+        from server_MET.acquisition.grib_downloader import GribDownloader
+
+        removed = GribDownloader().clean_old_tmp()
+        if removed:
+            logger.info("Limpeza inicial de data/tmp: %d arquivos removidos.", removed)
+    except Exception as e:
+        logger.warning("Falha na limpeza inicial de data/tmp: %s", e)
+
     scheduler_runner = None
     if settings.scheduler_enabled:
         from server_MET.acquisition.scheduler import get_scheduler_runner

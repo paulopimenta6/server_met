@@ -35,7 +35,7 @@ class FakeDownloader:
         self.calls: list[tuple] = []
 
     def download_gribs_all_resolutions(self, date_str, analysis_hour, **kwargs):
-        self.calls.append((date_str, analysis_hour))
+        self.calls.append((date_str, analysis_hour, kwargs))
         return self.files
 
 
@@ -45,7 +45,8 @@ class TestSchedulerRunner:
         fake = FakeDownloader()
         runner.downloader = fake
         ran = []
-        runner._run_pipeline = lambda date, ana: ran.append((date, ana))
+        runner._run_pipeline = lambda date, ana, proc=None: ran.append((date, ana))
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (True, [])
 
         import asyncio
 
@@ -55,6 +56,40 @@ class TestSchedulerRunner:
         assert ran, "pipeline deveria ter rodado"
         state = runner.state.get_json("processed_cycles", [])
         assert f"{ran[0][0]}_{ran[0][1]}" in state
+
+    def test_process_new_cycles_partial_forecast_not_marked(self, isolated_db):
+        """Ciclo com previsão parcial/incompleta NÃO é marcado como processado."""
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        ran = []
+        runner._run_pipeline = lambda date, ana, proc=None: ran.append((date, ana))
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (False, ["06"])
+
+        import asyncio
+
+        asyncio.run(runner._process_new_cycles())
+
+        assert ran == [], "pipeline não deveria rodar com previsão incompleta"
+        state = runner.state.get_json("processed_cycles", [])
+        assert state == []
+        assert runner.state.get("last_pipeline_cycle") is None
+
+    def test_process_new_cycles_uses_configured_resolution(self, isolated_db):
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        runner.settings._scheduler_resolution = "0p50"
+        runner._run_pipeline = lambda date, ana, proc=None: None
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (True, [])
+
+        import asyncio
+
+        asyncio.run(runner._process_new_cycles())
+
+        assert fake.calls
+        _, _, kwargs = fake.calls[0]
+        assert kwargs.get("resolutions") == ["0p50"]
 
     def test_process_new_cycles_skips_already_processed(self, isolated_db):
         runner = SchedulerRunner()
@@ -66,7 +101,7 @@ class TestSchedulerRunner:
             "processed_cycles",
             [f"{target[0]}_{target[1]}", f"{prev[0]}_{prev[1]}"],
         )
-        runner._run_pipeline = lambda date, ana: None
+        runner._run_pipeline = lambda date, ana, proc=None: None
 
         import asyncio
 
@@ -96,3 +131,66 @@ class TestIngestStateRepository:
         repo.set("a", "1")
         repo.set("b", "2")
         assert repo.all() == {"a": "1", "b": "2"}
+
+
+class TestGribDownloaderExistingFiles:
+    """A2: arquivo existente não é confiado cegamente — valida antes de pular."""
+
+    def _paths(self):
+        from server_MET.core.config import Settings
+
+        dest = Settings().dir_gribs / "20260801" / "06"
+        dest.mkdir(parents=True, exist_ok=True)
+        return dest / "gfs.t06z.pgrb2.0p25.f000"
+
+    def test_existing_validated_file_skipped(self, isolated_db, isolated_data_dirs, monkeypatch):
+        from server_MET.acquisition.grib_downloader import GribDownloader
+
+        d = GribDownloader()
+        fp = self._paths()
+        fp.write_bytes(b"data")
+        d.repo.register("20260801", "06", "0p25", "00", fp)
+        d.repo.mark("20260801", "06", "0p25", "00", "downloaded", file_size=4)
+
+        monkeypatch.setattr(
+            d, "validate_grib",
+            lambda *a, **k: (_ for _ in ()).throw(AssertionError("não deveria validar")),
+        )
+        files = d.download_gribs(
+            date_str="20260801", analysis_hour="06",
+            forecast_hours=["00"], resolution="0p25",
+        )
+        assert files == [fp]
+        assert d.repo.get("20260801", "06", "0p25", "00")["status"] == "skipped"
+
+    def test_existing_unvalidated_file_is_validated(self, isolated_db, isolated_data_dirs, monkeypatch):
+        from server_MET.acquisition.grib_downloader import GribDownloader
+
+        d = GribDownloader()
+        fp = self._paths()
+        fp.write_bytes(b"data")
+
+        monkeypatch.setattr(d, "validate_grib", lambda *a, **k: True)
+        files = d.download_gribs(
+            date_str="20260801", analysis_hour="06",
+            forecast_hours=["00"], resolution="0p25",
+        )
+        assert files == [fp]
+        assert d.repo.get("20260801", "06", "0p25", "00")["status"] == "downloaded"
+
+    def test_existing_corrupted_file_removed_and_redownloaded(self, isolated_db, isolated_data_dirs, monkeypatch):
+        from server_MET.acquisition.grib_downloader import GribDownloader
+
+        d = GribDownloader()
+        fp = self._paths()
+        fp.write_bytes(b"parcial")
+
+        monkeypatch.setattr(d, "validate_grib", lambda *a, **k: False)
+        monkeypatch.setattr(d, "check_url_exists", lambda *a, **k: False)
+        files = d.download_gribs(
+            date_str="20260801", analysis_hour="06",
+            forecast_hours=["00"], resolution="0p25",
+        )
+        assert files == []
+        assert not fp.exists(), "arquivo corrompido deveria ter sido removido"
+        assert d.repo.get("20260801", "06", "0p25", "00")["status"] == "failed"

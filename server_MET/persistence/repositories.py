@@ -76,6 +76,20 @@ class DownloadRepository:
             (status, file_size, error, date_str, analysis_hour, resolution, forecast_hour),
         )
 
+    def get(
+        self,
+        date_str: str,
+        analysis_hour: str,
+        resolution: str,
+        forecast_hour: str,
+    ) -> Optional[dict]:
+        """Registro do download de um arquivo específico (ou None)."""
+        return self.db.fetchone(
+            "SELECT * FROM downloads WHERE date_str = ? AND analysis_hour = ? "
+            "AND resolution = ? AND forecast_hour = ?",
+            (date_str, analysis_hour, resolution, forecast_hour),
+        )
+
     def list(
         self,
         date_str: Optional[str] = None,

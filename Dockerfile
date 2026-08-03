@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN mkdir -p /app/data/gribs /app/data/mapasGrib /app/data/matrizGrib \
-    && mkdir -p /app/data/matrizGrib/predi /app/data/matrizGrib/bluesky \
+    && mkdir -p /app/data/matrizGrib/bluesky \
     && mkdir -p /app/data/analise /app/data/tmp
 
 EXPOSE 8000
