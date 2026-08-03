@@ -82,7 +82,7 @@
         <h2>Animações (GIF)</h2>
         <p class="hint">
           Gera um GIF animado com a evolução da variável nas horas de previsão
-          (agora, +6h, +12h e +18h) — um quadro para cada previsão.
+          (+00h, +06h, +12h e +18h) — um quadro para cada previsão.
         </p>
         <div class="controls card">
           <label>Região <select id="anim-region"></select></label>
@@ -176,16 +176,16 @@
         <ul>
           <li><strong>GFS</strong> — o "previsor". A cada 6 horas ele calcula
               como o tempo deve estar nas próximas horas.</li>
-          <li><strong>Previsão (+6h, +12h, +18h)</strong> — o quanto de tempo
-              à frente o modelo está olhando. "+00h" é o "agora", "+06h" é
-              daqui a 6 horas, e assim por diante.</li>
+          <li><strong>Previsão (+00h, +06h, +12h, +18h)</strong> — o quanto de
+              tempo à frente o modelo está olhando. "+00h" é o "agora",
+              "+06h" é daqui a 6 horas, e assim por diante.</li>
           <li><strong>Análise (00, 06, 12, 18 Z)</strong> — o horário em que o
               modelo "rodou". A letra Z indica o horário de Londres (UTC).
               Escolha "Automática" e o sistema escolhe o mais recente.</li>
-          <li><strong>Nível (hPa)</strong> — a altitude do mapa. Valores altos
-              (500, 300, 200) são o meio e o topo da atmosfera; valores baixos
-              (850, 925) são próximos do chão. Variáveis de superfície não usam
-              nível.</li>
+          <li><strong>Nível (hPa)</strong> — a altitude do mapa. O sistema usa
+              níveis fixos: <strong>850</strong> (próximo do chão),
+              <strong>500</strong> (meio da atmosfera) e <strong>200</strong>
+              (topo da atmosfera). Variáveis de superfície não usam nível.</li>
           <li><strong>Data e análise</strong> — a lista já vem preenchida com
               as <strong>datas, análises e previsões que existem de verdade</strong>
               nos arquivos baixados. "Automática" usa o ciclo mais recente
@@ -240,7 +240,7 @@
 
   <footer>
     <p>
-      MET Server v4.2 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
+      MET Server v4.3 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
     </p>
   </footer>
 

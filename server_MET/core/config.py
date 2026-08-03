@@ -10,7 +10,12 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from server_MET.core.constants import FORECAST_HOURS, GFS_BASE_URL, RESOLUTIONS
+from server_MET.core.constants import (
+    FORECAST_HOURS,
+    GFS_BASE_URL,
+    PIPELINE_LEVELS,
+    RESOLUTIONS,
+)
 
 
 class Settings:
@@ -183,7 +188,11 @@ class Settings:
 
     @property
     def pipeline_levels(self) -> list[int]:
-        """Níveis (hPa) gerados no pipeline automático (vazio = todos os GRIB)."""
+        """Níveis fixos (hPa) gerados no pipeline: superfície + 850/500/200.
+
+        O padrão é `PIPELINE_LEVELS` (850, 500 e 200 hPa); um valor vazio na
+        configuração também cai no padrão.
+        """
         if self._pipeline_levels:
             levels = []
             for h in self._pipeline_levels.split(","):
@@ -192,7 +201,7 @@ class Settings:
                     levels.append(int(h))
             if levels:
                 return levels
-        return []
+        return list(PIPELINE_LEVELS)
 
     def ensure_dirs(self) -> None:
         for d in [

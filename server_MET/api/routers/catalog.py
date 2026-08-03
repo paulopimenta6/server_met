@@ -9,7 +9,8 @@ from server_MET.api.dependencies import get_processor, get_reader, get_settings
 from server_MET.core.config import Settings
 from server_MET.core.constants import (
     COMPUTED_VARIABLES,
-    PRESSURE_LEVELS,
+    MAIN_VARIABLES,
+    PIPELINE_LEVELS,
     VAR_FIXED_LEVEL,
     VAR_MAP,
     var_label,
@@ -28,6 +29,7 @@ router = APIRouter(tags=["catalog"])
 
 @router.get("/variables")
 async def list_variables():
+    """Catálogo enxuto: apenas as variáveis principais do sistema."""
     variables = [
         {
             "key": k,
@@ -38,6 +40,7 @@ async def list_variables():
             "fixed_level": VAR_FIXED_LEVEL.get(k),
         }
         for k, v in VAR_MAP.items()
+        if k in MAIN_VARIABLES
     ]
     variables += [
         {
@@ -58,8 +61,9 @@ async def list_variables():
 
 @router.get("/levels")
 async def list_levels():
-    """Níveis de pressão padrão (hPa) suportados pelas variáveis de nível."""
-    return {"levels": PRESSURE_LEVELS, "count": len(PRESSURE_LEVELS)}
+    """Níveis fixos de pressão (hPa) do sistema (850, 500 e 200)."""
+    levels = list(PIPELINE_LEVELS)
+    return {"levels": levels, "count": len(levels)}
 
 
 @router.get("/catalog/cycles")

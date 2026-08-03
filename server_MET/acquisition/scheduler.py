@@ -20,6 +20,7 @@ from typing import Optional
 from server_MET.acquisition.grib_downloader import GribDownloader
 from server_MET.acquisition.metar_client import MetarClient
 from server_MET.core.config import Settings
+from server_MET.core.constants import MAIN_VARIABLES, PIPELINE_LEVELS
 from server_MET.core.logging_conf import get_logger
 from server_MET.persistence.repositories import IngestStateRepository
 
@@ -29,66 +30,40 @@ logger = get_logger(__name__)
 PUBLISH_DELAY_HOURS = 5
 
 #: (variável, nível) gerados automaticamente pelo pipeline por região.
-#: Para variáveis com nível `None` usa-se superfície/nível fixo; variáveis
-#: com nível na lista expandem para todos os níveis disponíveis no GRIB
-#: (limitados por `Settings.pipeline_levels`, se configurado).
+#: Conjunto enxuto: principais variáveis meteorológicas + poluição, com os
+#: níveis fixos do sistema (superfície, 850, 500 e 200 hPa — ver
+#: `Settings.pipeline_levels` / `PIPELINE_LEVELS`). Variáveis com nível `None`
+#: que estão em `PIPELINE_LEVELED_VARS` são expandidas para os níveis fixos;
+#: as demais são de superfície/nível próprio. `winds` é calculado (uSupe/vSupe).
 PIPELINE_VARS: list[tuple[str, Optional[int]]] = [
-    ("temp", 500),
-    ("temp", 850),
-    ("umidadeRel", 850),
-    ("nuvem", 850),
-    ("ozonio", 500),
-    ("winds", None),
-    ("uSupe", 10),
-    ("vSupe", 10),
-    ("temps2m", 2),
-    ("dewpoint2m", 2),
-    ("rh2m", 2),
-    ("aparente", 2),
-    ("nuvemTot", None),
-    ("chuvaNaoConvec", None),
-    ("chuvaConvec", None),
-    ("precipitacao", None),
-    ("ps", None),
-    ("prnm", None),
-    ("rajada", None),
-    ("neve", None),
-    ("visibilidade", None),
-    ("cape", None),
-    ("cin", None),
-    ("indiceLift", None),
-    ("helicidade", 3000),
-    ("indiceHaines", None),
-    ("aguaPrecipitavel", None),
-    ("ozonioTot", None),
-    ("ventilacao", None),
-]
+    (var_name, None) for var_name in MAIN_VARIABLES
+] + [("winds", None)]
 
-#: Variáveis do pipeline cujo nível é variável e deve ser expandido
-#: para todos os níveis disponíveis no GRIB (exceto quando fixado em
-#: `PIPELINE_VARS` ou em `Settings.pipeline_levels`).
-PIPELINE_LEVELED_VARS: tuple[str, ...] = ("temp", "umidadeRel", "nuvem", "ozonio", "u", "v")
+#: Variáveis do pipeline cujo nível é variável e deve ser expandido para os
+#: níveis fixos do sistema (850, 500 e 200 hPa). `nuvem`/`nuvemTot` são
+#: colunas únicas (nível atmosférico) e ficam fora da expansão.
+PIPELINE_LEVELED_VARS: tuple[str, ...] = ("temp", "umidadeRel", "ozonio")
 
 #: (variável, nível) das estatísticas geradas automaticamente pelo pipeline,
-#: persistidas na tabela `statistics` e em CSV. Inclui níveis de superfície
-#: e de média/alta altitude.
+#: persistidas na tabela `statistics` e em CSV — principais variáveis nos
+#: níveis fixos do sistema.
 PIPELINE_STATS_VARS: list[tuple[str, Optional[int]]] = [
-    ("temp", 500),
     ("temp", 850),
+    ("temp", 500),
+    ("temp", 200),
     ("umidadeRel", 850),
-    ("gh", 500),
-    ("omega", 500),
-    ("nuvemTot", None),
+    ("dewpoint2m", None),
     ("temps2m", None),
     ("rh2m", None),
-    ("dewpoint2m", None),
+    ("nuvemTot", None),
+    ("precipitacao", None),
     ("chuvaNaoConvec", None),
-    ("cape", None),
-]
-
-#: Níveis comuns (hPa) usados quando a descoberta automática falha.
-PIPELINE_DEFAULT_LEVELS: list[int] = [
-    200, 250, 300, 400, 500, 700, 850, 925, 1000,
+    ("chuvaConvec", None),
+    ("winds", None),
+    ("ps", None),
+    ("ozonio", 850),
+    ("ozonio", 500),
+    ("ozonioTot", None),
 ]
 
 
@@ -210,15 +185,11 @@ class SchedulerRunner:
         from server_MET.output.matrices import MatrixGenerator
         from server_MET.persistence.repositories import AnalysisRepository
         from server_MET.processing.processor import DataProcessor
-        from server_MET.processing.regions import (
-            CIDADES_PREDEFINIDAS,
-            REGIOES_PREDEFINIDAS,
-            Region,
-        )
+        from server_MET.processing.regions import Region, todas_as_regioes
 
         self.pipeline_running = True
         try:
-            regions = list(REGIOES_PREDEFINIDAS) + list(CIDADES_PREDEFINIDAS)
+            regions = list(todas_as_regioes())
             regions = [r for r in regions if r != "SA"]
             if self.settings.scheduler_auto_pipeline:
                 allowed = set(self.settings.scheduler_auto_pipeline)
@@ -315,19 +286,9 @@ class SchedulerRunner:
     def _expand_pipeline_combos(
         self, date_str: str, ana: str
     ) -> list[tuple[str, Optional[int]]]:
-        """Expande PIPELINE_VARS: níveis None de variáveis com nível viram
-        todos os níveis disponíveis no GRIB (ou `Settings.pipeline_levels`)."""
-        if not self.settings.pipeline_levels:
-            from server_MET.acquisition.grib_reader import GribReader
-
-            reader = GribReader()
-            forecast = self.settings.forecast_hours[0] if self.settings.forecast_hours else "00"
-            available = reader.available_levels(date_str, ana, forecast)
-            if not available:
-                available = PIPELINE_DEFAULT_LEVELS
-            levels = available
-        else:
-            levels = self.settings.pipeline_levels
+        """Expande `PIPELINE_VARS`: níveis `None` de variáveis com nível viram
+        os níveis fixos do sistema (`Settings.pipeline_levels`)."""
+        levels = self.settings.pipeline_levels or list(PIPELINE_LEVELS)
 
         combos: list[tuple[str, Optional[int]]] = []
         for var_name, level in PIPELINE_VARS:
@@ -412,5 +373,4 @@ __all__ = [
     "PIPELINE_VARS",
     "PIPELINE_LEVELED_VARS",
     "PIPELINE_STATS_VARS",
-    "PIPELINE_DEFAULT_LEVELS",
 ]

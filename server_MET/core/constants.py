@@ -71,6 +71,32 @@ VAR_FIXED_LEVEL: dict[str, int] = {
 #: Chaves calculadas (não são variáveis GRIB diretas).
 COMPUTED_VARIABLES: tuple[str, ...] = ("wind", "winds")
 
+#: Variáveis principais do sistema (pipeline, catálogo e site): temperatura,
+#: chuva, vento (rajada; `winds` é calculado), nuvens/nebulosidade, umidade,
+#: pressão e poluição do ar. `winds` é calculado e entra pelo `COMPUTED_VARIABLES`.
+MAIN_VARIABLES: tuple[str, ...] = (
+    "temp",
+    "temps2m",
+    "dewpoint2m",
+    "aparente",
+    "precipitacao",
+    "chuvaNaoConvec",
+    "chuvaConvec",
+    "nuvem",
+    "nuvemTot",
+    "umidadeRel",
+    "rh2m",
+    "ps",
+    "rajada",
+    "ozonio",
+    "ozonioTot",
+)
+
+#: Níveis de pressão fixos do sistema: próximo à superfície (850 hPa),
+#: média troposfera (500 hPa) e alta troposfera (200 hPa). Usados pelo
+#: pipeline automático, pelo catálogo de níveis e pelos seletores do site.
+PIPELINE_LEVELS: list[int] = [850, 500, 200]
+
 #: Níveis de pressão padrão (hPa) para snap de níveis solicitados.
 #: Corresponde ao conjunto completo de níveis isobáricos do GFS 0.25°.
 PRESSURE_LEVELS: list[int] = [
@@ -192,6 +218,8 @@ def var_label(var_name: str) -> str:
 __all__ = [
     "VAR_MAP",
     "COMPUTED_VARIABLES",
+    "MAIN_VARIABLES",
+    "PIPELINE_LEVELS",
     "PRESSURE_LEVELS",
     "ANALYSIS_HOURS",
     "FORECAST_HOURS",

@@ -1,4 +1,4 @@
-/* MET Server — frontend do site meteorológico (v4.2). */
+/* MET Server — frontend do site meteorológico (v4.3). */
 "use strict";
 
 /* ---------------------------------------------------------------- utils */
@@ -113,64 +113,47 @@ const REGION_GROUPS = [
   },
 ];
 
+/* Conjunto enxuto: principais variáveis meteorológicas + poluição
+   (mesmas de server_MET.core.constants.MAIN_VARIABLES). */
 const VARIABLE_GROUPS = [
   {
-    label: "Temperatura e umidade",
+    label: "Temperatura",
     options: [
-      { value: "temp", label: "Temperatura (nível de pressão)" },
+      { value: "temp", label: "Temperatura (nível)" },
       { value: "temps2m", label: "Temperatura a 2 m" },
-      { value: "temps", label: "Temperatura na superfície" },
       { value: "dewpoint2m", label: "Ponto de orvalho a 2 m" },
       { value: "aparente", label: "Temperatura aparente" },
-      { value: "rh2m", label: "Umidade relativa a 2 m" },
+    ],
+  },
+  {
+    label: "Umidade e nuvens",
+    options: [
       { value: "umidadeRel", label: "Umidade relativa (nível)" },
+      { value: "rh2m", label: "Umidade relativa a 2 m" },
+      { value: "nuvem", label: "Nebulosidade" },
+      { value: "nuvemTot", label: "Nebulosidade total (coluna)" },
+    ],
+  },
+  {
+    label: "Chuva",
+    options: [
+      { value: "chuvaNaoConvec", label: "Chuva acumulada" },
+      { value: "chuvaConvec", label: "Chuva convectiva" },
+      { value: "precipitacao", label: "Taxa de precipitação" },
     ],
   },
   {
     label: "Vento",
     options: [
-      { value: "wind", label: "Vento (nível de pressão)" },
       { value: "winds", label: "Vento na superfície (10 m)" },
-      { value: "u", label: "Vento componente U (nível)" },
-      { value: "v", label: "Vento componente V (nível)" },
-      { value: "uSupe", label: "Vento componente U (10 m)" },
-      { value: "vSupe", label: "Vento componente V (10 m)" },
-      { value: "vento10u", label: "Vento U a 10 m" },
-      { value: "vento10v", label: "Vento V a 10 m" },
-      { value: "vento100u", label: "Vento U a 100 m" },
-      { value: "vento100v", label: "Vento V a 100 m" },
+      { value: "wind", label: "Vento (nível)" },
       { value: "rajada", label: "Rajada de vento" },
     ],
   },
   {
-    label: "Precipitação e nuvens",
-    options: [
-      { value: "chuvaNaoConvec", label: "Chuva acumulada" },
-      { value: "chuvaConvec", label: "Chuva convectiva" },
-      { value: "precipitacao", label: "Taxa de precipitação" },
-      { value: "nuvem", label: "Nebulosidade total" },
-      { value: "nuvemTot", label: "Nebulosidade total (coluna)" },
-      { value: "aguaPrecipitavel", label: "Água precipitável" },
-      { value: "neve", label: "Profundidade de neve" },
-    ],
-  },
-  {
-    label: "Pressão e visibilidade",
+    label: "Pressão",
     options: [
       { value: "ps", label: "Pressão na superfície" },
-      { value: "prnm", label: "Pressão ao nível do mar" },
-      { value: "visibilidade", label: "Visibilidade" },
-      { value: "ventilacao", label: "Ventilação" },
-    ],
-  },
-  {
-    label: "Instabilidade e severidade",
-    options: [
-      { value: "cape", label: "CAPE (energia potencial)" },
-      { value: "cin", label: "CIN (inibição convectiva)" },
-      { value: "indiceLift", label: "Índice de levantamento" },
-      { value: "helicidade", label: "Helicidade relativa à tempestade" },
-      { value: "indiceHaines", label: "Índice de Haines" },
     ],
   },
   {
@@ -180,29 +163,15 @@ const VARIABLE_GROUPS = [
       { value: "ozonioTot", label: "Ozônio total (coluna)" },
     ],
   },
-  {
-    label: "Atmosfera (níveis médios e altos)",
-    options: [
-      { value: "gh", label: "Altura geopotencial (nível)" },
-      { value: "omega", label: "Velocidade vertical (nível)" },
-      { value: "vortabs", label: "Vorticidade absoluta (nível)" },
-      { value: "temp", label: "Temperatura (nível)" },
-      { value: "umidadeRel", label: "Umidade relativa (nível)" },
-      { value: "u", label: "Vento U (nível)" },
-      { value: "v", label: "Vento V (nível)" },
-      { value: "ozonio", label: "Ozônio (nível)" },
-    ],
-  },
 ];
 
-/* Variáveis que aceitam nível de pressão (mesmas de server_MET.processor.LEVELED_VARIABLES).
-   É reforçado pela resposta de /variables quando disponível. */
+/* Variáveis que aceitam nível de pressão (reforçado por /variables). */
 const LEVELED_VARS = new Set([
-  "temp", "umidadeRel", "u", "v", "ozonio", "gh", "omega", "vortabs", "wind",
+  "temp", "umidadeRel", "ozonio", "wind",
 ]);
 
-/* Níveis padrão de pressão (hPa) para o seletor; substituído por /catalog/levels. */
-let STANDARD_LEVELS = [100, 150, 200, 250, 300, 400, 500, 600, 700, 850, 925, 1000];
+/* Níveis fixos de pressão (hPa) do sistema; substituído por /levels. */
+let STANDARD_LEVELS = [850, 500, 200];
 let leveledMap = {};
 
 function fillSelect(select, groups, withEmpty) {

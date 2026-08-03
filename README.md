@@ -1,4 +1,4 @@
-# Servidor Meteorológico — MET Server (v4.2.0)
+# Servidor Meteorológico — MET Server (v4.3.0)
 
 Servidor que **capta, organiza, analisa e mostra** dados de previsão do tempo do modelo
 **GFS** (da NOAA, agência meteorológica dos EUA), com **mapas, animações, dashboard
@@ -43,8 +43,9 @@ e temperatura medidos na hora. Eles servem para comparar a previsão com a
 realidade.
 
 ### O que é "nível (hPa)"?
-A **altitude** do mapa: 500 hPa é o meio da atmosfera, 850 hPa e 925 hPa são
-perto do chão.
+A **altitude** do mapa. O sistema usa níveis fixos: **850 hPa** (perto do chão),
+**500 hPa** (meio da atmosfera) e **200 hPa** (topo da atmosfera). Variáveis de
+superfície (temperatura a 2 m, vento a 10 m, chuva, pressão…) não usam nível.
 
 ### O que este sistema faz sozinho?
 - **Baixa dados continuamente**: a cada poucos minutos verifica se o GFS publicou
@@ -144,8 +145,8 @@ scheduler_grib_interval_min=60            # a cada X min verifica novo ciclo GFS
 scheduler_metar_interval_min=30           # a cada X min busca METARs
 scheduler_resolution=0p25                 # resolução GFS baixada pelo scheduler (0p25|0p50|1p00)
 # scheduler_auto_pipeline=SP,SP-CIDADE    # (opcional) só estas regiões no pipeline
-# forecast_hours=00,06,12,18              # (opcional) horas de previsão a capturar
-# pipeline_levels=500,700,850,925,1000    # (opcional) níveis do pipeline automático
+# forecast_hours=00,06,12,18              # (opcional) horas sinóticas de previsão a capturar
+# pipeline_levels=850,500,200             # (opcional) níveis fixos do pipeline (padrão: 850,500,200)
 ```
 
 No código, use sempre o singleton `Settings` (nunca `data/...` direto):
@@ -167,7 +168,8 @@ servidor (ou avulso com `./scripts/run.sh scheduler`):
    recente que já deveria estar publicado (o NOMADS publica ~5h após o início
    do ciclo). Se ainda não baixado:
    - baixa a resolução configurada em `scheduler_resolution` (padrão 0.25°),
-     apenas nas horas de previsão configuradas;
+     apenas nas horas sinóticas de previsão configuradas (`forecast_hours`,
+     padrão 00, 06, 12 e 18 Z — os horários em que o GFS publica);
    - valida cada arquivo em subprocesso (pygrib com timeout) e descarta
      corrompidos antes de usá-los no pipeline;
    - **só marca o ciclo como processado quando todas as horas de previsão
@@ -175,8 +177,9 @@ servidor (ou avulso com `./scripts/run.sh scheduler`):
      marcado e é re-verificado no próximo ciclo (o re-download é barato, pois
      arquivos válidos já existentes são pulados);
    - roda o **pipeline automático**: mapas e matrizes CSV (persistidas também
-     no SQLite) por nível para todas as regiões predefinidas — Estados,
-     países da América do Sul e cidades;
+     no SQLite) das **principais variáveis meteorológicas + poluição**, nos
+     **níveis fixos** (superfície, 850, 500 e 200 hPa), para todas as regiões
+     predefinidas — Estados, países da América do Sul e cidades;
    - gera o **perfil vertical** por região (as análises de resumo e série
      ficam sob demanda pela API);
    - registra o ciclo em `ingest_state` para não repetir.
@@ -194,6 +197,12 @@ Acompanhe pelo navegador ou API: `GET /scheduler/status` (ou
 ---
 
 ## Variáveis disponíveis
+
+O **pipeline automático, o catálogo (`GET /variables`) e o site** trabalham com
+o conjunto principal (`MAIN_VARIABLES`): temperatura, chuva, vento, nuvens,
+umidade, pressão e poluição do ar. As demais variáveis técnicas (CAPE, CIN,
+geopotencial, vorticidade, neve, visibilidade…) continuam suportadas pela
+engine de extração e pela API sob demanda, mas não são pré-geradas.
 
 ### Temperatura e umidade
 
@@ -225,8 +234,8 @@ Acompanhe pelo navegador ou API: `GET /scheduler/status` (ou
 | `chuvaNaoConvec` | Chuva acumulada | mm |
 | `chuvaConvec` | Chuva convectiva | mm |
 | `precipitacao` | Taxa de precipitação | mm/h |
-| `nuvem` | Nebulosidade (nível de pressão) | % |
-| `nuvemTot` | Nebulosidade total | % |
+| `nuvem` | Nebulosidade (coluna) | % |
+| `nuvemTot` | Nebulosidade total (coluna) | % |
 | `aguaPrecipitavel` | Água precipitável | mm |
 | `neve` | Profundidade de neve | cm |
 
@@ -256,12 +265,12 @@ Acompanhe pelo navegador ou API: `GET /scheduler/status` (ou
 | `ozonio` | Razão de mistura de ozônio (nível de pressão) | ppb |
 | `ozonioTot` | Ozônio total (coluna) | DU |
 
-**Níveis de pressão**: 1–1000 hPa — o conjunto completo de níveis isobáricos
-do GFS 0.25° (1, 2, 3, 5, 7, 10, 20, 30, 40, 50, 70, 100, 150, 200, 250, 300,
-350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 925, 950, 975, 1000).
-Níveis fora do intervalo são ajustados para o mais próximo disponível.
+**Níveis fixos do sistema**: superfície (sem nível), **850 hPa** (perto do chão),
+**500 hPa** (meio da atmosfera) e **200 hPa** (topo). As variáveis com nível
+(`temp`, `umidadeRel`, `ozonio`) são geradas nesses três níveis; o restante é de
+superfície. `PRESSURE_LEVELS` (1–1000 hPa, todos os isobáricos do GFS 0.25°)
+continua sendo usado para **snap** de níveis pedidos pela API sob demanda.
 Variáveis de superfície (nível fixo, ex.: 2 m/10 m/100 m) ignoram o nível pedido.
-`GribReader.available_levels()` descobre os níveis presentes no arquivo.
 
 ---
 
@@ -436,6 +445,16 @@ curl -X POST http://localhost:8000/maps/generate \
 
 ## Changelog
 
+- **v4.3.0** — **servidor leve e focado nas variáveis principais**:
+  pipeline, catálogo (`GET /variables`/`GET /levels`) e site reduzidos ao
+  conjunto principal (`MAIN_VARIABLES`): temperatura, chuva, vento,
+  nuvens/nebulosidade, umidade, pressão e poluição do ar. **Níveis fixos** do
+  sistema: superfície, **850**, **500** e **200 hPa** (sem descoberta de
+  níveis a cada ciclo). Pipeline gera para **todas as regiões parametrizadas**
+  (Estados + países da América do Sul + cidades, exceto SA). Captação apenas
+  nos **horários sinóticos** do GFS (`forecast_hours` = 00, 06, 12 e 18 Z).
+  As demais variáveis técnicas (CAPE, CIN, geopotencial, neve…) continuam na
+  engine e na API sob demanda, mas não são pré-geradas.
 - **v4.2.0** — **níveis médios/altos padronizados** na API e no site (500 hPa
   padrão para variáveis de nível; geopotencial `gh`, omega `omega` e vorticidade
   absoluta `vortabs` adicionadas); **datas/horas reais dos arquivos GRIB** em
