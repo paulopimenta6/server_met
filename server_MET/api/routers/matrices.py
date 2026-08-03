@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from server_MET.api.dependencies import (
     build_region,
+    default_cycle,
     get_grid_repo,
     get_matrix_generator,
     get_settings,
@@ -27,8 +28,9 @@ async def generate_matrix(
     matrix_generator=Depends(get_matrix_generator),
 ):
     region = build_region(request)
-    date_str = request.date or matrix_generator.processor.get_date_str()
-    ana = request.analysis or matrix_generator.processor.get_current_analysis_hour()
+    date_str, ana = default_cycle(
+        matrix_generator.processor, request.date, request.analysis
+    )
     output_dir = str(settings.dir_tmp / uuid.uuid4().hex)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 

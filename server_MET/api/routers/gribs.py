@@ -7,6 +7,7 @@ from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 
 from server_MET.api.dependencies import (
+    default_cycle,
     get_downloader,
     get_processor,
     get_reader,
@@ -115,15 +116,16 @@ async def grib_info(
     reader=Depends(get_reader),
     processor=Depends(get_processor),
 ):
-    date_str = request.date or processor.get_date_str()
-    ana = request.analysis or processor.get_current_analysis_hour()
+    date_str, ana = default_cycle(processor, request.date, request.analysis)
     prev = request.forecast or "00"
     f = reader.find_grib_file(date_str, ana, prev)
-    if f is None and not request.analysis:
-        for alt_ana in reader.find_available_analyses(date_str):
-            f = reader.find_grib_file(date_str, alt_ana, prev)
+    if f is None and not request.date:
+        for alt_date, alt_ana in [
+            cycle for cycle in [reader.latest_available_cycle()] if cycle
+        ]:
+            f = reader.find_grib_file(alt_date, alt_ana, prev)
             if f is not None:
-                ana = alt_ana
+                date_str, ana = alt_date, alt_ana
                 break
     if f is None:
         raise HTTPException(status_code=404, detail="Arquivo GRIB não encontrado")

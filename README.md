@@ -1,7 +1,8 @@
-# Servidor Meteorológico — MET Server (v4.1.0)
+# Servidor Meteorológico — MET Server (v4.2.0)
 
 Servidor que **capta, organiza, analisa e mostra** dados de previsão do tempo do modelo
-**GFS** (da NOAA, agência meteorológica dos EUA), com **mapas, animações, estatísticas**
+**GFS** (da NOAA, agência meteorológica dos EUA), com **mapas, animações, dashboard
+estatístico**
 e observações reais de aeroportos (METAR), tudo em um **site simples de usar**.
 
 > **Linguagem simples:** se você não é da área técnica, comece pela seção
@@ -268,11 +269,16 @@ Arquivo padrão: **`data/met_server.db`** (`db_file=` no path.conf), modo WAL
 | `tasks` | tarefas em segundo plano (download) | API |
 | `analysis_results` | análises (cache + histórico) | API / pipeline |
 | `grid_data` | pontos de grade (matrizes) — **persistência dupla** dos CSVs | `MatrixGenerator` |
+| `statistics` | estatísticas descritivas por hora de previsão (dashboard) | `DashboardAnalyzer` / pipeline |
 | `ingest_state` | estado da captação contínua (ciclos processados, horários) | scheduler |
 
 - **Persistência dupla**: cada matriz gerada é salva como CSV em
   `data/matrizGrib` **e** ponto a ponto na tabela `grid_data`. Consulte sem
   depender de arquivos via `GET /matrices/data`.
+- **Estatísticas**: cada hora de previsão vira uma linha na tabela `statistics`
+  (min, max, média, mediana, DP, IQR, percentis p1–p99, assimetria e curtose),
+  consultável via `GET /analysis/statistics`. O dashboard também exporta um CSV
+  em `data/analise/estatisticas_...csv` (servido em `/files/analise/...`).
 - **Cache**: repetir a mesma análise não recalcula — responde do banco com a
   marca `"**cached**": true`.
 - **Backup**: basta copiar `data/met_server.db`.
@@ -378,7 +384,11 @@ curl -X POST http://localhost:8000/maps/generate \
 | POST | `/analysis/profile` | Perfil vertical em todos os níveis 1–1000 hPa |
 | POST | `/analysis/timeseries` | Série nas previsões + tendência (slope, p-valor, R²) |
 | POST | `/analysis/charts` | Gráficos PNG (perfil, série, histograma) |
+| POST | `/analysis/dashboard` | Dashboard completo (cards + tendência OLS + perfil + CSV); grava na tabela `statistics` |
+| GET | `/analysis/dashboard?variable=&region=&level=&date=&analysis=` | Dashboard já calculado (cache persistido) |
+| GET | `/analysis/statistics?variable=&region=&date=&analysis=&level=` | Linhas da tabela `statistics` (uma por hora de previsão) |
 | GET | `/analysis/regions/{region}` | Estado consolidado da região |
+| GET | `/catalog/cycles` | Datas, análises e horas de previsão realmente nos arquivos GRIB |
 
 ### METAR, histórico e captação contínua
 
@@ -417,6 +427,17 @@ curl -X POST http://localhost:8000/maps/generate \
 
 ## Changelog
 
+- **v4.2.0** — **níveis médios/altos padronizados** na API e no site (500 hPa
+  padrão para variáveis de nível; geopotencial `gh`, omega `omega` e vorticidade
+  absoluta `vortabs` adicionadas); **datas/horas reais dos arquivos GRIB** em
+  vez de suposições (`latest_available_cycle`/`available_cycles`, `GET
+  /catalog/cycles`, seletores de data/análise/previsão no site); **dashboard
+  estatístico** (cards por hora de previsão + tendência por regressão linear
+  com intervalo de confiança, R², p-valor e Jarque-Bera + perfil vertical +
+  histograma + tabela), persistido em SQLite (**tabela `statistics`**, `GET
+  /analysis/statistics`) e em **CSV** (`data/analise/estatisticas_...csv`,
+  gerado pelo pipeline e pelo `POST /analysis/dashboard`, baixável no site);
+  aba "Estatísticas" do site substituída pela aba "Dashboard".
 - **v4.1.0** — variáveis profissionais: superfície/próximas da superfície
   (2 m/10 m/100 m, CAPE, CIN, índice de levantamento, helicidade, rajada,
   visibilidade, neve, precipitação, vento em 80 m/100 m) e **poluição**

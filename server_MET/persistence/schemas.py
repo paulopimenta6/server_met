@@ -1,7 +1,7 @@
 """DDL (esquema) do banco de dados SQLite do servidor meteorológico."""
 from __future__ import annotations
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 TABLES_DDL: list[str] = [
     """
@@ -95,6 +95,36 @@ TABLES_DDL: list[str] = [
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS statistics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        variable TEXT NOT NULL,
+        level INTEGER,
+        region TEXT NOT NULL,
+        date_str TEXT NOT NULL,
+        analysis TEXT NOT NULL,
+        forecast INTEGER NOT NULL,
+        units TEXT,
+        n_points INTEGER,
+        n_missing INTEGER,
+        min REAL,
+        max REAL,
+        mean REAL,
+        median REAL,
+        std REAL,
+        iqr REAL,
+        p1 REAL,
+        p5 REAL,
+        p25 REAL,
+        p50 REAL,
+        p75 REAL,
+        p95 REAL,
+        p99 REAL,
+        skewness REAL,
+        kurtosis REAL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+    """,
 ]
 
 INDEXES_DDL: list[str] = [
@@ -104,6 +134,7 @@ INDEXES_DDL: list[str] = [
     "CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks (status)",
     "CREATE INDEX IF NOT EXISTS idx_analysis_lookup ON analysis_results (kind, region, date_str, variable)",
     "CREATE INDEX IF NOT EXISTS idx_grid_lookup ON grid_data (variable, region, date_str, analysis, forecast)",
+    "CREATE INDEX IF NOT EXISTS idx_stats_lookup ON statistics (variable, region, date_str, analysis, level)",
 ]
 
 __all__ = ["SCHEMA_VERSION", "TABLES_DDL", "INDEXES_DDL"]

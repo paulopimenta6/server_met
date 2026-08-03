@@ -7,8 +7,15 @@ from fastapi import APIRouter, Depends
 
 from server_MET.api.dependencies import get_processor, get_reader, get_settings
 from server_MET.core.config import Settings
-from server_MET.core.constants import COMPUTED_VARIABLES, VAR_MAP, var_label
+from server_MET.core.constants import (
+    COMPUTED_VARIABLES,
+    PRESSURE_LEVELS,
+    VAR_FIXED_LEVEL,
+    VAR_MAP,
+    var_label,
+)
 from server_MET.core.models import MetVariable
+from server_MET.processing.processor import LEVELED_VARIABLES
 from server_MET.processing.regions import (
     CIDADES_PREDEFINIDAS,
     PAISES_AMERICA_DO_SUL,
@@ -22,7 +29,14 @@ router = APIRouter(tags=["catalog"])
 @router.get("/variables")
 async def list_variables():
     variables = [
-        {"key": k, "name": v[0], "level_type": v[1], "label": var_label(k)}
+        {
+            "key": k,
+            "name": v[0],
+            "level_type": v[1],
+            "label": var_label(k),
+            "leveled": k in LEVELED_VARIABLES,
+            "fixed_level": VAR_FIXED_LEVEL.get(k),
+        }
         for k, v in VAR_MAP.items()
     ]
     variables += [
@@ -31,6 +45,8 @@ async def list_variables():
             "name": name,
             "level_type": level_type,
             "label": var_label(key),
+            "leveled": level_type == "pressure",
+            "fixed_level": None,
         }
         for key, name, level_type in [
             ("wind", "Wind speed (computed from u/v)", "pressure"),
@@ -38,6 +54,28 @@ async def list_variables():
         ]
     ]
     return {"variables": variables}
+
+
+@router.get("/levels")
+async def list_levels():
+    """Níveis de pressão padrão (hPa) suportados pelas variáveis de nível."""
+    return {"levels": PRESSURE_LEVELS, "count": len(PRESSURE_LEVELS)}
+
+
+@router.get("/catalog/cycles")
+async def list_cycles(reader=Depends(get_reader)):
+    """Ciclos (data/análise) realmente disponíveis nos arquivos GRIB do disco.
+
+    É a fonte de datas, análises e horas de previsão usada pelos seletores do
+    site e como padrão da API quando data/análise não são informadas.
+    """
+    cycles = reader.available_cycles()
+    latest = reader.latest_available_cycle()
+    return {
+        "cycles": cycles,
+        "latest": {"date": latest[0], "analysis": latest[1]} if latest else None,
+        "count": len(cycles),
+    }
 
 
 @router.get("/regions")

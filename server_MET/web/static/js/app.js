@@ -1,4 +1,4 @@
-/* MET Server — frontend do site meteorológico (v4). */
+/* MET Server — frontend do site meteorológico (v4.2). */
 "use strict";
 
 /* ---------------------------------------------------------------- utils */
@@ -28,9 +28,10 @@ function tmpUrl(serverPath) {
   return m ? "/files/tmp/" + m[1] : null;
 }
 
-function dateToYmd(input) {
-  if (!input || !input.value) return undefined;
-  return input.value.replace(/-/g, "");
+/* Converte caminho absoluto (data/analise/...) em URL servível /files/analise/... */
+function analiseUrl(serverPath) {
+  const m = String(serverPath).match(/\/analise\/(.+)$/);
+  return m ? "/files/analise/" + m[1] : null;
 }
 
 function el(id) { return document.getElementById(id); }
@@ -130,6 +131,10 @@ const VARIABLE_GROUPS = [
     options: [
       { value: "wind", label: "Vento (nível de pressão)" },
       { value: "winds", label: "Vento na superfície (10 m)" },
+      { value: "u", label: "Vento componente U (nível)" },
+      { value: "v", label: "Vento componente V (nível)" },
+      { value: "uSupe", label: "Vento componente U (10 m)" },
+      { value: "vSupe", label: "Vento componente V (10 m)" },
       { value: "vento10u", label: "Vento U a 10 m" },
       { value: "vento10v", label: "Vento V a 10 m" },
       { value: "vento100u", label: "Vento U a 100 m" },
@@ -143,8 +148,8 @@ const VARIABLE_GROUPS = [
       { value: "chuvaNaoConvec", label: "Chuva acumulada" },
       { value: "chuvaConvec", label: "Chuva convectiva" },
       { value: "precipitacao", label: "Taxa de precipitação" },
-      { value: "nuvem", label: "Nebulosidade (nível)" },
-      { value: "nuvemTot", label: "Nebulosidade total" },
+      { value: "nuvem", label: "Nebulosidade total" },
+      { value: "nuvemTot", label: "Nebulosidade total (coluna)" },
       { value: "aguaPrecipitavel", label: "Água precipitável" },
       { value: "neve", label: "Profundidade de neve" },
     ],
@@ -175,7 +180,30 @@ const VARIABLE_GROUPS = [
       { value: "ozonioTot", label: "Ozônio total (coluna)" },
     ],
   },
+  {
+    label: "Atmosfera (níveis médios e altos)",
+    options: [
+      { value: "gh", label: "Altura geopotencial (nível)" },
+      { value: "omega", label: "Velocidade vertical (nível)" },
+      { value: "vortabs", label: "Vorticidade absoluta (nível)" },
+      { value: "temp", label: "Temperatura (nível)" },
+      { value: "umidadeRel", label: "Umidade relativa (nível)" },
+      { value: "u", label: "Vento U (nível)" },
+      { value: "v", label: "Vento V (nível)" },
+      { value: "ozonio", label: "Ozônio (nível)" },
+    ],
+  },
 ];
+
+/* Variáveis que aceitam nível de pressão (mesmas de server_MET.processor.LEVELED_VARIABLES).
+   É reforçado pela resposta de /variables quando disponível. */
+const LEVELED_VARS = new Set([
+  "temp", "umidadeRel", "u", "v", "ozonio", "gh", "omega", "vortabs", "wind",
+]);
+
+/* Níveis padrão de pressão (hPa) para o seletor; substituído por /catalog/levels. */
+let STANDARD_LEVELS = [100, 150, 200, 250, 300, 400, 500, 600, 700, 850, 925, 1000];
+let leveledMap = {};
 
 function fillSelect(select, groups, withEmpty) {
   select.innerHTML = "";
@@ -200,6 +228,135 @@ function fillSelect(select, groups, withEmpty) {
 
 ["map-region", "anim-region", "stat-region"].forEach((id) => fillSelect(el(id), REGION_GROUPS));
 ["map-variable", "anim-variable", "stat-variable"].forEach((id) => fillSelect(el(id), VARIABLE_GROUPS));
+
+/* --------------------------------------------------- níveis (por variável) */
+function isLeveled(variable) {
+  if (leveledMap[variable] !== undefined) return leveledMap[variable] === true;
+  return LEVELED_VARS.has(variable);
+}
+
+function fillLevelSelect(prefix, variable) {
+  const sel = el(prefix + "-level");
+  const hint = el(prefix + "-level-hint");
+  sel.innerHTML = "";
+  if (isLeveled(variable)) {
+    STANDARD_LEVELS.forEach((lv) => {
+      const opt = document.createElement("option");
+      opt.value = lv;
+      opt.textContent = lv + " hPa";
+      if (lv === 500) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.disabled = false;
+    if (hint) hint.textContent = "Nível de pressão (altitude do mapa)";
+  } else {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Superfície";
+    sel.appendChild(opt);
+    sel.disabled = true;
+    if (hint) hint.textContent = "Variável de superfície — nível não se aplica";
+  }
+}
+
+function levelValueFor(prefix, variable) {
+  if (!isLeveled(variable)) return null;
+  const v = parseInt(el(prefix + "-level").value, 10);
+  return Number.isFinite(v) ? v : 500;
+}
+
+function bindLevelSelector(prefix) {
+  const varSel = el(prefix + "-variable");
+  fillLevelSelect(prefix, varSel.value);
+  varSel.addEventListener("change", () => fillLevelSelect(prefix, varSel.value));
+}
+["map", "anim", "stat"].forEach(bindLevelSelector);
+
+/* ------------------------------------------- ciclos (data/análise/previsão) */
+let cycles = [];
+
+function fmtDate(ymd) {
+  if (!ymd || ymd.length !== 8) return ymd;
+  return `${ymd.slice(0, 4)}-${ymd.slice(4, 6)}-${ymd.slice(6, 8)}`;
+}
+
+function cyclesForDate(date) {
+  return cycles.filter((c) => c.date === date);
+}
+
+function populateDateSelect(prefix) {
+  const sel = el(prefix + "-date");
+  sel.innerHTML = "";
+  const auto = document.createElement("option");
+  auto.value = "";
+  auto.textContent = "Mais recente";
+  sel.appendChild(auto);
+
+  const dates = [...new Set(cycles.map((c) => c.date))].sort().reverse();
+  if (!dates.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "— (sem dados ainda)";
+    sel.appendChild(opt);
+  }
+  dates.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = fmtDate(d);
+    sel.appendChild(opt);
+  });
+}
+
+function populateAnalysisSelect(prefix) {
+  const date = el(prefix + "-date").value;
+  const sel = el(prefix + "-analysis");
+  sel.innerHTML = "";
+  const auto = document.createElement("option");
+  auto.value = "";
+  auto.textContent = "Automática";
+  sel.appendChild(auto);
+  const horas = [...new Set(cyclesForDate(date).map((c) => c.analysis))].sort();
+  horas.forEach((h) => {
+    const opt = document.createElement("option");
+    opt.value = h;
+    opt.textContent = h + " Z";
+    sel.appendChild(opt);
+  });
+}
+
+function populateForecastSelect(prefix) {
+  const date = el(prefix + "-date").value;
+  const analysis = el(prefix + "-analysis").value;
+  const sel = el(prefix + "-forecast");
+  if (!sel) return;
+  sel.innerHTML = "";
+  const all = document.createElement("option");
+  all.value = "";
+  all.textContent = "Todas as disponíveis";
+  sel.appendChild(all);
+
+  let matches = cyclesForDate(date);
+  if (analysis) matches = matches.filter((c) => c.analysis === analysis);
+  const hours = [...new Set(matches.flatMap((c) => c.forecast_hours || []))].sort();
+  hours.forEach((h) => {
+    const opt = document.createElement("option");
+    opt.value = h;
+    opt.textContent = "+" + h + "h";
+    sel.appendChild(opt);
+  });
+}
+
+function bindCycleSelectors(prefix) {
+  const dateSel = el(prefix + "-date");
+  const anaSel = el(prefix + "-analysis");
+  dateSel.addEventListener("change", () => {
+    populateAnalysisSelect(prefix);
+    populateForecastSelect(prefix);
+  });
+  anaSel.addEventListener("change", () => populateForecastSelect(prefix));
+}
+
+["map", "anim", "stat"].forEach(bindCycleSelectors);
 
 /* ------------------------------------------------- mapa interativo */
 let picked = null;
@@ -227,11 +384,12 @@ el("btn-generate-map").addEventListener("click", async () => {
   const container = el("map-results");
   container.innerHTML = "";
   try {
+    const variable = el("map-variable").value;
     const body = {
-      variable: el("map-variable").value,
-      level: parseInt(el("map-level").value, 10) || 500,
+      variable,
+      level: levelValueFor("map", variable),
       region: el("map-region").value,
-      date: dateToYmd(el("map-date")),
+      date: el("map-date").value || null,
       analysis: el("map-analysis").value || null,
       forecast: el("map-forecast").value || null,
     };
@@ -239,7 +397,7 @@ el("btn-generate-map").addEventListener("click", async () => {
     const figs = data.maps
       .map((p) => tmpUrl(p))
       .filter(Boolean)
-      .map((url) => `<figure class="map-item"><img src="${url}" alt="Mapa GFS"></figure>`)
+      .map((url) => `<figure class="map-item"><img src="${url}" alt="Mapa meteorológico GFS"></figure>`)
       .join("");
     container.innerHTML =
       `<div class="msg ok">${data.count} mapa(s) gerado(s).</div>` + figs;
@@ -260,19 +418,20 @@ el("btn-use-coords").addEventListener("click", async () => {
   const container = el("map-results");
   container.innerHTML = "";
   try {
+    const variable = el("map-variable").value;
     const body = {
-      variable: el("map-variable").value,
-      level: parseInt(el("map-level").value, 10) || 500,
+      variable,
+      level: levelValueFor("map", variable),
       lon: picked.lon,
       lat: picked.lat,
-      date: dateToYmd(el("map-date")),
+      date: el("map-date").value || null,
       analysis: el("map-analysis").value || null,
     };
     const data = await apiPost("/maps/generate", body);
     const figs = data.maps
       .map((p) => tmpUrl(p))
       .filter(Boolean)
-      .map((url) => `<figure class="map-item"><img src="${url}" alt="Mapa GFS"></figure>`)
+      .map((url) => `<figure class="map-item"><img src="${url}" alt="Mapa meteorológico GFS"></figure>`)
       .join("");
     container.innerHTML =
       `<div class="msg ok">Mapa centrado em ${picked.lat.toFixed(3)}, ${picked.lon.toFixed(3)}.</div>` + figs;
@@ -293,11 +452,14 @@ el("btn-generate-anim").addEventListener("click", async () => {
     const qs = new URLSearchParams({
       duration_ms: el("anim-speed").value,
     });
+    const fc = el("anim-forecast").value;
+    if (fc) qs.set("forecast_hours", fc);
+    const variable = el("anim-variable").value;
     const body = {
-      variable: el("anim-variable").value,
-      level: parseInt(el("anim-level").value, 10) || 500,
+      variable,
+      level: levelValueFor("anim", variable),
       region: el("anim-region").value,
-      date: dateToYmd(el("anim-date")),
+      date: el("anim-date").value || null,
       analysis: el("anim-analysis").value || null,
     };
     const res = await fetch(`/maps/animate?${qs}`, {
@@ -312,7 +474,7 @@ el("btn-generate-anim").addEventListener("click", async () => {
     container.innerHTML = `
       <div class="msg ok">Animação gerada com sucesso.</div>
       <figure class="gif-item">
-        <img src="${url}" alt="Animação GFS">
+        <img src="${url}" alt="Animação GIF da previsão meteorológica">
         <figcaption>GIF da previsão — atualize a página para reiniciar a animação.</figcaption>
       </figure>`;
   } catch (err) {
@@ -322,7 +484,73 @@ el("btn-generate-anim").addEventListener("click", async () => {
   }
 });
 
-/* ----------------------------------------------------- estatísticas */
+/* ---------------------------------------------------- dashboard */
+function esc(v) {
+  return v === null || v === undefined || v === "" ? "—" : v;
+}
+
+function num(v, d = 2) {
+  return v === null || v === undefined || Number.isNaN(Number(v)) ? "—" : Number(v).toFixed(d);
+}
+
+function summaryCards(rows) {
+  return (rows || [])
+    .map(
+      (r) => `
+        <div class="stat-card">
+          <div class="k">Previsão +${String(r.forecast).padStart(2, "0")}h</div>
+          <div class="v">${num(r.mean)} ${esc(r.units)}</div>
+          <div>média (min ${num(r.min)} / máx ${num(r.max)})</div>
+        </div>`
+    )
+    .join("");
+}
+
+function summaryTable(rows) {
+  const thead = `
+    <tr>
+      <th>Previsão</th><th>n</th><th>Mín</th><th>Máx</th><th>Média</th><th>Mediana</th>
+      <th>Desvio</th><th>IQR</th><th>p5</th><th>p25</th><th>p75</th><th>p95</th><th>Assimetria</th>
+    </tr>`;
+  const tbody = (rows || [])
+    .map(
+      (r) => `
+        <tr>
+          <td>+${String(r.forecast).padStart(2, "0")}h</td>
+          <td>${esc(r.n_points)}</td>
+          <td>${num(r.min)}</td><td>${num(r.max)}</td><td>${num(r.mean)}</td>
+          <td>${num(r.median)}</td><td>${num(r.std)}</td><td>${num(r.iqr)}</td>
+          <td>${num(r.p5)}</td><td>${num(r.p25)}</td><td>${num(r.p75)}</td>
+          <td>${num(r.p95)}</td><td>${num(r.skewness)}</td>
+        </tr>`
+    )
+    .join("");
+  return `<div class="table-wrap"><table class="data-table">
+    <thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+}
+
+function trendPanel(trend) {
+  if (!trend || trend.slope === null || trend.slope === undefined) {
+    return `<div class="trend-panel"><strong>Tendência:</strong> ${trend && trend.note ? trend.note : "indisponível (menos de 2 pontos)."}</div>`;
+  }
+  const dir =
+    trend.direction === "crescente" ? "subindo" :
+    trend.direction === "decrescente" ? "caindo" : "estável";
+  const ci =
+    trend.slope_ci && trend.slope_ci[0] !== null && trend.slope_ci[1] !== null
+      ? ` (IC 95%: ${num(trend.slope_ci[0], 6)} a ${num(trend.slope_ci[1], 6)})`
+      : "";
+  const jb =
+    trend.jarque_bera_p !== null && trend.jarque_bera_p !== undefined
+      ? ` — resíduos normais? p(Jarque-Bera) ${num(trend.jarque_bera_p, 4)}`
+      : "";
+  return `<div class="trend-panel">
+    <strong>Tendência:</strong> ${dir} (${trend.slope > 0 ? "+" : ""}${num(trend.slope, 6)} un/hora${ci}).
+    Confiança: p-valor ${num(trend.p_value, 6)} — ${trend.significant ? "há indício forte de tendência" : "pouco indício"}.
+    Qualidade do ajuste: R² ${num(trend.r_squared, 4)}.${jb}
+  </div>`;
+}
+
 el("btn-generate-stats").addEventListener("click", async () => {
   setBusy(el("btn-generate-stats"));
   busy(el("btn-generate-stats"), true);
@@ -331,58 +559,45 @@ el("btn-generate-stats").addEventListener("click", async () => {
   try {
     const region = el("stat-region").value;
     const variable = el("stat-variable").value;
-    const level = parseInt(el("stat-level").value, 10) || 500;
-    const date = dateToYmd(el("stat-date"));
-    const common = { region, variable, level, date };
+    const level = levelValueFor("stat", variable);
+    const common = {
+      region,
+      variable,
+      level,
+      date: el("stat-date").value || null,
+      analysis: el("stat-analysis").value || null,
+    };
 
-    const summary = await apiPost("/analysis/summary", common);
-    const charts = await apiPost("/analysis/charts", {
-      ...common,
-      dpi: 130,
-    });
+    const dash = await apiPost("/analysis/dashboard", common);
+    const charts = await apiPost("/analysis/charts", { ...common, dpi: 130 });
 
-    const cards = (summary.results || [])
-      .map(
-        (r) => `
-        <div class="stat-card">
-          <div class="k">Previsão +${String(r.forecast).padStart(2, "0")}h</div>
-          <div class="v">${r.mean} ${r.units}</div>
-          <div>média (min ${r.min} / máx ${r.max})</div>
-        </div>`
-      )
-      .join("");
-
-    let trendText = "";
-    try {
-      const series = await apiPost("/analysis/timeseries", common);
-      const trend = series.trend || {};
-      if (trend.slope !== undefined) {
-        trendText = `<div class="msg info">
-           <strong>Tendência:</strong> ${trend.direction === "crescente" ? "subindo" :
-             trend.direction === "decrescente" ? "caindo" : "estável"}
-           (${trend.slope > 0 ? "+" : ""}${Number(trend.slope).toFixed(4)} un/hora).
-           Confiança estatística: p-valor ${Number(trend.p_value).toFixed(4)} —
-           ${trend.p_value < 0.05 ? "há indício forte de tendência" : "pouco indício"}.
-           Qualidade do ajuste: R² ${Number(trend.r_squared).toFixed(3)}.
-         </div>`;
-      }
-    } catch (e) {
-      trendText = `<div class="msg err">Série temporal indisponível: ${e.message}</div>`;
-    }
+    const trendHtml = trendPanel(dash.trend);
+    const cardsHtml = `<div class="stat-cards">${summaryCards(dash.summary)}</div>`;
+    const tableHtml = summaryTable(dash.summary);
 
     const chartFigs = (charts.charts || [])
       .map((p) => tmpUrl(p))
       .filter(Boolean)
-      .map((url) => `<figure><img src="${url}" alt="Gráfico de análise"></figure>`)
+      .map((url) => `<figure><img src="${url}" alt="Gráfico de análise meteorológica"></figure>`)
       .join("");
 
+    const csvUrl = dash.csv ? analiseUrl(dash.csv) : null;
+    const toolsHtml = `
+      <div class="dash-tools">
+        ${csvUrl ? `<a class="btn" href="${csvUrl}" download>⬇ Baixar estatísticas (CSV)</a>` : ""}
+        <a class="btn" href="/analysis/statistics?region=${region}&variable=${variable}&date=${dash.date || ""}&analysis=${dash.analysis || ""}" target="_blank">Ver no banco (API)</a>
+        <span class="hint-inline">Fonte: GFS (NOAA) · data ${dash.date || "hoje"} · análise ${dash.analysis || "auto"} · nível ${level ?? "superfície"}</span>
+      </div>`;
+
     container.innerHTML = `
-      ${trendText}
-      <div class="stat-cards">${cards}</div>
+      ${trendHtml}
+      <div style="margin-top:16px">${cardsHtml}</div>
       ${chartFigs ? `<div class="charts-grid">${chartFigs}</div>` : ""}
-      <div class="msg info" style="margin-top:14px">Fonte: GFS (NOAA) · data ${summary.date || date || "hoje"} · análise ${summary.analysis || "auto"}</div>`;
+      ${tableHtml}
+      ${toolsHtml}
+      <div class="msg info" style="margin-top:14px">Dados gravados no banco (tabela <code>statistics</code>) e em arquivo CSV servido pela API REST.</div>`;
   } catch (err) {
-    showMsg(container, "Não foi possível calcular as estatísticas: " + err.message, "err");
+    showMsg(container, "Não foi possível gerar o dashboard: " + err.message, "err");
   } finally {
     busy(el("btn-generate-stats"), false);
   }
@@ -430,6 +645,36 @@ async function refreshMetar() {
 }
 el("btn-refresh-metar").addEventListener("click", refreshMetar);
 refreshMetar();
+
+/* ------------------------------------------------------- bootstrap (catálogo) */
+async function loadCatalog() {
+  try {
+    const vars = await apiGet("/variables");
+    leveledMap = {};
+    (vars.variables || []).forEach((v) => {
+      leveledMap[v.key] = v.leveled === true;
+    });
+  } catch (e) {
+    /* offline: usa o conjunto estático LEVELED_VARS */
+  }
+  try {
+    const levels = await apiGet("/levels");
+    if (levels.levels && levels.levels.length) STANDARD_LEVELS = levels.levels;
+  } catch (e) { /* mantém STANDARD_LEVELS padrão */ }
+  try {
+    const cat = await apiGet("/catalog/cycles");
+    cycles = cat.cycles || [];
+  } catch (e) {
+    cycles = [];
+  }
+  ["map", "anim", "stat"].forEach((prefix) => {
+    populateDateSelect(prefix);
+    populateAnalysisSelect(prefix);
+    populateForecastSelect(prefix);
+    fillLevelSelect(prefix, el(prefix + "-variable").value);
+  });
+}
+loadCatalog();
 
 /* ------------------------------------------------------------ health */
 (async () => {

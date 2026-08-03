@@ -76,23 +76,30 @@ class TimeSeriesAnalyzer:
 
     def _fit_trend(self, points: list[dict]) -> dict:
         if len(points) < 2:
-            return {"slope": None, "intercept": None, "p_value": None, "r_squared": None, "note": "menos de 2 pontos"}
+            return {"slope": None, "intercept": None, "p_value": None, "r_squared": None,
+                    "slope_ci": None, "jarque_bera_p": None, "note": "menos de 2 pontos"}
 
         x = np.array([p["forecast"] for p in points], dtype=float)
         y = np.array([p["value"] for p in points], dtype=float)
         if np.isnan(y).any():
-            return {"slope": None, "intercept": None, "p_value": None, "r_squared": None, "note": "valores ausentes"}
+            return {"slope": None, "intercept": None, "p_value": None, "r_squared": None,
+                    "slope_ci": None, "jarque_bera_p": None, "note": "valores ausentes"}
 
         try:
             import statsmodels.api as sm
+            from statsmodels.stats.stattools import jarque_bera
 
             X = sm.add_constant(x)
-            model = sm.OLS(y, X).fit()
+            model = sm.OLS(y, X).fit(cov_type="HC3")
+            conf = model.conf_int(alpha=0.05)
+            _, jb_p, _, _ = jarque_bera(model.resid)
             return {
                 "slope": round(float(model.params[1]), 6),
                 "intercept": round(float(model.params[0]), 6),
                 "p_value": round(float(model.pvalues[1]), 6),
                 "r_squared": round(float(model.rsquared), 6),
+                "slope_ci": [round(float(conf[1, 0]), 6), round(float(conf[1, 1]), 6)],
+                "jarque_bera_p": round(float(jb_p), 6),
                 "significant": bool(model.pvalues[1] < 0.05),
                 "direction": (
                     "crescente" if model.params[1] > 0 else "decrescente"
@@ -106,6 +113,8 @@ class TimeSeriesAnalyzer:
                 "intercept": None,
                 "p_value": None,
                 "r_squared": None,
+                "slope_ci": None,
+                "jarque_bera_p": None,
                 "significant": None,
                 "direction": "crescente" if slope > 0 else "decrescente",
                 "n_points": int(len(points)),

@@ -47,6 +47,76 @@ class GribReader:
             return []
         return sorted(d.name for d in base_dir.iterdir() if d.is_dir())
 
+    def _forecast_hours_from_files(self, base_dir: Path) -> list[str]:
+        """Extrai horas de previsão presentes nos nomes dos arquivos (.fXX)."""
+        hours: set[str] = set()
+        for f in base_dir.iterdir():
+            if not f.is_file():
+                continue
+            name = f.name
+            idx = name.find(".f")
+            if idx != -1:
+                hours.add(name[idx + 2 : idx + 4])
+        return sorted(hours)
+
+    def available_cycles(self) -> list[dict]:
+        """Ciclos (data/análise) com arquivos GRIB no disco.
+
+        Para cada ciclo, informa as resoluções e horas de previsão realmente
+        presentes (fonte da verdade para os seletores do site e da API).
+        """
+        grib_dir = self.settings.dir_gribs
+        if not grib_dir.exists():
+            return []
+        cycles = []
+        for date_dir in sorted(grib_dir.iterdir(), reverse=True):
+            if not date_dir.is_dir() or not date_dir.name.isdigit():
+                continue
+            for ana_dir in sorted(date_dir.iterdir(), reverse=True):
+                if not ana_dir.is_dir():
+                    continue
+                resolutions = self.find_available_resolutions(date_dir.name, ana_dir.name)
+                forecast_hours = self._forecast_hours_from_files(ana_dir)
+                if resolutions or forecast_hours:
+                    cycles.append(
+                        {
+                            "date": date_dir.name,
+                            "analysis": ana_dir.name,
+                            "resolutions": resolutions,
+                            "forecast_hours": forecast_hours,
+                        }
+                    )
+        return cycles
+
+    def latest_available_cycle(self, date_str: Optional[str] = None) -> Optional[tuple[str, str]]:
+        """Ciclo (data, análise) mais recente com arquivos GRIB no disco.
+
+        Se `date_str` for informado, procura apenas nessa data; senão varre as
+        datas em ordem decrescente e retorna a análise mais recente da primeira
+        data que tenha arquivos. É a fonte de datas/horas padrão usada quando o
+        usuário não escolhe data/análise explicitamente.
+        """
+        grib_dir = self.settings.dir_gribs
+        if not grib_dir.exists():
+            return None
+        if date_str is not None:
+            base = grib_dir / date_str
+            if not base.is_dir():
+                return None
+            date_dirs = [base]
+        else:
+            date_dirs = sorted(
+                (d for d in grib_dir.iterdir() if d.is_dir() and d.name.isdigit()),
+                reverse=True,
+            )
+        for date_dir in date_dirs:
+            analyses = self.find_available_analyses(date_dir.name)
+            for ana in reversed(analyses):
+                base = date_dir / ana
+                if self._forecast_hours_from_files(base):
+                    return date_dir.name, ana
+        return None
+
     def is_healthy(self, filepath: Path, timeout: int = 90) -> bool:
         """Valida um GRIB em subprocesso (timeout), com cache por caminho.
 

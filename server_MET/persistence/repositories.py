@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 DOWNLOAD_STATUSES = ("pending", "downloaded", "skipped", "failed")
 TASK_STATUSES = ("pending", "running", "done", "failed")
-OUTPUT_KINDS = ("map", "matrix", "bluesky", "chart", "gif")
+OUTPUT_KINDS = ("map", "matrix", "bluesky", "chart", "gif", "statistics")
 
 
 def _now() -> str:
@@ -492,6 +492,99 @@ class IngestStateRepository:
         return {r["key"]: r["value"] for r in rows}
 
 
+_STATS_COLUMNS = (
+    "min", "max", "mean", "median", "std", "iqr",
+    "p1", "p5", "p25", "p50", "p75", "p95", "p99",
+    "skewness", "kurtosis",
+)
+
+
+class StatisticsRepository:
+    """Estatísticas descritivas por hora de previsão (tabela `statistics`).
+
+    Complementa o cache JSON de análises e os CSVs: cada hora de previsão vira
+    uma linha com as métricas descritivas, permitindo consulta programática.
+    """
+
+    def __init__(self, db: Optional[Database] = None) -> None:
+        self.db = db or get_database()
+
+    def save_many(self, rows: list[dict]) -> int:
+        if not rows:
+            return 0
+        values = []
+        for r in rows:
+            values.append(
+                tuple(
+                    r.get(field) if field not in _STATS_COLUMNS else (
+                        None if r.get(field) is None else float(r[field])
+                    )
+                    for field in (
+                        "variable", "level", "region", "date_str", "analysis",
+                        "forecast", "units", "n_points", "n_missing",
+                        *_STATS_COLUMNS,
+                    )
+                )
+            )
+        self.db.executemany(
+            f"""
+            INSERT INTO statistics
+                (variable, level, region, date_str, analysis, forecast, units,
+                 n_points, n_missing, {', '.join(_STATS_COLUMNS)})
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, {', '.join('?' * len(_STATS_COLUMNS))})
+            """,
+            values,
+        )
+        return len(values)
+
+    def delete(
+        self,
+        variable: str,
+        region: str,
+        date_str: str,
+        analysis: str,
+        level: Optional[int] = None,
+    ) -> int:
+        sql = (
+            "DELETE FROM statistics WHERE variable = ? AND region = ? "
+            "AND date_str = ? AND analysis = ?"
+        )
+        params: list[Any] = [variable, region, date_str, analysis]
+        if level is not None:
+            sql += " AND level IS ?"
+            params.append(level)
+        cur = self.db.execute(sql, params)
+        return cur.rowcount if cur else 0
+
+    def query(
+        self,
+        variable: str,
+        region: str,
+        date_str: Optional[str] = None,
+        analysis: Optional[str] = None,
+        level: Optional[int] = None,
+        limit: int = 1000,
+    ) -> list[dict]:
+        sql = "SELECT * FROM statistics WHERE variable = ? AND region = ?"
+        params: list[Any] = [variable, region]
+        if date_str:
+            sql += " AND date_str = ?"
+            params.append(date_str)
+        if analysis:
+            sql += " AND analysis = ?"
+            params.append(analysis)
+        if level is not None:
+            sql += " AND level IS ?"
+            params.append(level)
+        sql += " ORDER BY date_str DESC, analysis DESC, forecast ASC LIMIT ?"
+        params.append(limit)
+        return self.db.fetchall(sql, params)
+
+    def count(self) -> int:
+        row = self.db.fetchone("SELECT COUNT(*) AS n FROM statistics")
+        return int(row["n"]) if row else 0
+
+
 __all__ = [
     "DownloadRepository",
     "OutputRepository",
@@ -500,4 +593,5 @@ __all__ = [
     "AnalysisRepository",
     "GridDataRepository",
     "IngestStateRepository",
+    "StatisticsRepository",
 ]

@@ -17,7 +17,7 @@ from server_MET.processing.regions import Region
 logger = get_logger(__name__)
 
 #: Variáveis passíveis de perfil vertical por nível de pressão.
-PROFILE_VARIABLES = ("temp", "umidadeRel", "u", "v", "wind")
+PROFILE_VARIABLES = ("temp", "umidadeRel", "u", "v", "wind", "gh", "omega", "vortabs")
 
 
 class ProfileAnalyzer:

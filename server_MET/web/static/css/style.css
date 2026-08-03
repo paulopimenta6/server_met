@@ -148,6 +148,23 @@ table.data-table {
 .charts-grid figure { margin: 0; }
 .charts-grid img { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
 
+.hint-inline { font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+
+.trend-panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.table-wrap { overflow-x: auto; margin-top: 16px; }
+.table-wrap .data-table { min-width: 640px; }
+
+.dash-tools { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.dash-tools .btn { text-decoration: none; display: inline-block; }
+
 .ajuda { line-height: 1.7; max-width: 900px; }
 .ajuda h3 { margin-top: 28px; color: var(--primary); }
 .ajuda li { margin-bottom: 8px; }

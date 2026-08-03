@@ -9,7 +9,7 @@ async def test_health_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert data["version"] == "4.1.0"
+    assert data["version"] == "4.2.0"
     assert "grib_files_available" in data
 
 
@@ -26,7 +26,7 @@ async def test_info_endpoint(client):
     response = await client.get("/info")
     assert response.status_code == 200
     data = response.json()
-    assert data["version"] == "4.1.0"
+    assert data["version"] == "4.2.0"
     assert "/docs" in data["docs"]
 
 
@@ -223,7 +223,7 @@ async def test_db_status(client, isolated_db):
     data = response.json()
     assert set(data["tables"]) == {
         "downloads", "outputs", "metar_obs", "tasks", "analysis_results",
-        "ingest_state", "grid_data",
+        "ingest_state", "grid_data", "statistics",
     }
 
 

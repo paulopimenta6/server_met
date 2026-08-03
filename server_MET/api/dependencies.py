@@ -10,6 +10,7 @@ from server_MET.acquisition.grib_downloader import GribDownloader
 from server_MET.acquisition.grib_reader import GribReader
 from server_MET.acquisition.metar_client import MetarClient
 from server_MET.analysis.charts import AnalysisCharts
+from server_MET.analysis.dashboard import DashboardAnalyzer
 from server_MET.analysis.profiles import ProfileAnalyzer
 from server_MET.analysis.statistics import StatisticsAnalyzer
 from server_MET.analysis.summary import RegionSummary
@@ -18,12 +19,14 @@ from server_MET.core.config import Settings
 from server_MET.output.animation import AnimationGenerator
 from server_MET.output.maps import MapGenerator
 from server_MET.output.matrices import MatrixGenerator
+from server_MET.output.statistics import StatisticsCSVGenerator
 from server_MET.persistence.repositories import (
     AnalysisRepository,
     DownloadRepository,
     GridDataRepository,
     MetarRepository,
     OutputRepository,
+    StatisticsRepository,
     TaskRepository,
 )
 from server_MET.processing.processor import DataProcessor
@@ -116,6 +119,18 @@ def get_grid_repo() -> GridDataRepository:
     return _get("grid_repo", GridDataRepository)
 
 
+def get_stats_repo() -> StatisticsRepository:
+    return _get("stats_repo", StatisticsRepository)
+
+
+def get_dashboard() -> DashboardAnalyzer:
+    return _get("dashboard", DashboardAnalyzer)
+
+
+def get_stats_csv() -> StatisticsCSVGenerator:
+    return _get("stats_csv", StatisticsCSVGenerator)
+
+
 def build_region(req) -> Region:
     """Constrói uma Region a partir de um modelo com campos de seleção."""
     if req.region:
@@ -136,6 +151,27 @@ def build_region(req) -> Region:
         status_code=400,
         detail="Informe 'region', bounding box (lon_min/lon_max/lat_min/lat_max) ou centro (lon/lat)",
     )
+
+
+def default_cycle(processor: DataProcessor, date: Optional[str], analysis: Optional[str]):
+    """Resolve data/análise padrão a partir dos arquivos GRIB realmente no disco.
+
+    - Data e análise explícitas: respeitadas (e validarão a existência dos dados).
+    - Data explícita sem análise: usa a análise mais recente disponível dessa data.
+    - Nada informado: usa o ciclo (data, análise) mais recente disponível no disco.
+    """
+    if date and analysis:
+        return date, analysis
+    if date:
+        ana = analysis or processor.get_current_analysis_hour()
+        cycle = processor.reader.latest_available_cycle(date)
+        if cycle:
+            ana = cycle[1]
+        return date, ana
+    cycle = processor.reader.latest_available_cycle()
+    if cycle:
+        return cycle
+    return processor.get_date_str(), processor.get_current_analysis_hour()
 
 
 def resolve_path(kind: str) -> Path:
@@ -182,7 +218,11 @@ __all__ = [
     "get_task_repo",
     "get_analysis_repo",
     "get_grid_repo",
+    "get_stats_repo",
+    "get_dashboard",
+    "get_stats_csv",
     "build_region",
+    "default_cycle",
     "resolve_path",
     "safe_join",
 ]

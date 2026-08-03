@@ -19,7 +19,7 @@
     <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="mapas">Mapas</button>
       <button class="tab" data-tab="animacoes">Animações</button>
-      <button class="tab" data-tab="estatisticas">Estatísticas</button>
+      <button class="tab" data-tab="dashboard">Dashboard</button>
       <button class="tab" data-tab="metar">METAR</button>
       <button class="tab" data-tab="ajuda">Ajuda</button>
     </nav>
@@ -43,24 +43,21 @@
             <label>Variável
               <select id="map-variable"></select>
             </label>
-            <label>Nível (hPa) <input type="number" id="map-level" value="500" min="1" max="1000"></label>
-            <label>Data <input type="date" id="map-date"></label>
+            <label>Nível
+              <select id="map-level"></select>
+              <span class="hint-inline" id="map-level-hint"></span>
+            </label>
+            <label>Data
+              <select id="map-date"></select>
+            </label>
             <label>Análise (hora Z)
               <select id="map-analysis">
                 <option value="">Automática</option>
-                <option value="00">00</option>
-                <option value="06">06</option>
-                <option value="12">12</option>
-                <option value="18">18</option>
               </select>
             </label>
             <label>Previsão (+h)
               <select id="map-forecast">
-                <option value="">Todas (00/06/12/18)</option>
-                <option value="00">+00h (agora)</option>
-                <option value="06">+06h</option>
-                <option value="12">+12h</option>
-                <option value="18">+18h</option>
+                <option value="">Todas as disponíveis</option>
               </select>
             </label>
             <button id="btn-generate-map" class="btn primary">Gerar mapa</button>
@@ -90,15 +87,19 @@
         <div class="controls card">
           <label>Região <select id="anim-region"></select></label>
           <label>Variável <select id="anim-variable"></select></label>
-          <label>Nível (hPa) <input type="number" id="anim-level" value="500" min="1" max="1000"></label>
-          <label>Data <input type="date" id="anim-date"></label>
+          <label>Nível
+            <select id="anim-level"></select>
+            <span class="hint-inline" id="anim-level-hint"></span>
+          </label>
+          <label>Data <select id="anim-date"></select></label>
           <label>Análise (hora Z)
             <select id="anim-analysis">
               <option value="">Automática</option>
-              <option value="00">00</option>
-              <option value="06">06</option>
-              <option value="12">12</option>
-              <option value="18">18</option>
+            </select>
+          </label>
+          <label>Previsão (+h)
+            <select id="anim-forecast">
+              <option value="">Todas as disponíveis</option>
             </select>
           </label>
           <label>Velocidade do GIF
@@ -114,20 +115,32 @@
       </div>
     </section>
 
-    <!-- ============ ABA: ESTATÍSTICAS ============ -->
-    <section id="tab-estatisticas" class="tab-content">
+    <!-- ============ ABA: DASHBOARD ============ -->
+    <section id="tab-dashboard" class="tab-content">
       <div class="panel">
-        <h2>Estatísticas da região</h2>
+        <h2>Dashboard estatístico da região</h2>
         <p class="hint">
-          Resumo numérico (mínimo, máximo, média, mediana, desvio padrão e
-          percentis) e gráficos da variável escolhida sobre a região.
+          Resumo numérico (mínimo, máximo, média, mediana, desvio padrão,
+          percentis e assimetria) por hora de previsão, tendência com regressão
+          linear (inclinação, R² e p-valor com intervalo de confiança) e
+          gráficos de perfil vertical, série temporal e distribuição. Os dados
+          são gravados no banco (tabela <code>statistics</code>) e em arquivos
+          <code>.csv</code> — disponíveis também pela API REST.
         </p>
         <div class="controls card">
           <label>Região <select id="stat-region"></select></label>
           <label>Variável <select id="stat-variable"></select></label>
-          <label>Nível (hPa) <input type="number" id="stat-level" value="500" min="1" max="1000"></label>
-          <label>Data <input type="date" id="stat-date"></label>
-          <button id="btn-generate-stats" class="btn primary">Ver estatísticas</button>
+          <label>Nível
+            <select id="stat-level"></select>
+            <span class="hint-inline" id="stat-level-hint"></span>
+          </label>
+          <label>Data <select id="stat-date"></select></label>
+          <label>Análise (hora Z)
+            <select id="stat-analysis">
+              <option value="">Automática</option>
+            </select>
+          </label>
+          <button id="btn-generate-stats" class="btn primary">Gerar dashboard</button>
         </div>
         <div id="stat-results"></div>
       </div>
@@ -170,8 +183,13 @@
               modelo "rodou". A letra Z indica o horário de Londres (UTC).
               Escolha "Automática" e o sistema escolhe o mais recente.</li>
           <li><strong>Nível (hPa)</strong> — a altitude do mapa. Valores altos
-              (500) são o meio da atmosfera; valores baixos (850, 925) são
-              próximos do chão.</li>
+              (500, 300, 200) são o meio e o topo da atmosfera; valores baixos
+              (850, 925) são próximos do chão. Variáveis de superfície não usam
+              nível.</li>
+          <li><strong>Data e análise</strong> — a lista já vem preenchida com
+              as <strong>datas, análises e previsões que existem de verdade</strong>
+              nos arquivos baixados. "Automática" usa o ciclo mais recente
+              disponível.</li>
           <li><strong>METAR</strong> — o "boletim" real enviado pelos
               aeroportos: vento, visibilidade, nuvens e temperatura medidos na
               hora.</li>
@@ -198,6 +216,17 @@
           "assiste" a previsão se desenrolar.
         </p>
 
+        <h3>O que é o Dashboard?</h3>
+        <p>
+          A aba <strong>Dashboard</strong> junta os números e gráficos de uma
+          variável sobre a região: a <strong>média, mínima e máxima</strong> em
+          cada hora de previsão, a <strong>tendência</strong> (sobe, desce ou
+          fica estável, com o quanto confiamos nisso), o <strong>perfil
+          vertical</strong> (como a variável muda com a altitude), o
+          <strong>histograma</strong> (a distribuição dos valores) e uma
+          <strong>tabela</strong> completa com download em <strong>CSV</strong>.
+        </p>
+
         <h3>Os dados chegam sozinhos?</h3>
         <p>
           Sim. O servidor verifica a cada poucos minutos se há uma nova
@@ -211,7 +240,7 @@
 
   <footer>
     <p>
-      MET Server v4.1 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
+      MET Server v4.2 · Dados: GFS (NOAA) · Status: <span id="health-status">verificando…</span>
     </p>
   </footer>
 

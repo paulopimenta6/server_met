@@ -30,9 +30,9 @@ class TestDatabase:
         counts = db.table_counts()
         assert set(counts) == {
             "downloads", "outputs", "metar_obs", "tasks", "analysis_results",
-            "ingest_state", "grid_data",
+            "ingest_state", "grid_data", "statistics",
         }
-        assert db.user_version() == 2
+        assert db.user_version() == 3
         db.close()
 
     def test_wal_mode(self, tmp_path):

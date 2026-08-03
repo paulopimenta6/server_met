@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from server_MET.api.dependencies import (
     build_region,
+    default_cycle,
     get_animation_generator,
     get_map_generator,
     get_settings,
@@ -26,8 +27,9 @@ async def generate_map(
     map_generator=Depends(get_map_generator),
 ):
     region = build_region(request)
-    date_str = request.date or map_generator.processor.get_date_str()
-    ana = request.analysis or map_generator.processor.get_current_analysis_hour()
+    date_str, ana = default_cycle(
+        map_generator.processor, request.date, request.analysis
+    )
     output_dir = str(settings.dir_tmp / uuid.uuid4().hex)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -57,8 +59,9 @@ async def animate_map(
     forecast_hours: Optional[str] = Query(None, description="Horas de previsão separadas por vírgula (ex.: 00,06,12,18)"),
 ):
     region = build_region(request)
-    date_str = request.date or animation_generator.maps.processor.get_date_str()
-    ana = request.analysis or animation_generator.maps.processor.get_current_analysis_hour()
+    date_str, ana = default_cycle(
+        animation_generator.maps.processor, request.date, request.analysis
+    )
     output_dir = str(settings.dir_tmp / uuid.uuid4().hex)
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 

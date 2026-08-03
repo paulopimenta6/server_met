@@ -20,7 +20,7 @@ from server_MET.core.constants import (
 logger = logging.getLogger(__name__)
 
 #: Variáveis com nível de pressão (passíveis de snap de nível).
-LEVELED_VARIABLES = ("temp", "nuvem", "umidadeRel", "u", "v", "ozonio")
+LEVELED_VARIABLES = ("temp", "umidadeRel", "u", "v", "ozonio", "gh", "omega", "vortabs")
 
 
 class DataProcessor:

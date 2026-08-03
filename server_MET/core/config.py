@@ -41,6 +41,7 @@ class Settings:
         self._scheduler_grib_interval_min: Optional[str] = None
         self._scheduler_metar_interval_min: Optional[str] = None
         self._scheduler_auto_pipeline: Optional[str] = None
+        self._scheduler_auto_statistics: Optional[str] = None
         self._forecast_hours: Optional[str] = None
         self._pipeline_levels: Optional[str] = None
         self._parse_env_file()
@@ -80,6 +81,8 @@ class Settings:
                     self._scheduler_metar_interval_min = value
                 elif key == "scheduler_auto_pipeline":
                     self._scheduler_auto_pipeline = value
+                elif key == "scheduler_auto_statistics":
+                    self._scheduler_auto_statistics = value
                 elif key == "forecast_hours":
                     self._forecast_hours = value
                 elif key == "pipeline_levels":
@@ -156,6 +159,13 @@ class Settings:
         if not self._scheduler_auto_pipeline:
             return []
         return [r.strip().upper() for r in self._scheduler_auto_pipeline.split(",") if r.strip()]
+
+    @property
+    def scheduler_auto_statistics(self) -> bool:
+        """Pipeline automático também gera estatísticas (tabela + CSV)? Padrão: sim."""
+        if self._scheduler_auto_statistics is None:
+            return True
+        return self._scheduler_auto_statistics.strip().lower() in ("1", "true", "yes", "sim", "on")
 
     @property
     def forecast_hours(self) -> list[str]:

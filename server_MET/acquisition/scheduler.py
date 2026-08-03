@@ -69,6 +69,23 @@ PIPELINE_VARS: list[tuple[str, Optional[int]]] = [
 #: `PIPELINE_VARS` ou em `Settings.pipeline_levels`).
 PIPELINE_LEVELED_VARS: tuple[str, ...] = ("temp", "umidadeRel", "nuvem", "ozonio", "u", "v")
 
+#: (variável, nível) das estatísticas geradas automaticamente pelo pipeline,
+#: persistidas na tabela `statistics` e em CSV. Inclui níveis de superfície
+#: e de média/alta altitude.
+PIPELINE_STATS_VARS: list[tuple[str, Optional[int]]] = [
+    ("temp", 500),
+    ("temp", 850),
+    ("umidadeRel", 850),
+    ("gh", 500),
+    ("omega", 500),
+    ("nuvemTot", None),
+    ("temps2m", None),
+    ("rh2m", None),
+    ("dewpoint2m", None),
+    ("chuvaNaoConvec", None),
+    ("cape", None),
+]
+
 #: Níveis comuns (hPa) usados quando a descoberta automática falha.
 PIPELINE_DEFAULT_LEVELS: list[int] = [
     200, 250, 300, 400, 500, 700, 850, 925, 1000,
@@ -195,10 +212,52 @@ class SchedulerRunner:
                             "Pipeline: falha em %s/%s/%s: %s",
                             region_name, var_name, level, e,
                         )
+
+            if self.settings.scheduler_auto_statistics:
+                try:
+                    self._run_statistics(regions, date_str, ana)
+                except Exception as e:
+                    logger.warning("Pipeline: falha nas estatísticas: %s", e)
+
             logger.info("Pipeline %s %sZ concluído (%d mapas).",
                         date_str, ana, total)
         finally:
             self.pipeline_running = False
+
+    def _run_statistics(self, regions: list[str], date_str: str, ana: str) -> None:
+        """Gera estatísticas (tabela `statistics` + CSV) das variáveis do
+        pipeline para as regiões — dashboard fica sob demanda via API."""
+        from server_MET.analysis.statistics import StatisticsAnalyzer
+        from server_MET.output.statistics import StatisticsCSVGenerator
+        from server_MET.persistence.repositories import StatisticsRepository
+        from server_MET.processing.regions import Region
+
+        stats = StatisticsAnalyzer()
+        stats_repo = StatisticsRepository()
+        csv_gen = StatisticsCSVGenerator()
+
+        for region_name in regions:
+            region = Region(name=region_name)
+            for var_name, level in PIPELINE_STATS_VARS:
+                try:
+                    summary = stats.summarize(var_name, region, level, date_str, ana)
+                    if not summary:
+                        continue
+                    resolved_level = summary[0].get("level")
+                    rows = [
+                        dict(r, date_str=date_str, analysis=ana)
+                        for r in summary
+                    ]
+                    stats_repo.delete(var_name, region.name, date_str, ana, resolved_level)
+                    stats_repo.save_many(rows)
+                    csv_gen.generate(
+                        rows, region, var_name, resolved_level, date_str, ana,
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Pipeline: estatísticas de %s/%s/%s falharam: %s",
+                        region_name, var_name, level, e,
+                    )
 
     def _expand_pipeline_combos(
         self, date_str: str, ana: str
@@ -299,5 +358,6 @@ __all__ = [
     "previous_cycle",
     "PIPELINE_VARS",
     "PIPELINE_LEVELED_VARS",
+    "PIPELINE_STATS_VARS",
     "PIPELINE_DEFAULT_LEVELS",
 ]
