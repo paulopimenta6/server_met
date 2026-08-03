@@ -73,6 +73,27 @@ class MetarClient:
                 "qnh": props.get("qnh"),
                 "changements": props.get("changements"),
                 "vmc": props.get("vmc"),
+                "runway": props.get("runway"),
+                "recent": props.get("recent"),
+                "trend": props.get("trend"),
+                "qfe": props.get("qfe"),
+                "sea_level_pressure": props.get("sea_level_pressure"),
+                "pressure_tendency": props.get("pressure_tendency"),
+                "max_temp": props.get("max_temp"),
+                "min_temp": props.get("min_temp"),
+                "precipitation": props.get("precipitation"),
+                "sunshine": props.get("sunshine"),
+                "snow_depth": props.get("snow_depth"),
+                "present_weather": props.get("present_weather"),
+                "cloud_type": props.get("cloud_type"),
+                "cloud_base": props.get("cloud_base"),
+                "cloud_amount": props.get("cloud_amount"),
+                "wind_shear": props.get("wind_shear"),
+                "icing": props.get("icing"),
+                "turbulence": props.get("turbulence"),
+                "remarks": props.get("remarks"),
+                "metar_type": props.get("metar_type"),
+                "corrected": props.get("corrected"),
             }
             self._enrich_derived_fields(result)
             return result
@@ -89,6 +110,8 @@ class MetarClient:
             wind["speed_kmh"] = round(speed_kt * 1.852, 1)
             if wind.get("gust") is not None:
                 wind["gust_kmh"] = round(wind["gust"] * 1.852, 1)
+            if wind.get("dir") is not None:
+                wind["dir_cardinal"] = MetarClient._deg_to_cardinal(wind["dir"])
 
         temps = parsed.get("temperatures")
         if isinstance(temps, dict):
@@ -104,6 +127,19 @@ class MetarClient:
         visibility = parsed.get("visibility")
         if isinstance(visibility, int):
             parsed["visibility_km"] = round(visibility / 1000, 1) if visibility else None
+
+        qnh = parsed.get("qnh")
+        if isinstance(qnh, (int, float)):
+            parsed["qnh_hpa"] = qnh
+            parsed["qnh_inhg"] = round(qnh * 0.02953, 2)
+
+    @staticmethod
+    def _deg_to_cardinal(deg: float) -> str:
+        """Converte graus para direção cardinal."""
+        dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+        idx = int((deg + 11.25) / 22.5) % 16
+        return dirs[idx]
 
     def _extract_metadata(self, data: Optional[list[dict]]) -> Optional[dict]:
         if not data:
@@ -122,6 +158,8 @@ class MetarClient:
             "metarType",
             "lat",
             "lon",
+            "elev",
+            "name",
         )
         return {k: entry.get(k) for k in keys if k in entry}
 

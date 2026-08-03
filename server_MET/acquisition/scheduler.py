@@ -322,6 +322,9 @@ class SchedulerRunner:
         self._running = True
         self._grib_task = asyncio.create_task(self._grib_loop())
         self._metar_task = asyncio.create_task(self._metar_loop())
+        # Dispara uma verificação imediata na inicialização
+        asyncio.create_task(self._process_new_cycles())
+        asyncio.create_task(self._fetch_all_metars())
 
     def stop(self) -> None:
         self._running = False

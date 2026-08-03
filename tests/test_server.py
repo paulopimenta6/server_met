@@ -9,7 +9,7 @@ async def test_health_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert data["version"] == "4.3.0"
+    assert data["version"] == "4.4.0"
     assert "grib_files_available" in data
 
 
@@ -17,26 +17,13 @@ async def test_health_endpoint(client):
 async def test_root_endpoint(client):
     response = await client.get("/")
     assert response.status_code == 200
-    assert "text/html" in response.headers["content-type"]
-    assert "MET Server" in response.text
-
-
-@pytest.mark.asyncio
-async def test_info_endpoint(client):
-    response = await client.get("/info")
-    assert response.status_code == 200
+    assert "application/json" in response.headers["content-type"]
     data = response.json()
-    assert data["version"] == "4.3.0"
-    assert "/docs" in data["docs"]
-
-
-@pytest.mark.asyncio
-async def test_static_assets(client):
-    response = await client.get("/static/js/app.js")
-    assert response.status_code == 200
-    assert "javascript" in response.headers["content-type"]
-    response = await client.get("/static/vendor/leaflet/leaflet.js")
-    assert response.status_code == 200
+    assert data["name"] == "MET Server"
+    assert data["version"] == "4.4.0"
+    assert data["docs"] == "/docs"
+    assert data["health"] == "/health"
+    assert "description" in data
 
 
 @pytest.mark.asyncio

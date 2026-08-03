@@ -1,20 +1,20 @@
 # Servidor Meteorológico — MET Server (v4.3.0)
 
-Servidor que **capta, organiza, analisa e mostra** dados de previsão do tempo do modelo
+Servidor que **capta, organiza, analisa e distribui** dados de previsão do tempo do modelo
 **GFS** (da NOAA, agência meteorológica dos EUA), com **mapas, animações, dashboard
 estatístico**
-e observações reais de aeroportos (METAR), tudo em um **site simples de usar**.
+e observações reais de aeroportos (METAR), tudo via **API REST**.
 
 > **Linguagem simples:** se você não é da área técnica, comece pela seção
 > [Entendendo o sistema](#entendendo-o-sistema-em-linguagem-simples). A referência
 > técnica completa fica no [apêndice](#apendice-referencia-tecnica).
 
 ```
-captação → tratamento → análise → persistência → resultados → servidor + site
-(GRIB,     (extração,    (estatís-   (SQLite,       (mapas,      (API REST,
- METAR)     unidades,     tica,       histórico,     animações,   site web)
-            níveis,       perfis,     cache)         matrizes,
-            vento)        séries)                    gráficos)
+captação → tratamento → análise → persistência → resultados → servidor (API REST)
+(GRIB,     (extração,    (estatís-   (SQLite,       (mapas,      
+ METAR)     unidades,     tica,       histórico,     animações,   
+             níveis,       perfis,     cache)         matrizes,    
+             vento)        séries)                    gráficos)
 ```
 
 ---
@@ -54,7 +54,7 @@ superfície (temperatura a 2 m, vento a 10 m, chuva, pressão…) não usam nív
   predefinidas).
 - **Guarda histórico**: tudo fica registrado em um banco local (SQLite) — dá para
   consultar previsões e observações antigas.
-- **Serve mapas e análises na hora**: pelo site ou pela API.
+- **Serve mapas e análises na hora**: pela API.
 
 ---
 
@@ -67,62 +67,15 @@ superfície (temperatura a 2 m, vento a 10 m, chuva, pressão…) não usam nív
 # 2) rodar os testes (opcional, mas recomendado)
 ./scripts/run.sh test
 
-# 3) ligar o servidor + site
+# 3) ligar o servidor (API REST)
 ./scripts/run.sh server
 ```
 
-Abra o navegador em **http://localhost:8000** — o site já estará no ar.
 A documentação técnica interativa da API fica em **http://localhost:8000/docs**.
 
-> O download real de dados exige internet. Se não houver dados ainda, o site
-> mostra a mensagem de erro com orientação — o servidor continua tentando
-> baixar sozinho nos horários certos.
-
----
-
-## Usando o site (passo a passo)
-
-O site tem 5 abas:
-
-| Aba | O que faz | Como usar |
-|---|---|---|
-| **Mapas** | Gera mapas de uma variável (temperatura, chuva, vento…) sobre uma região | Escolha cidade/estado na lista **ou clique no mapa** para escolher latitude/longitude; ajuste variável, nível e data; clique em "Gerar mapa" |
-| **Animações** | Cria um **GIF** mostrando a evolução da previsão (agora → +6h → +12h → +18h) | Escolha região e variável, clique em "Gerar animação" |
-| **Estatísticas** | Números (média, mínima, máxima, desvio…) e gráficos da variável na região | Escolha região/variável e veja tabela + gráficos de perfil, série e histograma |
-| **METAR** | Últimas observações reais dos aeroportos | Clique em "Atualizar" |
-| **Ajuda** | Este guia em linguagem simples | — |
-
-### Regiões: cidades, estados e países da América do Sul
-
-Cada localidade tem enquadramento preciso (as coordenadas já vêm corretas):
-
-| Código | Estado (região) | Código | Cidade (centro ±0.5°) |
-|---|---|---|---|
-| `SP` | São Paulo | `SP-CIDADE` | São Paulo |
-| `RJ` | Rio de Janeiro | `RJ-CIDADE` | Rio de Janeiro |
-| `AM` | Amazonas | `AM-CIDADE` | Manaus |
-| `DF` | Distrito Federal | `DF-CIDADE` | Brasília |
-| `PR` | Paraná | `PR-CIDADE` | Curitiba |
-| `RS` | Rio Grande do Sul | `RS-CIDADE` | Porto Alegre |
-| `MG` | Minas Gerais | `MG-CIDADE` | Belo Horizonte |
-| `PA` | Pará | `PA-CIDADE` | Belém |
-| `PE` | Pernambuco | `PE-CIDADE` | Recife |
-| `CE` | Ceará | `CE-CIDADE` | Fortaleza |
-| `SA` | América do Sul (visão geral) | — | — |
-
-Além dos estados, há **países da América do Sul** prontos (bboxes precisas):
-
-| Código | País | Código | País |
-|---|---|---|---|
-| `BR` | Brasil | `PY` | Paraguai |
-| `AR` | Argentina | `UY` | Uruguai |
-| `BO` | Bolívia | `VE` | Venezuela |
-| `CL` | Chile | `GY` | Guiana |
-| `CO` | Colômbia | `SR` | Suriname |
-| `EC` | Equador | `PEU` | Peru |
-
-Na API também é possível escolher qualquer ponto: envie `lon`/`lat` (o sistema
-monta uma caixa de ±5°) ou uma caixa própria com `lon_min/lon_max/lat_min/lat_max`.
+> O download real de dados exige internet. Se não houver dados ainda, a API
+> retorna erro com orientação — o servidor continua tentando baixar sozinho
+> nos horários certos via captação contínua.
 
 ---
 
@@ -185,8 +138,8 @@ servidor (ou avulso com `./scripts/run.sh scheduler`):
    - registra o ciclo em `ingest_state` para não repetir.
 
 > O GRIB **não é baixado no momento de uma requisição**: ele sempre **pré-existe**
-> no disco, baixado pela captação contínua acima, para que o site e a API REST
-> respondam com dados já prontos (sem lentidão por download).
+> no disco, baixado pela captação contínua acima, para que a API REST
+> responda com dados já prontos (sem lentidão por download).
 2. **METAR**: a cada `scheduler_metar_interval_min` busca os boletins de todas
    as estações e guarda o histórico.
 
@@ -198,7 +151,7 @@ Acompanhe pelo navegador ou API: `GET /scheduler/status` (ou
 
 ## Variáveis disponíveis
 
-O **pipeline automático, o catálogo (`GET /variables`) e o site** trabalham com
+O **pipeline automático e o catálogo (`GET /variables`)** trabalham com
 o conjunto principal (`MAIN_VARIABLES`): temperatura, chuva, vento, nuvens,
 umidade, pressão e poluição do ar. As demais variáveis técnicas (CAPE, CIN,
 geopotencial, vorticidade, neve, visibilidade…) continuam suportadas pela
@@ -308,7 +261,7 @@ Arquivo padrão: **`data/met_server.db`** (`db_file=` no path.conf), modo WAL
 
 ```bash
 ./scripts/run.sh install            # dependências + diretórios
-./scripts/run.sh server             # sobe o servidor + site em :8000 (captação contínua inclusa)
+./scripts/run.sh server             # sobe o servidor (API REST) em :8000 (captação contínua inclusa)
 ./scripts/run.sh download [YYYYMMDD] [HH] [0p25|0p50|1p00]   # download manual de GRIB
 ./scripts/run.sh analysis [YYYYMMDD]   # exemplo de análise (SP)
 ./scripts/run.sh db-status          # estado do banco
@@ -354,8 +307,7 @@ Base: `http://localhost:8000` · Docs interativas: `/docs`
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/` | **Site** (HTML) |
-| GET | `/info` | Informações da API (JSON) |
+| GET | `/` | **API Info** (JSON: nome, versão, links para docs/health) |
 | GET | `/health` | Status, versão, GRIBs disponíveis, uptime |
 | GET | `/variables` | Variáveis (inclui rótulo em português) |
 | GET | `/regions` | Regiões (estados, países da América do Sul, cidades com centro, bboxes) |
@@ -438,13 +390,22 @@ curl -X POST http://localhost:8000/maps/generate \
 | `404` em mapas/análises | Arquivo GRIB não existe | Rodar `/gribs/download` antes ou aguardar a captação contínua |
 | Análise retorna `**cached**` | Resultado já computado | Apagar registros de `analysis_results` para recalcular |
 | METAR vazio | ICAO inválido ou sem rede | Verificar o código ICAO e acesso a aviationweather.gov |
-| Site sem tiles do mapa interativo | Sem internet no servidor | Os tiles (OpenStreetMap) exigem internet; o resto do site funciona offline |
 | Captação contínua não roda | `scheduler_enabled=false` | Ligar no `environment/path.conf` |
 
 ---
 
 ## Changelog
 
+- **v4.4.0** — **API REST pura**: remoção completa do frontend (site HTML/Leaflet).
+  O servidor agora expõe apenas a API REST (`/`, `/docs`, `/health`, etc.).
+  Inicialização imediata de captação GRIB+METAR no startup do servidor
+  (antes do primeiro request). `MetarClient` expandido para extrair **todos**
+  os campos decodificados pelo parser PythonMETAR (runway, recent, trend, qfe,
+  pressure_tendency, max/min temp, precipitation, sunshine, snow_depth,
+  present_weather, cloud_type/base/amount, wind_shear, icing, turbulence,
+  remarks, metar_type, corrected, etc.) + conversões derivadas (vento km/h,
+  direção cardinal, umidade, QNH em inHg). Pipeline automático dispara
+  verificação imediata na inicialização.
 - **v4.3.0** — **servidor leve e focado nas variáveis principais**:
   pipeline, catálogo (`GET /variables`/`GET /levels`) e site reduzidos ao
   conjunto principal (`MAIN_VARIABLES`): temperatura, chuva, vento,
