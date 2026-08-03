@@ -4,7 +4,7 @@ Pipeline: acquisition (captação) -> processing (tratamento) -> analysis (anál
         -> persistence (persistência SQLite) -> output (resultados) -> api (servidor).
 """
 
-__version__ = "4.4.0"
+__version__ = "4.4.1"
 
 from server_MET.core.config import Settings
 from server_MET.acquisition.grib_reader import GribReader

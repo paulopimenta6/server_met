@@ -55,23 +55,36 @@ class GribDownloader:
             return False
 
     def download_file(self, url: str, dest_path: Path, timeout: int = 300) -> bool:
+        """Baixa para `dest_path` de forma atômica.
+
+        O download vai para `<dest_path>.part` e só é renomeado para o destino
+        final após o wget concluir com sucesso. Assim um download interrompido
+        (timeout/rede) não deixa um arquivo parcial no caminho com nome válido
+        (o que passaria na validação e corromperia o ciclo).
+        """
         dest_path.parent.mkdir(parents=True, exist_ok=True)
+        part_path = dest_path.with_name(dest_path.name + ".part")
+        part_path.unlink(missing_ok=True)
         try:
             result = subprocess.run(
-                ["wget", "-O", str(dest_path), url],
+                ["wget", "-O", str(part_path), url],
                 capture_output=True,
                 timeout=timeout,
             )
-            if result.returncode == 0:
+            if result.returncode == 0 and part_path.exists() and part_path.stat().st_size > 0:
+                part_path.rename(dest_path)
                 logger.info("Baixado: %s -> %s", url, dest_path)
                 return True
             logger.error("Falha ao baixar %s: %s", url, result.stderr.decode(errors="replace"))
+            part_path.unlink(missing_ok=True)
             return False
         except subprocess.TimeoutExpired:
             logger.error("Timeout ao baixar %s", url)
+            part_path.unlink(missing_ok=True)
             return False
         except FileNotFoundError:
             logger.error("wget não encontrado. Instale wget ou use curl.")
+            part_path.unlink(missing_ok=True)
             return False
 
     def validate_grib(self, filepath: Path, timeout: int = 90) -> bool:
@@ -80,14 +93,22 @@ class GribDownloader:
         pygrib/eccodes podem travar em loop infinito ao ler arquivos
         corrompidos (download interrompido etc.); a validação em subprocesso
         permite abortar e descartar o arquivo antes que trave o pipeline.
+
+        A checagem percorre **todas** as mensagens do arquivo (sem decodificar
+        os valores), detectando truncamentos no final — um GRIB parcial em que
+        a Temperatura@500 (início do arquivo) lê ok mas o restante falta.
         """
         script = (
             "import sys, pygrib\n"
             "g = pygrib.open(sys.argv[1])\n"
+            "if not g.messages:\n"
+            "    sys.exit(2)\n"
             "sel = g.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)\n"
             "if not sel:\n"
             "    sys.exit(2)\n"
             "sel[0].values\n"
+            "for _ in g:\n"
+            "    pass\n"
             "print('OK')\n"
         )
         try:

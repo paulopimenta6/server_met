@@ -401,6 +401,14 @@ curl -X POST http://localhost:8000/maps/generate \
 
 ## Changelog
 
+- **v4.4.1** — **robustez na captação**: download **atômico** (wget grava em
+  `<arquivo>.part` e só renomeia após sucesso — download interrompido nunca
+  deixa arquivo parcial com nome válido); **validação GRIB completa** (percorre
+  todas as mensagens em subprocesso, detectando truncamentos que passariam
+  lendo só um campo); **`initial_acquisition` bloqueante exige ciclo completo**
+  (todas as horas `forecast_hours` 00/06/12/18 saudáveis; se o ciclo publicado
+  estiver incompleto, tenta o anterior; se nenhum estiver completo, o servidor
+  inicia mesmo assim com a captação completando em segundo plano).
 - **v4.4.0** — **API REST + Interface Web**: o servidor expõe a API REST
    (`/docs`, `/health`, etc.) e a **interface web interativa** (`/`, mantida e
    aprimorada, com seletor de variável/nível/região/hora de previsão e METAR).

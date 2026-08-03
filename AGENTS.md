@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Servidor meteorológico **FastAPI v4.4.0** (API REST pura) com pipeline modular: **captação** (NOAA GFS GRIB2 + METAR, scheduler contínuo), **tratamento** (pygrib/numpy), **análise** (estatística, perfis, séries com statsmodels, dashboard OLS/HC3), **persistência** (SQLite WAL, dupla persistência CSV + `grid_data` + tabela `statistics`) e **distribuição** (mapas PNG, GIFs, matrizes CSV, BlueSky). Pacote: `server_MET`, entrypoint `server_MET.api.app:app` (uvicorn, porta 8000).
+Servidor meteorológico **FastAPI v4.4.1** (API REST + interface web) com pipeline modular: **captação** (NOAA GFS GRIB2 + METAR, scheduler contínuo), **tratamento** (pygrib/numpy), **análise** (estatística, perfis, séries com statsmodels, dashboard OLS/HC3), **persistência** (SQLite WAL, dupla persistência CSV + `grid_data` + tabela `statistics`) e **distribuição** (mapas PNG, GIFs, matrizes CSV, BlueSky). Pacote: `server_MET`, entrypoint `server_MET.api.app:app` (uvicorn, porta 8000).
 
 ## README.md
 
-`README.md` é a fonte única de documentação (v4.4.0, em português — linguagem simples + referência técnica no apêndice). Se mudar comportamento, atualize-o.
+`README.md` é a fonte única de documentação (v4.4.1, em português — linguagem simples + referência técnica no apêndice). Se mudar comportamento, atualize-o.
 
 ## Comandos
 
@@ -52,8 +52,8 @@ server_MET/
 
 - `Settings` (server_MET/core/config.py) é singleton lendo `environment/path.conf` (`chave=valor`); caminhos relativos a `PROJECT_ROOT`. **Nunca hardcode `data/...`** — use `Settings`. `ensure_dirs()` roda no lifespan. Chaves: `scheduler_enabled`, `scheduler_grib_interval_min`, `scheduler_metar_interval_min`, `scheduler_auto_pipeline`, `scheduler_auto_statistics`, `scheduler_resolution` (default `0p25`), `forecast_hours` (CSV `00,06,12,18`), `pipeline_levels` (CSV `850,500,200`).
 - Diretórios de dados: `data/gribs`, `data/mapasGrib`, `data/matrizGrib/{bluesky}`, `data/analise`, `data/tmp`. Banco: `data/met_server.db`.
-- GRIBs: `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. Download usa `wget` via subprocess (obrigatório; `check_url_exists` falha silenciosamente sem ele).
-- **Validação GRIB obrigatória em subprocesso** (`GribDownloader.validate_grib`, `GribReader.is_healthy`/`filter_healthy`): pygrib/eccodes travam em loop infinito em arquivo corrompido — try/except no mesmo processo não funciona.
+- GRIBs: `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. Download usa `wget` via subprocess (obrigatório; `check_url_exists` falha silenciosamente sem ele). **Download atômico**: wget grava em `<arquivo>.part` e `download_file` só renomeia para o nome final após sucesso — download interrompido nunca deixa arquivo parcial com nome válido.
+- **Validação GRIB obrigatória em subprocesso** (`GribDownloader.validate_grib`, `GribReader.is_healthy`/`filter_healthy`): pygrib/eccodes travam em loop infinito em arquivo corrompido — try/except no mesmo processo não funciona. A checagem percorre **todas** as mensagens (`for _ in g`), detectando truncamentos no final que passariam lendo só um campo.
 - **`extract_data` (v4)**: `_normalize_lat` inverte DADOS e latitude juntos (S→N). Não altere só a latitude.
 - `VAR_MAP` em `server_MET/core/constants.py` (não em processor). Inclui superfície/próximas da superfície (2m/10m/100m, CAPE, CIN, helicidade, rajada, neve, precipitação), **poluição** (`ozonio` por nível, `ozonioTot` coluna) e **níveis médios/altos** (`gh`, `omega`, `vortabs` — `isobaricInhPa`). `VAR_FIXED_LEVEL` fixa nível (2/10/100m). `wind`/`winds` calculados (u/v) — **não** estão no VAR_MAP.
 - Níveis de pressão: clamp 1–1000 hPa com snap para `PRESSURE_LEVELS` (GFS 0.25°). Variáveis de superfície esperam `level=None`. `GribReader.available_levels()` descobre níveis via subprocesso.
@@ -68,9 +68,12 @@ server_MET/
 - **Scheduler** (`acquisition/scheduler.py`): `SchedulerRunner` no lifespan (asyncio); `get_scheduler_runner()` singleton. `latest_published_cycle()` = agora − 5h (atraso NOMADS). Baixa resolução `scheduler_resolution` (default `0p25`). **Ciclo só marcado processado quando TODAS as `forecast_hours` existem e saudáveis** (`_cycle_has_complete_forecast`); parcial → re-verifica. Pipeline: `PIPELINE_VARS` = `MAIN_VARIABLES` + `winds`; `PIPELINE_LEVELED_VARS` = `temp,umidadeRel,ozonio` expandidas nos `pipeline_levels` (850,500,200). Mapas+matrizes para **todas regiões** (`todas_as_regioes()` exceto SA). Summary/timeseries sob demanda. `_run_pipeline`/`_run_statistics` compartilham `DataProcessor` (validação 1x/ciclo). Regiões restringíveis por `scheduler_auto_pipeline`. Estado em `ingest_state.processed_cycles` (JSON).
 - **Startup imediato**: scheduler dispara verificação GRIB+METAR no lifespan
   **antes** de aceitar requests. `initial_acquisition()` é **bloqueante**:
-  garante GRIBs do ciclo publicado (horas `forecast_hours` 00/06/12/18) e
+  garante GRIBs do ciclo publicado **completo e saudável** (todas as horas
+  `forecast_hours` 00/06/12/18 validadas por `_cycle_has_complete_forecast`) e
   METARs no disco antes de servir — valida rápido arquivos existentes, baixa
-  só o que falta; pipeline segue em segundo plano via `start()`.
+  só o que falta; se o ciclo publicado estiver incompleto tenta o anterior, e
+  se nenhum estiver completo o servidor inicia mesmo assim (summary vazio) com
+  a captação contínua completando em segundo plano via `start()`.
 - Animação GIF: `AnimationGenerator` usa `MapGenerator` + Pillow (`_compose_gif`). Kind `"gif"`. `.gif` → `image/gif` em `files.py`.
 - METAR: API JSON `https://aviationweather.gov/api/data/metar?ids={icao}&format=json&hours=2`. Parser offline vendado. `MetarClient` extrai **todos** campos (runway, recent, trend, qfe, pressure_tendency, max/min_temp, precipitation, sunshine, snow_depth, present_weather, cloud_type/base/amount, wind_shear, icing, turbulence, remarks, metar_type, corrected) + derivados (vento km/h, direção cardinal, umidade, QNH inHg).
 - API: `POST /gribs/download` usa **query params**, retorna `task_id`; `GET /gribs/download/{task_id}` persiste. `POST /maps/generate`, `/maps/animate`, `/matrices/generate`, `/analysis/charts` retornam JSON com caminhos `data/tmp/<uuid>`. Frontend converte para `/files/tmp/<rel>` (regex `/tmp/(.+)$`). `/maps/generate` e `/matrices/generate` respeitam `request.forecast`.

@@ -320,11 +320,13 @@ class SchedulerRunner:
     async def initial_acquisition(self) -> dict:
         """Captação inicial bloqueante antes do servidor aceitar requests.
 
-        Garante que os arquivos GRIB (ciclo 00/06/12/18) e as observações
-        METAR estejam no disco quando o servidor começar a servir. Se o dado
-        já existir e for saudável, valida rápido e segue; só baixa o que falta.
-        A geração do pipeline (mapas/matrizes/estatísticas) fica com o
-        scheduler em segundo plano (disparado por `start()`).
+        Garante que o ciclo publicado esteja **completo e saudável** — todas
+        as horas `forecast_hours` (00/06/12/18) presentes no disco — e que as
+        observações METAR estejam salvas. Se o dado já existir e for saudável,
+        valida rápido e segue; baixa somente o que falta. Percorre os ciclos
+        candidatos (publicado e anterior) até encontrar um completo. A geração
+        do pipeline (mapas/matrizes/estatísticas) fica com o scheduler em
+        segundo plano (disparado por `start()`).
         """
         target = latest_published_cycle()
         candidates = [target, previous_cycle(*target)]
@@ -333,23 +335,46 @@ class SchedulerRunner:
             "grib": {"obtained": 0, "cycle": None, "matches": []},
             "metar": {"count": 0},
         }
+        from server_MET.processing.processor import DataProcessor
+
         for date_str, ana in candidates:
-            files = await asyncio.to_thread(
+            await asyncio.to_thread(
                 self.downloader.download_gribs_all_resolutions,
                 date_str=date_str,
                 analysis_hour=ana,
                 resolutions=[self.settings.scheduler_resolution],
             )
-            files_flat = [f for lst in files.values() for f in lst] if files else []
-            if not files_flat:
-                logger.info("Ciclo %s %sZ ainda sem dados disponíveis.", date_str, ana)
+            processor = DataProcessor()
+            complete, missing = await asyncio.to_thread(
+                self._cycle_has_complete_forecast, date_str, ana, processor
+            )
+            if not complete:
+                logger.warning(
+                    "Ciclo %s %sZ incompleto na inicialização (horas faltando/"
+                    "inválidas: %s); tentando ciclo anterior.",
+                    date_str, ana, ", ".join(missing) or "todas",
+                )
                 continue
             summary["grib"] = {
-                "obtained": len(files_flat),
+                "obtained": len(self.settings.forecast_hours),
                 "cycle": f"{date_str}_{ana}",
-                "matches": [str(f) for f in files_flat],
+                "matches": [
+                    str(processor.reader.find_grib_file(date_str, ana, fh, self.settings.scheduler_resolution))
+                    for fh in self.settings.forecast_hours
+                ],
             }
+            logger.info(
+                "Ciclo completo disponível na inicialização: %s %sZ.",
+                date_str, ana,
+            )
             break
+        else:
+            logger.warning(
+                "Nenhum ciclo candidato (%s) completo na inicialização. "
+                "Servidor iniciará com os dados disponíveis; a captação "
+                "contínua completará em segundo plano.",
+                ", ".join(f"{d}_{a}" for d, a in candidates),
+            )
 
         try:
             summary["metar"]["count"] = await asyncio.to_thread(self._fetch_all_metars)

@@ -58,11 +58,12 @@ class TestSchedulerRunner:
         assert f"{ran[0][0]}_{ran[0][1]}" in state
 
     def test_initial_acquisition_downloads_and_metar(self, isolated_db):
-        """Captação inicial bloqueante obtém GRIB (00/06/12/18) + METAR."""
+        """Captação inicial bloqueante obtém GRIB completo (00/06/12/18) + METAR."""
         runner = SchedulerRunner()
         fake = FakeDownloader()
         runner.downloader = fake
         runner.settings._scheduler_resolution = "0p50"
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (True, [])
         runner.metar.get_all_metars = lambda: [{"station": "SBGR"}]
 
         import asyncio
@@ -72,19 +73,51 @@ class TestSchedulerRunner:
         assert fake.calls, "deveria ter tentado baixar GRIB"
         _, _, kwargs = fake.calls[0]
         assert kwargs.get("resolutions") == ["0p50"]
-        assert summary["grib"]["obtained"] == 1
+        assert summary["grib"]["obtained"] == len(runner.settings.forecast_hours)
+        assert summary["grib"]["cycle"]
         assert summary["metar"]["count"] == 1
 
     def test_initial_acquisition_tolerates_no_metar(self, isolated_db):
         runner = SchedulerRunner()
         fake = FakeDownloader()
         runner.downloader = fake
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (True, [])
         runner.metar.get_all_metars = lambda: None
 
         import asyncio
 
         summary = asyncio.run(runner.initial_acquisition())
-        assert summary["grib"]["obtained"] == 1
+        assert summary["grib"]["obtained"] == len(runner.settings.forecast_hours)
+        assert "metar" in summary
+
+    def test_initial_acquisition_tries_previous_cycle_when_latest_incomplete(self, isolated_db):
+        """Se o ciclo publicado estiver incompleto, tenta o anterior."""
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        target = latest_published_cycle()
+        prev = previous_cycle(*target)
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (ana == prev[1], [])
+        runner.metar.get_all_metars = lambda: []
+
+        import asyncio
+
+        summary = asyncio.run(runner.initial_acquisition())
+        assert len(fake.calls) >= 2, "deveria tentar o ciclo anterior"
+        assert summary["grib"]["cycle"] == f"{prev[0]}_{prev[1]}"
+
+    def test_initial_acquisition_no_complete_cycle_graceful(self, isolated_db):
+        """Nenhum ciclo completo: servidor inicia mesmo assim (summary vazio)."""
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        runner._cycle_has_complete_forecast = lambda date, ana, proc=None: (False, ["00"])
+        runner.metar.get_all_metars = lambda: []
+
+        import asyncio
+
+        summary = asyncio.run(runner.initial_acquisition())
+        assert summary["grib"]["cycle"] is None
         assert "metar" in summary
 
     def test_process_new_cycles_partial_forecast_not_marked(self, isolated_db):
@@ -224,3 +257,55 @@ class TestGribDownloaderExistingFiles:
         assert files == []
         assert not fp.exists(), "arquivo corrompido deveria ter sido removido"
         assert d.repo.get("20260801", "06", "0p25", "00")["status"] == "failed"
+
+
+class TestGribDownloaderAtomic:
+    """Download atômico: `.part` só vira arquivo final se o wget concluir."""
+
+    def _paths(self):
+        from server_MET.core.config import Settings
+
+        dest = Settings().dir_gribs / "20260801" / "06"
+        dest.mkdir(parents=True, exist_ok=True)
+        return dest / "gfs.t06z.pgrb2.0p25.f000"
+
+    def _fake_run(self, monkeypatch, *, exit_code=0, partial_first=True):
+        from pathlib import Path
+
+        from server_MET.acquisition.grib_downloader import GribDownloader
+
+        d = GribDownloader()
+        state = {"calls": 0}
+
+        def fake_run(cmd, **kw):
+            fp = cmd[2]
+            state["calls"] += 1
+            # sempre deixa o .part no disco (como o wget real faria)
+            Path(fp).parent.mkdir(parents=True, exist_ok=True)
+            Path(fp).write_bytes(b"conteudo")
+            return type("R", (), {"returncode": exit_code, "stdout": b"", "stderr": b""})()
+
+        monkeypatch.setattr("subprocess.run", fake_run)
+        return d, state
+
+    def test_download_success_renames_part(self, isolated_db, isolated_data_dirs, monkeypatch):
+        from pathlib import Path
+
+        d, state = self._fake_run(monkeypatch)
+        fp = self._paths()
+        ok = d.download_file("http://fake/gfs", fp)
+        assert ok
+        assert fp.exists(), "arquivo final deveria existir"
+        part = Path(str(fp) + ".part")
+        assert not part.exists(), ".part não deveria sobrar após sucesso"
+
+    def test_download_failure_removes_part_and_keeps_no_final(self, isolated_db, isolated_data_dirs, monkeypatch):
+        from pathlib import Path
+
+        d, state = self._fake_run(monkeypatch, exit_code=1)
+        fp = self._paths()
+        ok = d.download_file("http://fake/gfs", fp)
+        assert not ok
+        assert not fp.exists(), "arquivo final não deveria existir após falha"
+        part = Path(str(fp) + ".part")
+        assert not part.exists(), ".part deveria ser limpo após falha"

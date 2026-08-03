@@ -130,10 +130,14 @@ class GribReader:
         script = (
             "import sys, pygrib\n"
             "g = pygrib.open(sys.argv[1])\n"
+            "if not g.messages:\n"
+            "    sys.exit(2)\n"
             "sel = g.select(name='Temperature', typeOfLevel='isobaricInhPa', level=500)\n"
             "if not sel:\n"
             "    sys.exit(2)\n"
             "sel[0].values\n"
+            "for _ in g:\n"
+            "    pass\n"
             "print('OK')\n"
         )
         try:
