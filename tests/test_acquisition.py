@@ -57,6 +57,36 @@ class TestSchedulerRunner:
         state = runner.state.get_json("processed_cycles", [])
         assert f"{ran[0][0]}_{ran[0][1]}" in state
 
+    def test_initial_acquisition_downloads_and_metar(self, isolated_db):
+        """Captação inicial bloqueante obtém GRIB (00/06/12/18) + METAR."""
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        runner.settings._scheduler_resolution = "0p50"
+        runner.metar.get_all_metars = lambda: [{"station": "SBGR"}]
+
+        import asyncio
+
+        summary = asyncio.run(runner.initial_acquisition())
+
+        assert fake.calls, "deveria ter tentado baixar GRIB"
+        _, _, kwargs = fake.calls[0]
+        assert kwargs.get("resolutions") == ["0p50"]
+        assert summary["grib"]["obtained"] == 1
+        assert summary["metar"]["count"] == 1
+
+    def test_initial_acquisition_tolerates_no_metar(self, isolated_db):
+        runner = SchedulerRunner()
+        fake = FakeDownloader()
+        runner.downloader = fake
+        runner.metar.get_all_metars = lambda: None
+
+        import asyncio
+
+        summary = asyncio.run(runner.initial_acquisition())
+        assert summary["grib"]["obtained"] == 1
+        assert "metar" in summary
+
     def test_process_new_cycles_partial_forecast_not_marked(self, isolated_db):
         """Ciclo com previsão parcial/incompleta NÃO é marcado como processado."""
         runner = SchedulerRunner()

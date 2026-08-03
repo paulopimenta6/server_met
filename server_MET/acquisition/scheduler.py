@@ -309,13 +309,54 @@ class SchedulerRunner:
                 logger.exception("Erro no loop METAR: %s", e)
             await asyncio.sleep(self.settings.scheduler_metar_interval_min * 60)
 
-    def _fetch_all_metars(self) -> None:
+    def _fetch_all_metars(self) -> int:
         self.state.set("last_metar_fetch", _now_iso())
         results = self.metar.get_all_metars()
         self.state.set("last_metar_count", str(len(results)))
         logger.info("METAR atualizado: %d estações.", len(results))
+        return len(results)
 
     # --------------------------------------------------- lifecycle / API
+    async def initial_acquisition(self) -> dict:
+        """Captação inicial bloqueante antes do servidor aceitar requests.
+
+        Garante que os arquivos GRIB (ciclo 00/06/12/18) e as observações
+        METAR estejam no disco quando o servidor começar a servir. Se o dado
+        já existir e for saudável, valida rápido e segue; só baixa o que falta.
+        A geração do pipeline (mapas/matrizes/estatísticas) fica com o
+        scheduler em segundo plano (disparado por `start()`).
+        """
+        target = latest_published_cycle()
+        candidates = [target, previous_cycle(*target)]
+
+        summary = {
+            "grib": {"obtained": 0, "cycle": None, "matches": []},
+            "metar": {"count": 0},
+        }
+        for date_str, ana in candidates:
+            files = await asyncio.to_thread(
+                self.downloader.download_gribs_all_resolutions,
+                date_str=date_str,
+                analysis_hour=ana,
+                resolutions=[self.settings.scheduler_resolution],
+            )
+            files_flat = [f for lst in files.values() for f in lst] if files else []
+            if not files_flat:
+                logger.info("Ciclo %s %sZ ainda sem dados disponíveis.", date_str, ana)
+                continue
+            summary["grib"] = {
+                "obtained": len(files_flat),
+                "cycle": f"{date_str}_{ana}",
+                "matches": [str(f) for f in files_flat],
+            }
+            break
+
+        try:
+            summary["metar"]["count"] = await asyncio.to_thread(self._fetch_all_metars)
+        except Exception as e:
+            logger.exception("Falha na captação inicial METAR: %s", e)
+        return summary
+
     def start(self) -> None:
         if self._running:
             return
@@ -324,7 +365,10 @@ class SchedulerRunner:
         self._metar_task = asyncio.create_task(self._metar_loop())
         # Dispara uma verificação imediata na inicialização
         asyncio.create_task(self._process_new_cycles())
-        asyncio.create_task(self._fetch_all_metars())
+        asyncio.create_task(self._fetch_metars_now())
+
+    async def _fetch_metars_now(self) -> None:
+        await asyncio.to_thread(self._fetch_all_metars)
 
     def stop(self) -> None:
         self._running = False

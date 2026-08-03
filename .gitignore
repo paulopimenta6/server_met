@@ -15,6 +15,10 @@ data/
 .env
 *.env
 
+# wget log residuais
+wget-log
+wget-log.*
+
 # Editor / OS
 .vscode/
 .idea/

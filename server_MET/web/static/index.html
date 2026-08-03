@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MET Server - Servidor Meteorológico GFS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-left">
+                <h1>MET Server</h1>
+                <span class="version">v4.4.0</span>
+            </div>
+            <div class="header-right">
+                <button id="refreshData" class="btn btn-primary" title="Atualizar dados">⟳ Atualizar</button>
+                <span id="connectionStatus" class="status-indicator offline" title="Status da conexão"></span>
+            </div>
+        </header>
+
+        <nav class="tabs" role="tablist">
+            <button class="tab-btn active" role="tab" data-tab="maps" aria-selected="true">🗺️ Mapas</button>
+            <button class="tab-btn" role="tab" data-tab="animation" aria-selected="false">🎬 Animação</button>
+            <button class="tab-btn" role="tab" data-tab="dashboard" aria-selected="false">📊 Dashboard</button>
+            <button class="tab-btn" role="tab" data-tab="metar" aria-selected="false">✈️ METAR</button>
+            <button class="tab-btn" role="tab" data-tab="analysis" aria-selected="false">📈 Análises</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- ABA MAPAS -->
+            <section class="tab-panel active" id="maps-panel" role="tabpanel">
+                <div class="panel-header">
+                    <h2>Gerar Mapa Meteorológico</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="mapVariable">Variável</label>
+                            <select id="mapVariable" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="mapLevel">Nível (hPa)</label>
+                            <select id="mapLevel" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="mapRegion">Região</label>
+                            <select id="mapRegion" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="mapDate">Data</label>
+                            <input type="date" id="mapDate" class="form-input">
+                        </div>
+                        <div class="control-group">
+                            <label for="mapAnalysis">Análise</label>
+                            <select id="mapAnalysis" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="mapForecast">Previsão (+h)</label>
+                            <select id="mapForecast" class="form-select"></select>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="generateMap" class="btn btn-success">Gerar Mapa</button>
+                        <button id="openMap" class="btn btn-secondary" disabled>Ver Mapa</button>
+                    </div>
+                    <div id="mapPreview" class="map-preview hidden">
+                        <img id="mapImage" src="" alt="Mapa meteorológico">
+                        <div class="map-info" id="mapInfo"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA ANIMAÇÃO -->
+            <section class="tab-panel" id="animation-panel" role="tabpanel">
+                <div class="panel-header">
+                    <h2>Gerar Animação GIF</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="animVariable">Variável</label>
+                            <select id="animVariable" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="animLevel">Nível (hPa)</label>
+                            <select id="animLevel" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="animRegion">Região</label>
+                            <select id="animRegion" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="animDate">Data</label>
+                            <input type="date" id="animDate" class="form-input">
+                        </div>
+                        <div class="control-group">
+                            <label for="animAnalysis">Análise</label>
+                            <select id="animAnalysis" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="animDuration">Duração quadro (ms)</label>
+                            <input type="number" id="animDuration" class="form-input" value="700" min="100" max="5000">
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="generateAnim" class="btn btn-success">Gerar Animação</button>
+                        <button id="openAnim" class="btn btn-secondary" disabled>Ver Animação</button>
+                    </div>
+                    <div id="animPreview" class="map-preview hidden">
+                        <img id="animImage" src="" alt="Animação meteorológica">
+                        <div class="map-info" id="animInfo"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA DASHBOARD -->
+            <section class="tab-panel" id="dashboard-panel" role="tabpanel">
+                <div class="panel-header">
+                    <h2>Dashboard Estatístico</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="dashVariable">Variável</label>
+                            <select id="dashVariable" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="dashLevel">Nível (hPa)</label>
+                            <select id="dashLevel" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="dashRegion">Região</label>
+                            <select id="dashRegion" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="dashDate">Data</label>
+                            <input type="date" id="dashDate" class="form-input">
+                        </div>
+                        <div class="control-group">
+                            <label for="dashAnalysis">Análise</label>
+                            <select id="dashAnalysis" class="form-select"></select>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="generateDashboard" class="btn btn-success">Gerar Dashboard</button>
+                    </div>
+                    <div id="dashboardResults" class="dashboard-results hidden">
+                        <div class="dashboard-cards" id="dashboardCards"></div>
+                        <div class="dashboard-charts" id="dashboardCharts"></div>
+                        <div class="dashboard-profile" id="dashboardProfile"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA METAR -->
+            <section class="tab-panel" id="metar-panel" role="tabpanel">
+                <div class="panel-header">
+                    <h2>Observações METAR</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="metarRegion">Região / Aeródromo</label>
+                            <select id="metarRegion" class="form-select"></select>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="fetchMetar" class="btn btn-primary">Buscar METAR</button>
+                    </div>
+                    <div id="metarResults" class="metar-results hidden">
+                        <div class="metar-card" id="metarCard"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ABA ANÁLISES -->
+            <section class="tab-panel" id="analysis-panel" role="tabpanel">
+                <div class="panel-header">
+                    <h2>Análises Estatísticas</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="anaVariable">Variável</label>
+                            <select id="anaVariable" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="anaLevel">Nível (hPa)</label>
+                            <select id="anaLevel" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="anaRegion">Região</label>
+                            <select id="anaRegion" class="form-select"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="anaDate">Data</label>
+                            <input type="date" id="anaDate" class="form-input">
+                        </div>
+                        <div class="control-group">
+                            <label for="anaAnalysis">Análise</label>
+                            <select id="anaAnalysis" class="form-select"></select>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="genSummary" class="btn btn-primary">Resumo</button>
+                        <button id="genProfile" class="btn btn-primary">Perfil Vertical</button>
+                        <button id="genTimeseries" class="btn btn-primary">Série Temporal</button>
+                        <button id="genCharts" class="btn btn-secondary">Gráficos</button>
+                    </div>
+                    <div id="analysisResults" class="analysis-results hidden"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-left">
+                <span id="lastUpdate">Última atualização: --</span>
+            </div>
+            <div class="footer-right">
+                <a href="/docs" target="_blank">Documentação API</a>
+                <span>|</span>
+                <a href="/health" target="_blank">Health Check</a>
+            </div>
+        </footer>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loadingText">Processando...</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

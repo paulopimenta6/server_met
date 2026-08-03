@@ -11,6 +11,7 @@ from server_MET.core.constants import (
     COMPUTED_VARIABLES,
     MAIN_VARIABLES,
     PIPELINE_LEVELS,
+    UNITS_MAP,
     VAR_FIXED_LEVEL,
     VAR_MAP,
     var_label,
@@ -21,6 +22,7 @@ from server_MET.processing.regions import (
     CIDADES_PREDEFINIDAS,
     PAISES_AMERICA_DO_SUL,
     REGIOES_DESCRICOES,
+    REGIOES_ICAO,
     REGIOES_PREDEFINIDAS,
 )
 
@@ -38,6 +40,8 @@ async def list_variables():
             "label": var_label(k),
             "leveled": k in LEVELED_VARIABLES,
             "fixed_level": VAR_FIXED_LEVEL.get(k),
+            "has_level": k in LEVELED_VARIABLES or k in VAR_FIXED_LEVEL,
+            "unit": UNITS_MAP.get(k, ""),
         }
         for k, v in VAR_MAP.items()
         if k in MAIN_VARIABLES
@@ -50,6 +54,8 @@ async def list_variables():
             "label": var_label(key),
             "leveled": level_type == "pressure",
             "fixed_level": None,
+            "has_level": level_type == "pressure",
+            "unit": UNITS_MAP.get(key, ""),
         }
         for key, name, level_type in [
             ("wind", "Wind speed (computed from u/v)", "pressure"),
@@ -91,6 +97,8 @@ async def list_regions():
                 "name": k,
                 "kind": "estado" if k != "SA" else "visao_geral",
                 "bounds": list(v),
+                "full_name": REGIOES_DESCRICOES.get(k, k),
+                "icao": REGIOES_ICAO.get(k),
                 "description": REGIOES_DESCRICOES.get(k, ""),
             }
         )
@@ -100,6 +108,8 @@ async def list_regions():
                 "name": k,
                 "kind": "pais",
                 "bounds": list(v),
+                "full_name": REGIOES_DESCRICOES.get(k, k),
+                "icao": REGIOES_ICAO.get(k),
                 "description": REGIOES_DESCRICOES.get(k, ""),
             }
         )
@@ -109,6 +119,8 @@ async def list_regions():
                 "name": k,
                 "kind": "cidade",
                 "center": {"lon": lon, "lat": lat},
+                "full_name": REGIOES_DESCRICOES.get(k, city_name),
+                "icao": REGIOES_ICAO.get(k),
                 "description": REGIOES_DESCRICOES.get(k, city_name),
             }
         )

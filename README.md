@@ -117,6 +117,11 @@ print(s.dir_gribs, s.db_path)
 O `SchedulerRunner` (`server_MET/acquisition/scheduler.py`) roda dentro do
 servidor (ou avulso com `./scripts/run.sh scheduler`):
 
+0. **Startup bloqueante**: no início (lifespan), antes de o servidor aceitar
+   o primeiro request, `initial_acquisition()` garante que os GRIBs do ciclo
+   publicado e os METARs estejam no disco — valida rápido os que já existem e
+   baixa somente o que falta. Assim os dados **já estão disponíveis quando o
+   servidor vai ao ar** (o download nunca acontece no meio de uma requisição).
 1. **GRIB**: a cada `scheduler_grib_interval_min` verifica o ciclo GFS mais
    recente que já deveria estar publicado (o NOMADS publica ~5h após o início
    do ciclo). Se ainda não baixado:
@@ -396,10 +401,15 @@ curl -X POST http://localhost:8000/maps/generate \
 
 ## Changelog
 
-- **v4.4.0** — **API REST pura**: remoção completa do frontend (site HTML/Leaflet).
-  O servidor agora expõe apenas a API REST (`/`, `/docs`, `/health`, etc.).
-  Inicialização imediata de captação GRIB+METAR no startup do servidor
-  (antes do primeiro request). `MetarClient` expandido para extrair **todos**
+- **v4.4.0** — **API REST + Interface Web**: o servidor expõe a API REST
+   (`/docs`, `/health`, etc.) e a **interface web interativa** (`/`, mantida e
+   aprimorada, com seletor de variável/nível/região/hora de previsão e METAR).
+   **Captação inicial bloqueante** no startup: antes de o servidor aceitar
+   requests, `SchedulerRunner.initial_acquisition()` garante que os GRIBs do
+   ciclo publicado (horas `forecast_hours` = 00/06/12/18) e as observações
+   METAR estejam no disco — valida rápido se já existem, baixa somente o que
+   falta. O pipeline (mapas/matrizes/estatísticas) segue em segundo plano via
+   scheduler. `MetarClient` expandido para extrair **todos**
   os campos decodificados pelo parser PythonMETAR (runway, recent, trend, qfe,
   pressure_tendency, max/min temp, precipitation, sunshine, snow_depth,
   present_weather, cloud_type/base/amount, wind_shear, icing, turbulence,

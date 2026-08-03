@@ -111,7 +111,9 @@ class GribDownloader:
     ) -> list[Path]:
         date_str = date_str or get_date_str()
         analysis_hour = analysis_hour or get_current_analysis_hour()
-        forecast_hours = forecast_hours or self.settings.forecast_hours
+
+        # Horas de previsão padrão: 00, 06, 12, 18 (Settings.forecast_hours).
+        forecast_hours = forecast_hours or list(self.settings.forecast_hours)
 
         downloaded = []
         base_url = f"{self.settings.gfs_url}{date_str}/{analysis_hour}/atmos/"
