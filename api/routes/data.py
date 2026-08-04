@@ -11,7 +11,7 @@ from api.schemas import (
     StatsResponse
 )
 from core.persistence import persistence
-from core.variables import VARIABLES_MET, get_all_variable_codes, get_variable_info
+from core.variables import VARIABLES_MET, get_all_variable_codes, get_variable_info, is_variable_available
 from core.config import REGIOES
 import os
 
@@ -28,7 +28,8 @@ async def list_variables():
             level_values=info.get("level_values", []),
             unit=info["unit"],
             description=info["description"],
-            category=info["category"]
+            category=info["category"],
+            available=is_variable_available(code)
         ))
     return VariableListResponse(variables=variables)
 

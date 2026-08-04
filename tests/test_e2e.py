@@ -121,6 +121,17 @@ def test_total_ozone_variable(client):
     assert total_o3["unit"] == "DU"
 
 
+def test_pollution_available_from_varmet(client):
+    # Only Ozone mixing ratio (o3) and Total ozone (total_o3) exist in the GFS
+    # pgrb2 0p25 inventory (varMET). Everything else stays catalogued but marked
+    # unavailable so the frontend does not offer it.
+    r = client.get(f"{API}/data/variables")
+    pollution = [v for v in r.json()["variables"] if v["category"] == "pollution"]
+    available = {v["code"] for v in pollution if v["available"]}
+    assert available == {"o3", "total_o3"}
+    assert {v["code"] for v in pollution} >= {"no2", "so2", "co", "pm25", "pm10", "aod", "dust"}
+
+
 def test_map_total_ozone(client):
     r = client.get(f"{API}/maps/total_o3/SP",
                    params={"date": "20260804", "analysis": "00"})

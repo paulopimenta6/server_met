@@ -221,6 +221,20 @@ VARIABLE_CATEGORIES = {
     "pollution": ["o3", "total_o3", "no2", "so2", "co", "pm25", "pm10", "aod", "dust"],
 }
 
+# Variables confirmed present in the GFS pgrb2 0p25 product, cross-checked
+# against the file inventory `varMET` at the project root. Pollution available
+# there: Ozone mixing ratio (o3) and Total ozone (total_o3) only.
+AVAILABLE_IN_GFS = {
+    "ps", "prnm", "temp", "temps", "nuvem", "umidadeRel", "u", "v",
+    "uSupe", "vSupe", "o3", "total_o3",
+}
+
+def is_variable_available(var_code: str) -> bool:
+    return var_code in AVAILABLE_IN_GFS
+
+def get_available_variables() -> dict:
+    return {k: v for k, v in VARIABLES_MET.items() if is_variable_available(k)}
+
 def get_variable_info(var_code: str) -> Optional[Dict[str, Any]]:
     return VARIABLES_MET.get(var_code)
 

@@ -15,6 +15,7 @@ class VariableInfo(BaseModel):
     unit: str
     description: str
     category: str
+    available: bool = False
 
 class RegionInfo(BaseModel):
     code: str

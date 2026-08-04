@@ -69,9 +69,12 @@ async function loadConfig() {
 }
 
 function renderVariables(category) {
+    // Only show variables confirmed available in the GFS data (see varMET):
+    // e.g. the pollution category lists o3 and total_o3 only.
     const filtered = variables.filter(v =>
-        !category ||
-        (category === 'pollution' ? v.category === 'pollution' : v.category !== 'pollution'));
+        v.available &&
+        (!category ||
+        (category === 'pollution' ? v.category === 'pollution' : v.category !== 'pollution')));
     const opts = filtered.map(v => `<option value="${v.code}">${varLabel(v)}</option>`).join('');
     $('varSel').innerHTML = '<option value="">Selecione...</option>' + opts;
     $('varSel')._data = filtered;

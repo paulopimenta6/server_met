@@ -267,6 +267,9 @@ curl -s "$BASE/data/dashboard"
 > reais. As demais estão registradas no catálogo (`core/variables.py`) mas **não existem**
 > no produto GFS pgrb2 0p25 (confirmado via inventário `varMET` do próprio arquivo), ficando
 > disponíveis assim que o dado existir na fonte.
+>
+> O endpoint `/data/variables` retorna o campo `available` para cada variável; o frontend
+> exibe **apenas as disponíveis** — na categoria **Poluição**, apenas `o3` e `total_o3`.
 
 Níveis isobáricos suportados: `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa.
 Níveis de altura (`uSupe`/`vSupe`): `10, 20, 30, 40, 50, 80, 100` m.

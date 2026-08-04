@@ -45,6 +45,8 @@ NOAA filter supports: temp(TMP), umidadeRel(RH), u/v(UGRD/VGRD), o3(O3MR), total
 
 Confirmed in GFS pgrb2 0p25 (verified 2026-08-04): ps, prnm, temp, temps, nuvem, umidadeRel, u, v, uSupe, vSupe, o3, total_o3. Not present in pgrb2: no2, so2, co, pm25, pm10, aod, dust, chuvaNaoConvec, chuvaConvec (they remain catalog-only).
 
+`core/variables.py` `AVAILABLE_IN_GFS` marks which variables are present in the product (derived from `varMET`); `/data/variables` returns `available` and the frontend only shows available variables (pollution category = o3, total_o3).
+
 Map filenames: `GFS_<res>_<REGION>_N<level|SFC>_<variable>_<analysis>_<date>_<forecast>.png` — variable codes may contain underscores (total_o3, umidadeRel, uSupe); `api/routes/maps.py` `_FILENAME_RE` handles them.
 
 ## Regions (18)
