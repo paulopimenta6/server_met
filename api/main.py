@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 
-from api.routes import health, data, maps
+from api.routes import health, data, maps, metar
 from core.config import API_HOST, API_PORT, FRONTEND_DIR
 
 app = FastAPI(
@@ -31,6 +31,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(data.router, prefix="/api/v1")
 app.include_router(maps.router, prefix="/api/v1")
+app.include_router(metar.router, prefix="/api/v1")
 
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
@@ -56,6 +57,7 @@ async def api_info():
             "health": "/health",
             "data": "/api/v1/data",
             "maps": "/api/v1/maps",
+            "metar": "/api/v1/metar",
             "docs": "/docs"
         }
     }

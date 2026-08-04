@@ -10,7 +10,7 @@
 <body>
     <header class="header">
         <h1>🌤️ Server MET v2.0</h1>
-        <p class="subtitle">Visualização de Dados Meteorológicos e de Poluição Atmosférica</p>
+        <p class="subtitle">Dados Meteorológicos e de Poluição Atmosférica</p>
     </header>
 
     <div class="container">
@@ -23,7 +23,7 @@
                     <select id="variableSelect" class="form-control"></select>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" id="levelGroup">
                     <label for="levelSelect">Nível (hPa/m)</label>
                     <select id="levelSelect" class="form-control"></select>
                 </div>
@@ -63,11 +63,32 @@
                 <h3>📈 Série Temporal</h3>
                 <canvas id="timeSeriesChart" height="200"></canvas>
             </div>
+            
+            <div class="panel">
+                <h3>📍 METAR</h3>
+                <div id="metarContainer" class="metar-container">
+                    <select id="metarStationSelect" class="form-control" onchange="loadMETAR()">
+                        <option value="">Selecione estação...</option>
+                    </select>
+                    <pre id="metarData" class="metar-output"></pre>
+                </div>
+            </div>
         </aside>
 
         <main class="main-content">
-            <div id="map" class="map-container"></div>
-            <div id="loading" class="loading hidden">Carregando...</div>
+            <div class="image-container">
+                <div id="loading" class="loading hidden">Carregando...</div>
+                <div id="imageWrapper" class="image-wrapper hidden">
+                    <div class="image-header">
+                        <h3 id="imageTitle">Mapa</h3>
+                        <div class="image-meta">
+                            <span id="imageMeta"></span>
+                        </div>
+                    </div>
+                    <img id="mapImage" src="" alt="Mapa meteorológico" class="map-img">
+                    <div id="imageError" class="image-error hidden">Imagem não disponível</div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -75,7 +96,7 @@
         <p>Server MET v2.0 | Dados: NOAA GFS | <a href="/docs" target="_blank">API Docs</a></p>
     </footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/app.js"></script>
 </body>
 </html>

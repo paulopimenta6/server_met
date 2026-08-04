@@ -1,28 +1,18 @@
-// Server MET v2.0 - Frontend Application
+// Server MET v2.0 - Frontend Application (Lightweight)
 const API_BASE = '/api/v1';
 
-let map = null;
-let dataLayer = null;
 let timeSeriesChart = null;
 let currentData = null;
+let variablesCache = [];
+
+// Surface variables (don't need level selection)
+const SURFACE_VARIABLES = ['ps', 'prnm', 'temps', 'chuvaNaoConvec', 'chuvaConvec', 'pm25', 'pm10', 'aod'];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    initMap();
     initChart();
     await loadConfig();
     setupEventListeners();
 });
-
-function initMap() {
-    map = L.map('map').setView([-15, -50], 4);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 18
-    }).addTo(map);
-    
-    dataLayer = L.layerGroup().addTo(map);
-}
 
 function initChart() {
     const ctx = document.getElementById('timeSeriesChart').getContext('2d');
@@ -56,12 +46,17 @@ async function loadConfig() {
         const regions = (await regionsRes.json()).regions;
         const available = await availRes.json();
         
+        variablesCache = variables;
+        
         populateSelect('variableSelect', variables.map(v => ({value: v.code, text: `${v.name} (${v.unit})`})));
         populateSelect('regionSelect', regions.map(r => ({value: r.code, text: r.code})));
         populateSelect('dateSelect', available.dates.map(d => ({value: d, text: formatDate(d)})));
         
         document.getElementById('variableSelect').addEventListener('change', onVariableChange);
         document.getElementById('regionSelect').addEventListener('change', onRegionChange);
+        
+        // Load METAR stations
+        await loadMETARStations();
         
     } catch (error) {
         console.error('Error loading config:', error);
@@ -83,9 +78,34 @@ function populateSelect(selectId, options) {
 async function onVariableChange() {
     const variable = document.getElementById('variableSelect').value;
     const region = document.getElementById('regionSelect').value;
+    const levelGroup = document.getElementById('levelGroup');
     
-    if (!variable || !region) return;
+    // Hide level selector for surface variables
+    if (variable && SURFACE_VARIABLES.includes(variable)) {
+        levelGroup.style.display = 'none';
+        document.getElementById('levelSelect').value = '';
+    } else {
+        levelGroup.style.display = 'block';
+        if (variable && region) {
+            await loadLevels(variable);
+        }
+    }
     
+    // Update image when variable changes
+    if (variable && region) {
+        await loadImage();
+    }
+}
+
+async function onRegionChange() {
+    const variable = document.getElementById('variableSelect').value;
+    if (variable) {
+        await onVariableChange();
+        await loadImage();
+    }
+}
+
+async function loadLevels(variable) {
     try {
         const res = await fetch(`${API_BASE}/data/levels/${variable}`);
         const data = await res.json();
@@ -93,11 +113,6 @@ async function onVariableChange() {
     } catch (error) {
         console.error('Error loading levels:', error);
     }
-}
-
-async function onRegionChange() {
-    const variable = document.getElementById('variableSelect').value;
-    if (variable) await onVariableChange();
 }
 
 function setupEventListeners() {
@@ -112,8 +127,11 @@ async function loadData() {
     const date = document.getElementById('dateSelect').value;
     const analysis = document.getElementById('analysisSelect').value;
     
-    if (!variable || !level || !region) {
-        showError('Selecione variável, nível e região');
+    // Check required fields (level only required for non-surface vars)
+    const needsLevel = !SURFACE_VARIABLES.includes(variable);
+    
+    if (!variable || !region || (needsLevel && !level)) {
+        showError(needsLevel ? 'Selecione variável, nível e região' : 'Selecione variável e região');
         return;
     }
     
@@ -122,7 +140,8 @@ async function loadData() {
     
     try {
         const params = new URLSearchParams({
-            variable, level, region,
+            variable, region,
+            ...(level && { level }),
             ...(date && { date }),
             ...(analysis && { analysis })
         });
@@ -137,8 +156,11 @@ async function loadData() {
         
         currentData = data.data[0];
         displayData(currentData);
-        loadTimeSeries(variable, level, region);
+        loadTimeSeries(variable, level || 'sfc', region);
         document.getElementById('exportBtn').disabled = false;
+        
+        // Also load the pre-generated image
+        await loadImage();
         
     } catch (error) {
         console.error('Error loading data:', error);
@@ -153,94 +175,82 @@ function displayData(data) {
     document.getElementById('statMax').textContent = data.max_value?.toFixed(2) || '-';
     document.getElementById('statMean').textContent = data.mean_value?.toFixed(2) || '-';
     document.getElementById('statsPanel').classList.remove('hidden');
-    
-    if (data.csv_path) {
-        loadMapLayer(data);
-    }
 }
 
-async function loadMapLayer(data) {
-    dataLayer.clearLayers();
+async function loadImage() {
+    const variable = document.getElementById('variableSelect').value;
+    const region = document.getElementById('regionSelect').value;
+    const level = document.getElementById('levelSelect').value;
+    const date = document.getElementById('dateSelect').value;
+    const analysis = document.getElementById('analysisSelect').value;
+    
+    if (!variable || !region) return;
+    
+    const wrapper = document.getElementById('imageWrapper');
+    const loading = document.getElementById('loading');
+    const img = document.getElementById('mapImage');
+    const error = document.getElementById('imageError');
+    const title = document.getElementById('imageTitle');
+    const meta = document.getElementById('imageMeta');
+    
+    loading.classList.remove('hidden');
+    wrapper.classList.add('hidden');
+    error.classList.add('hidden');
     
     try {
-        const res = await fetch(`${API_BASE}/maps/geojson/${data.variable_code}/${data.region_code}?level=${data.level_value}&date=${data.data_date}&analysis=${data.analysis_time}`);
-        const geojson = await res.json();
+        const params = new URLSearchParams({
+            ...(level && { level }),
+            ...(date && { date }),
+            ...(analysis && { analysis })
+        });
         
-        const variableInfo = await (await fetch(`${API_BASE}/data/variables`)).json();
-        const varInfo = variableInfo.variables.find(v => v.code === data.variable_code);
-        const unit = varInfo?.unit || '';
+        const res = await fetch(`${API_BASE}/maps/${variable}/${region}?${params}`, { method: 'HEAD' });
         
-        L.geoJSON(geojson, {
-            pointToLayer: (feature, latlng) => {
-                const value = feature.properties.value;
-                const intensity = normalizeValue(value, data.min_value, data.max_value);
-                const color = getColor(intensity);
-                
-                return L.circleMarker(latlng, {
-                    radius: 4,
-                    fillColor: color,
-                    color: '#fff',
-                    weight: 0.5,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                });
-            },
-            onEachFeature: (feature, layer) => {
-                layer.bindPopup(`
-                    <strong>${feature.properties.variable}</strong><br>
-                    Valor: ${feature.properties.value.toFixed(2)} ${unit}<br>
-                    Nível: ${feature.properties.level} hPa<br>
-                    Região: ${feature.properties.region}
-                `);
-            }
-        }).addTo(dataLayer);
-        
-        if (geojson.bbox) {
-            map.fitBounds([
-                [geojson.bbox[1], geojson.bbox[0]],
-                [geojson.bbox[3], geojson.bbox[2]]
-            ]);
+        if (res.ok) {
+            // Build the full URL for the image
+            const imgUrl = `${API_BASE}/maps/${variable}/${region}?${params}`;
+            img.src = imgUrl;
+            img.onload = () => {
+                loading.classList.add('hidden');
+                wrapper.classList.remove('hidden');
+            };
+            img.onerror = () => {
+                loading.classList.add('hidden');
+                error.classList.remove('hidden');
+            };
+            
+            // Update title and meta
+            const varInfo = variablesCache.find(v => v.code === variable);
+            const levelText = level ? `${level} hPa` : 'Superfície';
+            title.textContent = `${varInfo?.name || variable} - ${levelText} - ${region}`;
+            meta.textContent = `Análise: ${analysis || '00'}Z | Data: ${formatDate(date || 'latest')} | Previsão: ${params.get('forecast') || '00'}h`;
+        } else {
+            loading.classList.add('hidden');
+            error.classList.remove('hidden');
         }
-        
-        addLegend(data.min_value, data.max_value, unit);
-        
-    } catch (error) {
-        console.error('Error loading map layer:', error);
+    } catch (err) {
+        console.error('Error loading image:', err);
+        loading.classList.add('hidden');
+        error.classList.remove('hidden');
     }
-}
-
-function addLegend(min, max, unit) {
-    const legend = L.control({position: 'bottomright'});
-    legend.onAdd = () => {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = `
-            <div style="background: white; padding: 10px; border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.3);">
-                <strong>${unit}</strong>
-                <div style="display: flex; align-items: center; margin-top: 5px;">
-                    <div style="width: 100px; height: 10px; background: linear-gradient(to right, #440154, #31688e, #35b779, #fde725);"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; width: 100px; margin-top: 2px; font-size: 11px;">
-                    <span>${min?.toFixed(1) || 'Min'}</span>
-                    <span>${max?.toFixed(1) || 'Max'}</span>
-                </div>
-            </div>
-        `;
-        return div;
-    };
-    legend.addTo(map);
 }
 
 async function loadTimeSeries(variable, level, region) {
     try {
-        const res = await fetch(`${API_BASE}/data/?variable=${variable}&level=${level}&region=${region}&limit=50`);
+        const params = new URLSearchParams({ variable, region, limit: '50' });
+        if (level) params.append('level', level);
+        
+        const res = await fetch(`${API_BASE}/data/?${params}`);
         const data = await res.json();
         
         const labels = data.data.map(d => `${d.data_date} ${d.analysis_time}Z`).reverse();
         const values = data.data.map(d => d.mean_value).reverse();
         
+        const levelText = level ? `${level} hPa` : 'Superfície';
+        
         timeSeriesChart.data.labels = labels;
         timeSeriesChart.data.datasets = [{
-            label: `${variable} (${level} hPa) - ${region}`,
+            label: `${variable} (${levelText}) - ${region}`,
             data: values,
             borderColor: '#31688e',
             backgroundColor: 'rgba(49, 104, 142, 0.1)',
@@ -260,7 +270,7 @@ async function exportCSV() {
     const params = new URLSearchParams({
         variable: currentData.variable_code,
         region: currentData.region_code,
-        level: currentData.level_value,
+        ...(currentData.level_value && { level: currentData.level_value }),
         ...(currentData.data_date && { date: currentData.data_date }),
         ...(currentData.analysis_time && { analysis: currentData.analysis_time })
     });
@@ -268,15 +278,51 @@ async function exportCSV() {
     window.open(`${API_BASE}/data/export/csv?${params}`, '_blank');
 }
 
-function normalizeValue(value, min, max) {
-    if (min === max) return 0.5;
-    return Math.max(0, Math.min(1, (value - min) / (max - min)));
+// METAR functionality
+async function loadMETARStations() {
+    try {
+        const res = await fetch(`${API_BASE}/metar/stations`);
+        const data = await res.json();
+        
+        if (data.stations) {
+            const select = document.getElementById('metarStationSelect');
+            select.innerHTML = '<option value="">Selecione estação...</option>';
+            
+            data.stations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station.code;
+                option.textContent = `${station.code} - ${station.name}`;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading METAR stations:', error);
+    }
 }
 
-function getColor(intensity) {
-    const colors = ['#440154', '#482878', '#3e4a89', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
-    const index = Math.floor(intensity * (colors.length - 1));
-    return colors[Math.max(0, Math.min(index, colors.length - 1))];
+async function loadMETAR() {
+    const station = document.getElementById('metarStationSelect').value;
+    const output = document.getElementById('metarData');
+    
+    if (!station) {
+        output.textContent = '';
+        return;
+    }
+    
+    output.textContent = 'Carregando...';
+    
+    try {
+        const res = await fetch(`${API_BASE}/metar/${station}`);
+        const data = await res.json();
+        
+        if (data.metar) {
+            output.textContent = `${data.station}\n${data.time}\n${data.metar}`;
+        } else {
+            output.textContent = 'METAR não disponível';
+        }
+    } catch (error) {
+        output.textContent = 'Erro ao carregar METAR';
+    }
 }
 
 function formatDate(dateStr) {
