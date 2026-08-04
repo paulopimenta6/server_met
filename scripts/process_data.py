@@ -24,6 +24,7 @@ from core.grib_reader import GribReader
 from core.processor import DataProcessor
 from core.persistence import persistence
 from core.maps import generate_map
+from core.variables import VARIABLES_MET
 import core.metar as metar_mod
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -38,6 +39,20 @@ DEFAULT_VARIABLES = {
     "o3":          [500],
     "ps":          [0],
 }
+
+
+def build_all_variables_map() -> dict:
+    """One representative level per variable from core.variables registry."""
+    levels = {}
+    for var, info in VARIABLES_MET.items():
+        ltype = info["level_type"]
+        if ltype == "isobaricInhPa":
+            levels[var] = [500 if var == "o3" else 850]
+        elif ltype == "heightAboveGround":
+            levels[var] = [10]
+        else:
+            levels[var] = [0]
+    return levels
 
 
 def find_latest_cycle(date: str = None, analysis: str = None):
@@ -149,6 +164,8 @@ def main():
     parser.add_argument("--analysis", choices=["00", "06", "12", "18"], help="GFS cycle")
     parser.add_argument("--regions", nargs="+", default=["SP", "RJ", "PR", "RS", "MG", "AM"],
                         help="Region codes (default: SP RJ PR RS MG AM)")
+    parser.add_argument("--all-variables", action="store_true",
+                        help="Process every variable in core/variables.py (unavailable ones are skipped)")
     parser.add_argument("--skip-metar", action="store_true", help="Do not fetch METAR")
     args = parser.parse_args()
 
@@ -158,7 +175,10 @@ def main():
     regions = [r.upper() for r in args.regions if r.upper() in REGIOES]
     logger.info("Regions: %s", regions)
 
-    grib_results = process_grib(date_str, analysis, regions, DEFAULT_VARIABLES)
+    variables = build_all_variables_map() if args.all_variables else DEFAULT_VARIABLES
+    logger.info("Variables: %s", variables)
+
+    grib_results = process_grib(date_str, analysis, regions, variables)
     logger.info("GRIB results: %s", grib_results)
 
     if not args.skip_metar:

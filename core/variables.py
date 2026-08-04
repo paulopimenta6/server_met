@@ -130,6 +130,15 @@ VARIABLES_MET: Dict[str, Dict[str, Any]] = {
         "description": "Razão de mistura de ozônio",
         "category": "pollution",
     },
+    "total_o3": {
+        "grib_name": "Total ozone",
+        "level_type": "atmosphereSingleLayer",
+        "level_values": [0],
+        "unit_conv": identity,
+        "unit": "DU",
+        "description": "Ozônio total na coluna atmosférica (unidade Dobson)",
+        "category": "pollution",
+    },
     "no2": {
         "grib_name": "Nitrogen dioxide mixing ratio",
         "level_type": "isobaricInhPa",
@@ -209,7 +218,7 @@ VARIABLE_CATEGORIES = {
     "precipitation": ["chuvaNaoConvec", "chuvaConvec"],
     "humidity": ["umidadeRel"],
     "wind": ["u", "v", "uSupe", "vSupe"],
-    "pollution": ["o3", "no2", "so2", "co", "pm25", "pm10", "aod", "dust"],
+    "pollution": ["o3", "total_o3", "no2", "so2", "co", "pm25", "pm10", "aod", "dust"],
 }
 
 def get_variable_info(var_code: str) -> Optional[Dict[str, Any]]:

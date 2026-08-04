@@ -16,7 +16,7 @@
 5. [Configuração (.env)](#-configuração-env)
 6. [Como usar](#-como-usar)
 7. [Endpoints da API](#-endpoints-da-api)
-8. [Variáveis (20)](#-variáveis-20)
+8. [Variáveis (21)](#-variáveis-21)
 9. [Regiões (18)](#-regiões-18)
 10. [Frontend](#-frontend)
 11. [Testes e validação](#-testes-e-validação)
@@ -47,7 +47,7 @@
 server_met/
 ├── core/                 # Lógica de negócio (módulos puros)
 │   ├── config.py         #   Caminhos, regiões, níveis e URLs
-│   ├── variables.py      #   Registro das 20 variáveis (meteo + poluição)
+│   ├── variables.py      #   Registro das 21 variáveis (meteo + poluição)
 │   ├── regions.py        #   Classes auxiliares das 18 regiões
 │   ├── persistence.py    #   Camada SQLite + CSV (dados e METAR)
 │   ├── downloader.py     #   Download GFS (endpoint filter da NOAA)
@@ -166,10 +166,17 @@ PYTHONPATH=. python scripts/process_data.py \
 | `--date` | última disponível | Data no formato `YYYYMMDD` |
 | `--analysis` | detecta recente | Ciclo sinótico `00`, `06`, `12`, `18` |
 | `--regions` | `SP RJ PR RS MG AM` | Códigos de região |
+| `--all-variables` | — | Processa **todas** as 21 variáveis de `core/variables.py` (as que não existem no GFS são ignoradas com erro registrado) |
 | `--skip-metar` | — | Não busca METAR |
 
 > O conjunto padrão de variáveis/ níveis processado está em `DEFAULT_VARIABLES`
 > em `scripts/process_data.py` (ex.: `temp` em 1000/850/500 hPa, `o3` em 500 hPa, `ps` superfície).
+>
+> Exemplo com todas as variáveis:
+>
+> ```bash
+> PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --regions SP RJ PR --all-variables
+> ```
 
 ### 2. Subir o servidor
 
@@ -198,7 +205,7 @@ Base: `/api/v1` (exceto `/health` e `/docs`).
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/health` | Status do servidor e do banco |
-| GET | `/data/variables` | Catálogo das 20 variáveis |
+| GET | `/data/variables` | Catálogo das 21 variáveis |
 | GET | `/data/regions` | As 18 regiões |
 | GET | `/data/dashboard` | Resumo estatístico agregado |
 | GET | `/data/available` | Variáveis/regiões/datas disponíveis no banco |
@@ -248,16 +255,18 @@ curl -s "$BASE/data/dashboard"
 
 ---
 
-## 🎯 Variáveis (20)
+## 🎯 Variáveis (21)
 
 **Meteorológicas (12):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `chuvaNaoConvec`,
 `chuvaConvec`, `umidadeRel`, `u`, `v`, `uSupe`, `vSupe`
 
-**Poluição (8):** `o3`, `no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`
+**Poluição (9):** `o3`, `total_o3`, `no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`
 
-> As variáveis **confirmadas no GFS pgrb2** (`temp`, `umidadeRel`, `u`, `v`, `o3`, `ps`)
-> são processáveis com dados reais. As demais estão registradas e mapeadas no catálogo
-> (`core/variables.py`), ficando disponíveis assim que o dado existir no arquivo baixado.
+> As variáveis **confirmadas no GFS pgrb2** (`ps`, `prnm`, `temp`, `temps`, `nuvem`,
+> `umidadeRel`, `u`, `v`, `uSupe`, `vSupe`, `o3`, `total_o3`) são processáveis com dados
+> reais. As demais estão registradas no catálogo (`core/variables.py`) mas **não existem**
+> no produto GFS pgrb2 0p25 (confirmado via inventário `varMET` do próprio arquivo), ficando
+> disponíveis assim que o dado existir na fonte.
 
 Níveis isobáricos suportados: `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa.
 Níveis de altura (`uSupe`/`vSupe`): `10, 20, 30, 40, 50, 80, 100` m.

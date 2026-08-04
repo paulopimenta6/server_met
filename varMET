@@ -1,0 +1,696 @@
+1:Pressure reduced to MSL:Pa (instant):regular_ll:meanSea:level 0:fcst time 0 hrs:from 202108041200
+2:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+3:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+4:Rain mixing ratio:kg kg**-1 (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+5:Snow mixing ratio:kg kg**-1 (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+6:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+7:Derived radar reflectivity:dB (instant):regular_ll:hybrid:level 1:fcst time 0 hrs:from 202108041200
+8:Derived radar reflectivity:dB (instant):regular_ll:hybrid:level 2:fcst time 0 hrs:from 202108041200
+9:Maximum/Composite radar reflectivity:dB (instant):regular_ll:atmosphere:level 0 -:fcst time 0 hrs:from 202108041200
+10:Visibility:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+11:U component of wind:m s**-1 (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+12:V component of wind:m s**-1 (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+13:Ventilation Rate:m**2 s**-1 (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+14:Wind speed (gust):m s**-1 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+15:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+16:Temperature:K (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+17:Relative humidity:% (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+18:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+19:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+20:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+21:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+22:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+23:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+24:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 1 Pa:fcst time 0 hrs:from 202108041200
+25:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+26:Temperature:K (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+27:Relative humidity:% (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+28:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+29:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+30:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+31:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+32:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+33:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+34:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 2 Pa:fcst time 0 hrs:from 202108041200
+35:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+36:Temperature:K (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+37:Relative humidity:% (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+38:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+39:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+40:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+41:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+42:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+43:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+44:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 4 Pa:fcst time 0 hrs:from 202108041200
+45:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+46:Temperature:K (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+47:Relative humidity:% (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+48:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+49:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+50:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+51:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+52:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+53:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+54:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 7 Pa:fcst time 0 hrs:from 202108041200
+55:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+56:Temperature:K (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+57:Relative humidity:% (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+58:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+59:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+60:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+61:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+62:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+63:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+64:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 10 Pa:fcst time 0 hrs:from 202108041200
+65:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+66:Temperature:K (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+67:Relative humidity:% (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+68:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+69:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+70:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+71:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+72:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+73:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+74:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 20 Pa:fcst time 0 hrs:from 202108041200
+75:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+76:Temperature:K (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+77:Relative humidity:% (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+78:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+79:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+80:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+81:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+82:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+83:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+84:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 40 Pa:fcst time 0 hrs:from 202108041200
+85:Geopotential Height:gpm (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+86:Temperature:K (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+87:Relative humidity:% (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+88:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+89:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+90:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+91:U component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+92:V component of wind:m s**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+93:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+94:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInPa:level 70 Pa:fcst time 0 hrs:from 202108041200
+95:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+96:Temperature:K (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+97:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+98:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+99:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+100:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+101:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+102:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+103:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+104:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100 Pa:fcst time 0 hrs:from 202108041200
+105:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+106:Temperature:K (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+107:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+108:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+109:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+110:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+111:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+112:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+113:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+114:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 200 Pa:fcst time 0 hrs:from 202108041200
+115:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+116:Temperature:K (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+117:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+118:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+119:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+120:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+121:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+122:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+123:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+124:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 300 Pa:fcst time 0 hrs:from 202108041200
+125:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+126:Temperature:K (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+127:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+128:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+129:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+130:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+131:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+132:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+133:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+134:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 500 Pa:fcst time 0 hrs:from 202108041200
+135:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+136:Temperature:K (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+137:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+138:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+139:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+140:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+141:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+142:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+143:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+144:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 700 Pa:fcst time 0 hrs:from 202108041200
+145:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+146:Temperature:K (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+147:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+148:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+149:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+150:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+151:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+152:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+153:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+154:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 1000 Pa:fcst time 0 hrs:from 202108041200
+155:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+156:Temperature:K (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+157:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+158:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+159:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+160:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+161:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+162:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+163:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+164:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 1500 Pa:fcst time 0 hrs:from 202108041200
+165:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+166:Temperature:K (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+167:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+168:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+169:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+170:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+171:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+172:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+173:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+174:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 2000 Pa:fcst time 0 hrs:from 202108041200
+175:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+176:Temperature:K (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+177:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+178:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+179:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+180:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+181:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+182:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+183:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+184:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 3000 Pa:fcst time 0 hrs:from 202108041200
+185:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+186:Temperature:K (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+187:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+188:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+189:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+190:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+191:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+192:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+193:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+194:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 4000 Pa:fcst time 0 hrs:from 202108041200
+195:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+196:Temperature:K (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+197:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+198:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+199:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+200:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+201:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+202:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+203:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+204:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+205:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+206:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+207:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+208:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+209:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+210:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 5000 Pa:fcst time 0 hrs:from 202108041200
+211:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+212:Temperature:K (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+213:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+214:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+215:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+216:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+217:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+218:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+219:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+220:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 7000 Pa:fcst time 0 hrs:from 202108041200
+221:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+222:Temperature:K (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+223:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+224:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+225:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+226:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+227:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+228:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+229:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+230:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+231:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+232:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+233:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+234:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+235:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+236:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 10000 Pa:fcst time 0 hrs:from 202108041200
+237:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+238:Temperature:K (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+239:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+240:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+241:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+242:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+243:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+244:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+245:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+246:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+247:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+248:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+249:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+250:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+251:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+252:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 15000 Pa:fcst time 0 hrs:from 202108041200
+253:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+254:Temperature:K (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+255:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+256:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+257:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+258:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+259:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+260:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+261:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+262:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+263:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+264:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+265:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+266:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+267:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+268:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 20000 Pa:fcst time 0 hrs:from 202108041200
+269:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+270:Temperature:K (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+271:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+272:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+273:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+274:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+275:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+276:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+277:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+278:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+279:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+280:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+281:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+282:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+283:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+284:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 25000 Pa:fcst time 0 hrs:from 202108041200
+285:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+286:Temperature:K (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+287:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+288:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+289:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+290:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+291:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+292:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+293:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+294:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+295:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+296:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+297:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+298:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+299:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+300:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 30000 Pa:fcst time 0 hrs:from 202108041200
+301:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+302:Temperature:K (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+303:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+304:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+305:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+306:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+307:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+308:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+309:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+310:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+311:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+312:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+313:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+314:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+315:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+316:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 35000 Pa:fcst time 0 hrs:from 202108041200
+317:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+318:Temperature:K (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+319:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+320:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+321:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+322:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+323:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+324:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+325:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+326:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+327:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+328:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+329:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+330:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+331:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+332:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 40000 Pa:fcst time 0 hrs:from 202108041200
+333:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+334:Temperature:K (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+335:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+336:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+337:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+338:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+339:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+340:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+341:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+342:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+343:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+344:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+345:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+346:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+347:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+348:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 45000 Pa:fcst time 0 hrs:from 202108041200
+349:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+350:Temperature:K (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+351:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+352:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+353:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+354:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+355:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+356:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+357:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+358:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+359:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+360:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+361:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+362:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+363:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+364:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 50000 Pa:fcst time 0 hrs:from 202108041200
+365:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+366:Temperature:K (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+367:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+368:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+369:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+370:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+371:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+372:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+373:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+374:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+375:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+376:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+377:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+378:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+379:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+380:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 55000 Pa:fcst time 0 hrs:from 202108041200
+381:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+382:Temperature:K (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+383:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+384:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+385:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+386:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+387:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+388:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+389:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+390:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+391:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+392:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+393:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+394:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+395:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+396:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 60000 Pa:fcst time 0 hrs:from 202108041200
+397:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+398:Temperature:K (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+399:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+400:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+401:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+402:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+403:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+404:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+405:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+406:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+407:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+408:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+409:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+410:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+411:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+412:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 65000 Pa:fcst time 0 hrs:from 202108041200
+413:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+414:Temperature:K (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+415:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+416:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+417:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+418:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+419:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+420:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+421:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+422:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+423:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+424:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+425:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+426:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+427:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+428:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 70000 Pa:fcst time 0 hrs:from 202108041200
+429:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+430:Temperature:K (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+431:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+432:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+433:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+434:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+435:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+436:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+437:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+438:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+439:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+440:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+441:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+442:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+443:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+444:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 75000 Pa:fcst time 0 hrs:from 202108041200
+445:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+446:Temperature:K (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+447:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+448:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+449:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+450:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+451:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+452:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+453:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+454:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+455:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+456:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+457:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+458:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+459:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+460:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 80000 Pa:fcst time 0 hrs:from 202108041200
+461:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+462:Temperature:K (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+463:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+464:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+465:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+466:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+467:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+468:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+469:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+470:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+471:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+472:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+473:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+474:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+475:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+476:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 85000 Pa:fcst time 0 hrs:from 202108041200
+477:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+478:Temperature:K (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+479:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+480:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+481:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+482:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+483:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+484:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+485:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+486:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+487:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+488:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+489:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+490:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+491:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+492:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 90000 Pa:fcst time 0 hrs:from 202108041200
+493:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+494:Temperature:K (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+495:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+496:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+497:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+498:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+499:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+500:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+501:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+502:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+503:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+504:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+505:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+506:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+507:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+508:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 92500 Pa:fcst time 0 hrs:from 202108041200
+509:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+510:Temperature:K (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+511:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+512:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+513:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+514:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+515:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+516:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+517:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+518:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+519:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+520:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+521:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+522:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+523:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+524:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 95000 Pa:fcst time 0 hrs:from 202108041200
+525:Haines Index:Numeric (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+526:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+527:Temperature:K (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+528:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+529:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+530:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+531:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+532:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+533:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+534:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+535:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+536:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+537:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+538:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+539:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+540:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+541:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 97500 Pa:fcst time 0 hrs:from 202108041200
+542:Temperature:K (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+543:Relative humidity:% (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+544:Total Cloud Cover:% (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+545:Specific humidity:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+546:Vertical velocity:Pa s**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+547:Geometric vertical velocity:m s**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+548:U component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+549:V component of wind:m s**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+550:Absolute vorticity:s**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+551:Cloud mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+552:Ice water mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+553:Rain mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+554:Snow mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+555:Graupel (snow pellets):kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+556:Ozone mixing ratio:kg kg**-1 (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+557:MSLP (Eta model reduction):Pa (instant):regular_ll:meanSea:level 0:fcst time 0 hrs:from 202108041200
+558:Geopotential Height:gpm (instant):regular_ll:isobaricInhPa:level 100000 Pa:fcst time 0 hrs:from 202108041200
+559:Derived radar reflectivity:dB (instant):regular_ll:heightAboveGround:level 4000 m:fcst time 0 hrs:from 202108041200
+560:Derived radar reflectivity:dB (instant):regular_ll:heightAboveGround:level 1000 m:fcst time 0 hrs:from 202108041200
+561:Surface pressure:Pa (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+562:Orography:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+563:Temperature:K (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+564:Soil Temperature:K (instant):regular_ll:depthBelowLandLayer:levels 0.0-0.1 m:fcst time 0 hrs:from 202108041200
+565:Volumetric soil moisture content:Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.0-0.1 m:fcst time 0 hrs:from 202108041200
+566:Liquid volumetric soil moisture (non-frozen):Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.0-0.1 m:fcst time 0 hrs:from 202108041200
+567:Soil Temperature:K (instant):regular_ll:depthBelowLandLayer:levels 0.1-0.4 m:fcst time 0 hrs:from 202108041200
+568:Volumetric soil moisture content:Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.1-0.4 m:fcst time 0 hrs:from 202108041200
+569:Liquid volumetric soil moisture (non-frozen):Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.1-0.4 m:fcst time 0 hrs:from 202108041200
+570:Soil Temperature:K (instant):regular_ll:depthBelowLandLayer:levels 0.4-1.0 m:fcst time 0 hrs:from 202108041200
+571:Volumetric soil moisture content:Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.4-1.0 m:fcst time 0 hrs:from 202108041200
+572:Liquid volumetric soil moisture (non-frozen):Proportion (instant):regular_ll:depthBelowLandLayer:levels 0.4-1.0 m:fcst time 0 hrs:from 202108041200
+573:Soil Temperature:K (instant):regular_ll:depthBelowLandLayer:levels 1.0-2.0 m:fcst time 0 hrs:from 202108041200
+574:Volumetric soil moisture content:Proportion (instant):regular_ll:depthBelowLandLayer:levels 1.0-2.0 m:fcst time 0 hrs:from 202108041200
+575:Liquid volumetric soil moisture (non-frozen):Proportion (instant):regular_ll:depthBelowLandLayer:levels 1.0-2.0 m:fcst time 0 hrs:from 202108041200
+576:Plant canopy surface water:kg m**-2 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+577:Water equivalent of accumulated snow depth (deprecated):kg m**-2 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+578:Snow depth:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+579:Ice thickness:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+580:2 metre temperature:K (instant):regular_ll:heightAboveGround:level 2 m:fcst time 0 hrs:from 202108041200
+581:2 metre specific humidity:kg kg**-1 (instant):regular_ll:heightAboveGround:level 2 m:fcst time 0 hrs:from 202108041200
+582:2 metre dewpoint temperature:K (instant):regular_ll:heightAboveGround:level 2 m:fcst time 0 hrs:from 202108041200
+583:2 metre relative humidity:% (instant):regular_ll:heightAboveGround:level 2 m:fcst time 0 hrs:from 202108041200
+584:Apparent temperature:K (instant):regular_ll:heightAboveGround:level 2 m:fcst time 0 hrs:from 202108041200
+585:10 metre U wind component:m s**-1 (instant):regular_ll:heightAboveGround:level 10 m:fcst time 0 hrs:from 202108041200
+586:10 metre V wind component:m s**-1 (instant):regular_ll:heightAboveGround:level 10 m:fcst time 0 hrs:from 202108041200
+587:Ice growth rate:m s**-1 (instant):regular_ll:heightAboveSea:level 10 m:fcst time 0 hrs:from 202108041200
+588:Percent frozen precipitation:% (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+589:Precipitation rate:kg m**-2 s**-1 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+590:Categorical snow:(Code table 4.222) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+591:Categorical ice pellets:(Code table 4.222) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+592:Categorical freezing rain:(Code table 4.222) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+593:Categorical rain:(Code table 4.222) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+594:Surface roughness:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+595:Frictional velocity:m s**-1 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+596:Vegetation:% (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+597:Soil type:~ (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+598:Wilting Point:Fraction (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+599:Field Capacity:Fraction (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+600:Sunshine Duration:s (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+601:Surface lifted index:K (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+602:Convective available potential energy:J kg**-1 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+603:Convective inhibition:J kg**-1 (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+604:Precipitable water:kg m**-2 (instant):regular_ll:unknown:level 0 considered as a single layer:fcst time 0 hrs:from 202108041200
+605:Cloud water:kg m**-2 (instant):regular_ll:unknown:level 0 considered as a single layer:fcst time 0 hrs:from 202108041200
+606:Relative humidity:% (instant):regular_ll:unknown:level 0 considered as a single layer:fcst time 0 hrs:from 202108041200
+607:Total ozone:DU (instant):regular_ll:unknown:level 0 considered as a single layer:fcst time 0 hrs:from 202108041200
+608:Low cloud cover:% (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+609:Medium cloud cover:% (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+610:High cloud cover:% (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+611:Total Cloud Cover:% (instant):regular_ll:atmosphere:level 0 -:fcst time 0 hrs:from 202108041200
+612:Geopotential Height:gpm (instant):regular_ll:unknown:level 0 215:fcst time 0 hrs:from 202108041200
+613:Storm relative helicity:J kg**-1 (instant):regular_ll:heightAboveGroundLayer:levels 3000-0 m:fcst time 0 hrs:from 202108041200
+614:U-component storm motion:m s**-1 (instant):regular_ll:heightAboveGroundLayer:levels 6000-0 m:fcst time 0 hrs:from 202108041200
+615:V-component storm motion:m s**-1 (instant):regular_ll:heightAboveGroundLayer:levels 6000-0 m:fcst time 0 hrs:from 202108041200
+616:Pressure:Pa (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+617:ICAO Standard Atmosphere reference height:m (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+618:Geopotential Height:gpm (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+619:Temperature:K (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+620:U component of wind:m s**-1 (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+621:V component of wind:m s**-1 (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+622:Vertical speed shear:s**-1 (instant):regular_ll:tropopause:level 0:fcst time 0 hrs:from 202108041200
+623:Pressure:Pa (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+624:ICAO Standard Atmosphere reference height:m (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+625:Geopotential Height:gpm (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+626:U component of wind:m s**-1 (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+627:V component of wind:m s**-1 (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+628:Temperature:K (instant):regular_ll:maxWind:level 0:fcst time 0 hrs:from 202108041200
+629:U component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 20 m:fcst time 0 hrs:from 202108041200
+630:V component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 20 m:fcst time 0 hrs:from 202108041200
+631:U component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 30 m:fcst time 0 hrs:from 202108041200
+632:V component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 30 m:fcst time 0 hrs:from 202108041200
+633:U component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 40 m:fcst time 0 hrs:from 202108041200
+634:V component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 40 m:fcst time 0 hrs:from 202108041200
+635:U component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 50 m:fcst time 0 hrs:from 202108041200
+636:V component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 50 m:fcst time 0 hrs:from 202108041200
+637:Temperature:K (instant):regular_ll:heightAboveGround:level 80 m:fcst time 0 hrs:from 202108041200
+638:Specific humidity:kg kg**-1 (instant):regular_ll:heightAboveGround:level 80 m:fcst time 0 hrs:from 202108041200
+639:Pressure:Pa (instant):regular_ll:heightAboveGround:level 80 m:fcst time 0 hrs:from 202108041200
+640:U component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 80 m:fcst time 0 hrs:from 202108041200
+641:V component of wind:m s**-1 (instant):regular_ll:heightAboveGround:level 80 m:fcst time 0 hrs:from 202108041200
+642:Temperature:K (instant):regular_ll:heightAboveGround:level 100 m:fcst time 0 hrs:from 202108041200
+643:100 metre U wind component:m s**-1 (instant):regular_ll:heightAboveGround:level 100 m:fcst time 0 hrs:from 202108041200
+644:100 metre V wind component:m s**-1 (instant):regular_ll:heightAboveGround:level 100 m:fcst time 0 hrs:from 202108041200
+645:Temperature:K (instant):regular_ll:heightAboveSea:level 1829 m:fcst time 0 hrs:from 202108041200
+646:U component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 1829 m:fcst time 0 hrs:from 202108041200
+647:V component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 1829 m:fcst time 0 hrs:from 202108041200
+648:Temperature:K (instant):regular_ll:heightAboveSea:level 2743 m:fcst time 0 hrs:from 202108041200
+649:U component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 2743 m:fcst time 0 hrs:from 202108041200
+650:V component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 2743 m:fcst time 0 hrs:from 202108041200
+651:Temperature:K (instant):regular_ll:heightAboveSea:level 3658 m:fcst time 0 hrs:from 202108041200
+652:U component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 3658 m:fcst time 0 hrs:from 202108041200
+653:V component of wind:m s**-1 (instant):regular_ll:heightAboveSea:level 3658 m:fcst time 0 hrs:from 202108041200
+654:Geopotential Height:gpm (instant):regular_ll:isothermZero:level 0:fcst time 0 hrs:from 202108041200
+655:Relative humidity:% (instant):regular_ll:isothermZero:level 0:fcst time 0 hrs:from 202108041200
+656:Geopotential Height:gpm (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+657:Relative humidity:% (instant):regular_ll:unknown:level 0:fcst time 0 hrs:from 202108041200
+658:Temperature:K (instant):regular_ll:pressureFromGroundLayer:levels 3000-0 Pa:fcst time 0 hrs:from 202108041200
+659:Relative humidity:% (instant):regular_ll:pressureFromGroundLayer:levels 3000-0 Pa:fcst time 0 hrs:from 202108041200
+660:Specific humidity:kg kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 3000-0 Pa:fcst time 0 hrs:from 202108041200
+661:U component of wind:m s**-1 (instant):regular_ll:pressureFromGroundLayer:levels 3000-0 Pa:fcst time 0 hrs:from 202108041200
+662:V component of wind:m s**-1 (instant):regular_ll:pressureFromGroundLayer:levels 3000-0 Pa:fcst time 0 hrs:from 202108041200
+663:Best (4-layer) lifted index:K (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+664:Convective available potential energy:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 18000-0 Pa:fcst time 0 hrs:from 202108041200
+665:Convective inhibition:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 18000-0 Pa:fcst time 0 hrs:from 202108041200
+666:Planetary boundary layer height:m (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+667:Relative humidity:% (instant):regular_ll:sigmaLayer:levels 0.33-1.0 sigma value:fcst time 0 hrs:from 202108041200
+668:Relative humidity:% (instant):regular_ll:sigmaLayer:levels 0.44-1.0 sigma value:fcst time 0 hrs:from 202108041200
+669:Relative humidity:% (instant):regular_ll:sigmaLayer:levels 0.72-0.94 sigma value:fcst time 0 hrs:from 202108041200
+670:Relative humidity:% (instant):regular_ll:sigmaLayer:levels 0.44-0.72 sigma value:fcst time 0 hrs:from 202108041200
+671:Temperature:K (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+672:Potential temperature:K (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+673:Relative humidity:% (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+674:U component of wind:m s**-1 (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+675:V component of wind:m s**-1 (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+676:Vertical velocity:Pa s**-1 (instant):regular_ll:sigma:level 0.995 sigma value:fcst time 0 hrs:from 202108041200
+677:Convective available potential energy:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 9000-0 Pa:fcst time 0 hrs:from 202108041200
+678:Convective inhibition:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 9000-0 Pa:fcst time 0 hrs:from 202108041200
+679:Convective available potential energy:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 25500-0 Pa:fcst time 0 hrs:from 202108041200
+680:Convective inhibition:J kg**-1 (instant):regular_ll:pressureFromGroundLayer:levels 25500-0 Pa:fcst time 0 hrs:from 202108041200
+681:Pressure of level from which parcel was lifted:Pa (instant):regular_ll:pressureFromGroundLayer:levels 25500-0 Pa:fcst time 0 hrs:from 202108041200
+682:Land-sea mask:(0 - 1) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+683:Sea ice area fraction:(0 - 1) (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+684:Ice temperature:K (instant):regular_ll:surface:level 0:fcst time 0 hrs:from 202108041200
+685:U component of wind:m s**-1 (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+686:V component of wind:m s**-1 (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+687:Temperature:K (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+688:Geopotential Height:gpm (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+689:Pressure:Pa (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+690:Vertical speed shear:s**-1 (instant):regular_ll:potentialVorticity:level 2e-06 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+691:U component of wind:m s**-1 (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+692:V component of wind:m s**-1 (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+693:Temperature:K (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+694:Geopotential Height:gpm (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+695:Pressure:Pa (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200
+696:Vertical speed shear:s**-1 (instant):regular_ll:potentialVorticity:level 2.147485648 K m2 kg-1 s-1:fcst time 0 hrs:from 202108041200

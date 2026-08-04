@@ -36,7 +36,7 @@ def test_variables(client):
     r = client.get(f"{API}/data/variables")
     assert r.status_code == 200
     vars = r.json()["variables"]
-    assert len(vars) == 20
+    assert len(vars) == 21
     categories = {v["category"] for v in vars}
     assert "pollution" in categories
     assert "temperature" in categories
@@ -100,6 +100,32 @@ def test_metar_all(client):
     r = client.get(f"{API}/metar/latest/all")
     assert r.status_code == 200
     assert len(r.json()["metars"]) > 0
+
+
+def test_metar_station_name_fixed(client):
+    # Guarulhos (SBGR) is in SP; AviationWeather upstream sends "PR" in the
+    # name, which must be corrected to "SP".
+    r = client.get(f"{API}/metar/stations")
+    sbgr = next(s for s in r.json()["stations"] if s["code"] == "SBGR")
+    assert sbgr["state"] == "SP"
+    assert "PR, BR" not in sbgr["name"]
+    assert "SP, BR" in sbgr["name"]
+
+
+def test_total_ozone_variable(client):
+    r = client.get(f"{API}/data/variables")
+    vars_ = r.json()["variables"]
+    total_o3 = next((v for v in vars_ if v["code"] == "total_o3"), None)
+    assert total_o3 is not None
+    assert total_o3["category"] == "pollution"
+    assert total_o3["unit"] == "DU"
+
+
+def test_map_total_ozone(client):
+    r = client.get(f"{API}/maps/total_o3/SP",
+                   params={"date": "20260804", "analysis": "00"})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
 
 
 def test_frontend(client):

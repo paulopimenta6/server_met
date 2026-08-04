@@ -38,6 +38,7 @@ SURFACE_VARIABLES = {
     "aod":           {"cmap": "YlOrBr", "unit": ""},
     "uSupe":         {"cmap": "RdBu", "unit": "m/s"},
     "vSupe":         {"cmap": "RdBu", "unit": "m/s"},
+    "total_o3":      {"cmap": "viridis", "unit": "DU"},
 }
 
 

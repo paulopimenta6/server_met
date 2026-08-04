@@ -1,6 +1,6 @@
 // Server MET v2.0 - Frontend Application
 const API = '/api/v1';
-const SURFACE_TYPES = ['surface', 'meanSea', 'atmosphere'];
+const SURFACE_TYPES = ['surface', 'meanSea', 'atmosphere', 'atmosphereSingleLayer'];
 
 const CATEGORY_LABELS = {
     pressure: 'Pressão',

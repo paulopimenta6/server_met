@@ -17,10 +17,11 @@ router = APIRouter(prefix="/maps", tags=["maps"])
 MAPS_BASE_DIR = MAPS_DIR
 
 # Filenames produced by core.maps.generate_map:
-#   GFS_<res>_<REGION>_<Nlevel>_<var>_<analysis>_<date>_<forecast>.png
+#   GFS_<res>_<REGION>_N<level|SFC>_<variable>_<analysis>_<date>_<forecast>.png
+# Variable codes may contain underscores (umidadeRel, total_o3, uSupe, ...).
 _FILENAME_RE = re.compile(
-    r"GFS_(?P<res>[^_]+)_(?P<region>[^_]+)_(?P<level>[^_]+)_"
-    r"(?P<var>[^_]+)_(?P<ana>[^_]+)_(?P<date>[^_]+)_(?P<forecast>[^_]+)\.png"
+    r"GFS_(?P<res>[^_]+)_(?P<region>[^_]+)_(?P<level>N\d+|NSFC)_"
+    r"(?P<var>.+?)_(?P<ana>\d{2})_(?P<date>\d{8})_(?P<forecast>\d+)\.png"
 )
 
 

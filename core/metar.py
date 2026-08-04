@@ -82,8 +82,27 @@ def fetch_metar(stations: Optional[List[str]] = None,
     return resp.json()
 
 
+def _station_name(code: str, api_name: str, state: str) -> str:
+    """Build a correct station label.
+
+    The AviationWeather API sometimes embeds an incorrect state in the station
+    name (e.g. "Sao Paulo Intl, PR, BR" for Guarulhos, which is in SP). We use
+    the authoritative state from our local registry and splice it into the API
+    name when possible.
+    """
+    token = (api_name or "").strip()
+    if state:
+        parts = [p.strip() for p in token.split(",")]
+        if len(parts) >= 2 and len(state) == 2:
+            parts[1] = state
+            return ", ".join(parts)
+    return token
+
+
 def _persist_report(item: Dict[str, Any]) -> Dict[str, Any]:
     code = item["icaoId"]
+    state = DEFAULT_STATIONS.get(code, {}).get("state")
+    name = _station_name(code, item.get("name"), state)
     report = {
         "station_code": code,
         "observed_at": _iso_observed(item.get("reportTime")),
@@ -105,7 +124,7 @@ def _persist_report(item: Dict[str, Any]) -> Dict[str, Any]:
 
     persistence.upsert_station(
         code=code,
-        name=item.get("name") or DEFAULT_STATIONS.get(code, {}).get("name"),
+        name=name,
         city=DEFAULT_STATIONS.get(code, {}).get("city"),
         state=DEFAULT_STATIONS.get(code, {}).get("state"),
         lat=item.get("lat"), lon=item.get("lon"),

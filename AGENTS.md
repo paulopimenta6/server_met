@@ -37,18 +37,22 @@ maps/        # Generated PNGs (gitignored)
 - Config: `.env` (copy from `.env.example`) and `core/config.py`
 - All paths are computed from `core/config.py` (BASE_DIR) — no hardcoded absolute paths.
 
-## Variables (20 total)
+## Variables (21 total)
 **Meteorological (12):** ps, prnm, temp, temps, nuvem, chuvaNaoConvec, chuvaConvec, umidadeRel, u, v, uSupe, vSupe
-**Pollution (8):** o3 (confirmed in GFS), no2, so2, co, pm25, pm10, aod, dust (experimental)
+**Pollution (9):** o3, total_o3 (confirmed in GFS), no2, so2, co, pm25, pm10, aod, dust (experimental)
 
-NOAA filter supports: temp(TMP), umidadeRel(RH), u/v(UGRD/VGRD), o3(O3MR), ps(PRES), prnm(PRMSL), nuvem(TCDC), uSupe/vSupe(at 10m).
+NOAA filter supports: temp(TMP), umidadeRel(RH), u/v(UGRD/VGRD), o3(O3MR), total_o3(TOZNE), ps(PRES), temps(TMP sfc), prnm(PRMSL), nuvem(TCDC), uSupe/vSupe(at 10m).
+
+Confirmed in GFS pgrb2 0p25 (verified 2026-08-04): ps, prnm, temp, temps, nuvem, umidadeRel, u, v, uSupe, vSupe, o3, total_o3. Not present in pgrb2: no2, so2, co, pm25, pm10, aod, dust, chuvaNaoConvec, chuvaConvec (they remain catalog-only).
+
+Map filenames: `GFS_<res>_<REGION>_N<level|SFC>_<variable>_<analysis>_<date>_<forecast>.png` — variable codes may contain underscores (total_o3, umidadeRel, uSupe); `api/routes/maps.py` `_FILENAME_RE` handles them.
 
 ## Regions (18)
 SP, RJ, AM, DF, PR, RS, MG, PA, PE, CE, SA, FOR, REC, SSA, BEL, BH, CWB, POA
 
-## API Endpoints (prefix `/api/v1`)
-- `GET /health` - health check
-- `GET /data/variables` - list all 20 variables
+## API Endpoints (most under `/api/v1`; `/health` and `/docs` are at root)
+- `GET /health` - health check (root, no `/api/v1` prefix)
+- `GET /data/variables` - list all 21 variables
 - `GET /data/regions` - list all 18 regions
 - `GET /data/dashboard` - aggregate statistical summary
 - `GET /data/available` - available variables/regions/dates

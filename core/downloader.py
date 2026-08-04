@@ -197,7 +197,9 @@ NOAA_FILTER_VARS = {
     "u":             ("UGRD",  "isobaricInhPa"),
     "v":             ("VGRD",  "isobaricInhPa"),
     "o3":            ("O3MR",  "isobaricInhPa"),
+    "total_o3":      ("TOZNE", "atmosphereSingleLayer"),
     "ps":            ("PRES",  "surface"),
+    "temps":         ("TMP",   "surface"),
     "prnm":          ("PRMSL", "meanSea"),
     "uSupe":         ("UGRD",  "heightAboveGround"),
     "vSupe":         ("VGRD",  "heightAboveGround"),
@@ -226,6 +228,7 @@ def _build_filter_url(date_str: str, analysis: str, forecast: str,
         params["lev_mean_sea_level"] = "on"
     elif level_type == "heightAboveGround":
         params[f"lev_{level}_m_above_ground"] = "on"
+    # atmosphereSingleLayer (e.g. Total ozone) needs no level selector.
 
     qs = "&".join(f"{k}={v}" for k, v in params.items())
     return f"{NOAA_FILTER_URL}?{qs}"

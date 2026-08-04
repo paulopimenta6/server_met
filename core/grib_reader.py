@@ -14,6 +14,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GribReader:
+    # GFS uses different long names for the same variable at different levels
+    # (e.g. "U component of wind" vs "10 metre U wind component"). Aliases let
+    # us match by shortName as well.
+    NAME_ALIASES = {
+        "u component of wind": ["u", "10u", "ugrd"],
+        "v component of wind": ["v", "10v", "vgrd"],
+    }
+
     def __init__(self, grib_dir: Path):
         self.grib_dir = grib_dir
         self._grb_cache: Dict[str, Any] = {}
@@ -61,20 +69,34 @@ class GribReader:
         if grb is None:
             return []
         
+        select_kwargs = {}
+        if name:
+            select_kwargs["name"] = name
+        if level_type:
+            select_kwargs["typeOfLevel"] = level_type
+        if level is not None:
+            select_kwargs["level"] = level
+        select_kwargs.update(kwargs)
+        
         try:
-            select_kwargs = {}
-            if name:
-                select_kwargs["name"] = name
-            if level_type:
-                select_kwargs["typeOfLevel"] = level_type
-            if level is not None:
-                select_kwargs["level"] = level
-            select_kwargs.update(kwargs)
-            
-            return grb.select(**select_kwargs)
-        except Exception as e:
-            logger.error(f"Error selecting messages from {file_path}: {e}")
-            return []
+            msgs = grb.select(**select_kwargs)
+        except Exception:
+            msgs = []
+        
+        if msgs or not name:
+            return msgs
+        
+        # Exact-name select failed (GRIB name variants such as "10 metre U wind
+        # component" vs "U component of wind"). Fall back to a tolerant match on
+        # the long name (substring) and shortName aliases.
+        aliases = self.NAME_ALIASES.get(name.lower(), [])
+        return [
+            m for m in grb
+            if (name.lower() in m.name.lower()
+                or getattr(m, "shortName", "").lower() in aliases)
+            and (level_type is None or m.typeOfLevel == level_type)
+            and (level is None or m.level == level)
+        ]
     
     def get_available_variables(self, file_path: Path) -> List[Dict[str, Any]]:
         grb = self.open_grib(file_path)
