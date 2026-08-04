@@ -1,349 +1,257 @@
-// Server MET v2.0 - Frontend Application (Lightweight)
-const API_BASE = '/api/v1';
+// Server MET v2.0 - Frontend Application
+const API = '/api/v1';
+const SURFACE_TYPES = ['surface', 'meanSea', 'atmosphere'];
 
-let timeSeriesChart = null;
-let currentData = null;
-let variablesCache = [];
+const CATEGORY_LABELS = {
+    pressure: 'Pressão',
+    temperature: 'Temperatura',
+    cloud: 'Nuvens',
+    precipitation: 'Precipitação',
+    humidity: 'Umidade',
+    wind: 'Vento',
+    pollution: 'Poluição',
+};
 
-// Surface variables (don't need level selection)
-const SURFACE_VARIABLES = ['ps', 'prnm', 'temps', 'chuvaNaoConvec', 'chuvaConvec', 'pm25', 'pm10', 'aod'];
+let variables = [];
+let regions = [];
+let dates = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
-    initChart();
-    await loadConfig();
-    setupEventListeners();
-});
+const $ = id => document.getElementById(id);
 
-function initChart() {
-    const ctx = document.getElementById('timeSeriesChart').getContext('2d');
-    timeSeriesChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: false, title: { display: true, text: 'Valor' } },
-                x: { title: { display: true, text: 'Tempo' } }
-            },
-            plugins: {
-                legend: { display: true, position: 'top' },
-                title: { display: true, text: 'Série Temporal' }
-            }
-        }
-    });
+async function init() {
+    await Promise.all([loadDashboard(), loadConfig(), loadMetarStations()]);
+    wireEvents();
+    autoSelect();
 }
 
+// ---------- Dashboard ----------
+async function loadDashboard() {
+    try {
+        const res = await fetch(`${API}/data/dashboard`);
+        const d = await res.json();
+        $('dTotal').textContent = d.total_records;
+        $('dVars').textContent = d.variables;
+        $('dRegs').textContent = d.regions;
+        $('dStations').textContent = (d.metar && d.metar.stations) || 0;
+        $('dReports').textContent = (d.metar && d.metar.reports) || 0;
+
+        $('dByVar').innerHTML = (d.by_variable || []).map(v =>
+            `<tr><td>${v.variable}</td><td>${v.records}</td><td>${v.avg}</td></tr>`).join('');
+        $('dByRegion').innerHTML = (d.by_region || []).map(r =>
+            `<tr><td>${r.region}</td><td>${r.records}</td></tr>`).join('');
+    } catch (e) {
+        console.error('Dashboard load failed', e);
+    }
+}
+
+// ---------- Configuration ----------
 async function loadConfig() {
-    try {
-        const [varsRes, regionsRes, availRes] = await Promise.all([
-            fetch(`${API_BASE}/data/variables`),
-            fetch(`${API_BASE}/data/regions`),
-            fetch(`${API_BASE}/data/available`)
-        ]);
-        
-        const variables = (await varsRes.json()).variables;
-        const regions = (await regionsRes.json()).regions;
-        const available = await availRes.json();
-        
-        variablesCache = variables;
-        
-        populateSelect('variableSelect', variables.map(v => ({value: v.code, text: `${v.name} (${v.unit})`})));
-        populateSelect('regionSelect', regions.map(r => ({value: r.code, text: r.code})));
-        populateSelect('dateSelect', available.dates.map(d => ({value: d, text: formatDate(d)})));
-        
-        document.getElementById('variableSelect').addEventListener('change', onVariableChange);
-        document.getElementById('regionSelect').addEventListener('change', onRegionChange);
-        
-        // Load METAR stations
-        await loadMETARStations();
-        
-    } catch (error) {
-        console.error('Error loading config:', error);
-        showError('Erro ao carregar configurações');
+    const [varsRes, regsRes, availRes] = await Promise.all([
+        fetch(`${API}/data/variables`),
+        fetch(`${API}/data/regions`),
+        fetch(`${API}/data/available`),
+    ]);
+    variables = (await varsRes.json()).variables;
+    regions = (await regsRes.json()).regions;
+    const avail = await availRes.json();
+    dates = avail.dates || [];
+
+    $('regSel').innerHTML = '<option value="">Selecione...</option>' +
+        regions.map(r => `<option value="${r.code}">${r.code}</option>`).join('');
+    $('dateSel').innerHTML = '<option value="">Mais recente</option>' +
+        dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
+
+    renderVariables('');
+
+    if (regions.length) $('regSel').value = regions[0].code;
+    if (dates.length) $('dateSel').value = dates[0];
+    $('anaSel').value = '00';
+}
+
+function renderVariables(category) {
+    const filtered = variables.filter(v =>
+        !category ||
+        (category === 'pollution' ? v.category === 'pollution' : v.category !== 'pollution'));
+    const opts = filtered.map(v => `<option value="${v.code}">${varLabel(v)}</option>`).join('');
+    $('varSel').innerHTML = '<option value="">Selecione...</option>' + opts;
+    $('varSel')._data = filtered;
+    if (filtered.length) {
+        $('varSel').value = filtered[0].code;
+        onVarChange();
     }
 }
 
-function populateSelect(selectId, options) {
-    const select = document.getElementById(selectId);
-    select.innerHTML = '<option value="">Selecione...</option>';
-    options.forEach(opt => {
-        const option = document.createElement('option');
-        option.value = opt.value;
-        option.textContent = opt.text;
-        select.appendChild(option);
-    });
+function varLabel(v) {
+    const cat = CATEGORY_LABELS[v.category] || v.category;
+    return `${v.code} (${v.unit}) — ${cat}`;
 }
 
-async function onVariableChange() {
-    const variable = document.getElementById('variableSelect').value;
-    const region = document.getElementById('regionSelect').value;
-    const levelGroup = document.getElementById('levelGroup');
-    
-    // Hide level selector for surface variables
-    if (variable && SURFACE_VARIABLES.includes(variable)) {
-        levelGroup.style.display = 'none';
-        document.getElementById('levelSelect').value = '';
+function isSurface(v) {
+    return v && SURFACE_TYPES.includes(v.level_type);
+}
+
+// ---------- Events ----------
+function wireEvents() {
+    $('categorySel').onchange = e => renderVariables(e.target.value);
+    $('varSel').onchange = onVarChange;
+    $('regSel').onchange = () => {};
+    $('loadBtn').onclick = loadData;
+    $('csvBtn').onclick = exportCSV;
+    $('metarSel').onchange = loadMETAR;
+}
+
+function currentVar() {
+    return variables.find(v => v.code === $('varSel').value);
+}
+
+async function onVarChange() {
+    const v = currentVar();
+    const levelGroup = $('levelGroup');
+    const hint = $('varHint');
+    hint.textContent = v ? (v.description || '') : '';
+    if (v && isSurface(v)) {
+        levelGroup.classList.add('hidden');
+        $('levelSel').value = '';
+    } else if (v) {
+        levelGroup.classList.remove('hidden');
+        await loadLevels(v.code);
     } else {
-        levelGroup.style.display = 'block';
-        if (variable && region) {
-            await loadLevels(variable);
-        }
+        levelGroup.classList.add('hidden');
     }
-    
-    // Update image when variable changes
-    if (variable && region) {
-        await loadImage();
-    }
+    if (v) await loadData();
 }
 
-async function onRegionChange() {
-    const variable = document.getElementById('variableSelect').value;
-    if (variable) {
-        await onVariableChange();
-        await loadImage();
-    }
-}
-
-async function loadLevels(variable) {
+async function loadLevels(varCode) {
     try {
-        const res = await fetch(`${API_BASE}/data/levels/${variable}`);
-        const data = await res.json();
-        populateSelect('levelSelect', data.levels.map(l => ({value: l, text: `${l}`})));
-    } catch (error) {
-        console.error('Error loading levels:', error);
+        const res = await fetch(`${API}/data/levels/${varCode}`);
+        const d = await res.json();
+        const levels = (d.levels || []).sort((a, b) => b - a);
+        $('levelSel').innerHTML = '<option value="">Selecione...</option>' +
+            levels.map(l => `<option value="${l}">${l} hPa</option>`).join('');
+        if (levels.length) $('levelSel').value = levels[0];
+    } catch (e) {
+        console.error(e);
     }
 }
 
-function setupEventListeners() {
-    document.getElementById('loadBtn').addEventListener('click', loadData);
-    document.getElementById('exportBtn').addEventListener('click', exportCSV);
+// ---------- Data + Map ----------
+function params() {
+    const v = currentVar();
+    const p = new URLSearchParams();
+    if (v && !isSurface(v) && $('levelSel').value) p.set('level', $('levelSel').value);
+    if ($('regSel').value) p.set('region', $('regSel').value);
+    if ($('dateSel').value) p.set('date', $('dateSel').value);
+    if ($('anaSel').value) p.set('analysis', $('anaSel').value);
+    return p;
 }
 
 async function loadData() {
-    const variable = document.getElementById('variableSelect').value;
-    const level = document.getElementById('levelSelect').value;
-    const region = document.getElementById('regionSelect').value;
-    const date = document.getElementById('dateSelect').value;
-    const analysis = document.getElementById('analysisSelect').value;
-    
-    // Check required fields (level only required for non-surface vars)
-    const needsLevel = !SURFACE_VARIABLES.includes(variable);
-    
-    if (!variable || !region || (needsLevel && !level)) {
-        showError(needsLevel ? 'Selecione variável, nível e região' : 'Selecione variável e região');
-        return;
-    }
-    
-    showLoading(true);
-    hideError();
-    
-    try {
-        const params = new URLSearchParams({
-            variable, region,
-            ...(level && { level }),
-            ...(date && { date }),
-            ...(analysis && { analysis })
-        });
-        
-        const res = await fetch(`${API_BASE}/data/?${params}`);
-        const data = await res.json();
-        
-        if (data.total === 0) {
-            showError('Nenhum dado encontrado para os filtros selecionados');
-            return;
-        }
-        
-        currentData = data.data[0];
-        displayData(currentData);
-        loadTimeSeries(variable, level || 'sfc', region);
-        document.getElementById('exportBtn').disabled = false;
-        
-        // Also load the pre-generated image
-        await loadImage();
-        
-    } catch (error) {
-        console.error('Error loading data:', error);
-        showError('Erro ao carregar dados');
-    } finally {
-        showLoading(false);
-    }
-}
+    const v = currentVar();
+    const region = $('regSel').value;
+    if (!v || !region) return;
 
-function displayData(data) {
-    document.getElementById('statMin').textContent = data.min_value?.toFixed(2) || '-';
-    document.getElementById('statMax').textContent = data.max_value?.toFixed(2) || '-';
-    document.getElementById('statMean').textContent = data.mean_value?.toFixed(2) || '-';
-    document.getElementById('statsPanel').classList.remove('hidden');
-}
+    $('loading').classList.remove('hidden');
+    $('imgWrap').classList.add('hidden');
+    $('imgErr').classList.add('hidden');
+    $('loadBtn').disabled = true;
 
-async function loadImage() {
-    const variable = document.getElementById('variableSelect').value;
-    const region = document.getElementById('regionSelect').value;
-    const level = document.getElementById('levelSelect').value;
-    const date = document.getElementById('dateSelect').value;
-    const analysis = document.getElementById('analysisSelect').value;
-    
-    if (!variable || !region) return;
-    
-    const wrapper = document.getElementById('imageWrapper');
-    const loading = document.getElementById('loading');
-    const img = document.getElementById('mapImage');
-    const error = document.getElementById('imageError');
-    const title = document.getElementById('imageTitle');
-    const meta = document.getElementById('imageMeta');
-    
-    loading.classList.remove('hidden');
-    wrapper.classList.add('hidden');
-    error.classList.add('hidden');
-    
+    const p = params();
     try {
-        const params = new URLSearchParams({
-            ...(level && { level }),
-            ...(date && { date }),
-            ...(analysis && { analysis })
-        });
-        
-        const res = await fetch(`${API_BASE}/maps/${variable}/${region}?${params}`, { method: 'HEAD' });
-        
-        if (res.ok) {
-            // Build the full URL for the image
-            const imgUrl = `${API_BASE}/maps/${variable}/${region}?${params}`;
-            img.src = imgUrl;
-            img.onload = () => {
-                loading.classList.add('hidden');
-                wrapper.classList.remove('hidden');
-            };
-            img.onerror = () => {
-                loading.classList.add('hidden');
-                error.classList.remove('hidden');
-            };
-            
-            // Update title and meta
-            const varInfo = variablesCache.find(v => v.code === variable);
-            const levelText = level ? `${level} hPa` : 'Superfície';
-            title.textContent = `${varInfo?.name || variable} - ${levelText} - ${region}`;
-            meta.textContent = `Análise: ${analysis || '00'}Z | Data: ${formatDate(date || 'latest')} | Previsão: ${params.get('forecast') || '00'}h`;
+        const url = `${API}/maps/${v.code}/${region}${p.toString() ? '?' + p : ''}`;
+        const head = await fetch(url, { method: 'HEAD' });
+        if (head.ok) {
+            const img = $('mapImg');
+            img.onload = () => { $('loading').classList.add('hidden'); $('imgWrap').classList.remove('hidden'); };
+            img.onerror = () => { $('loading').classList.add('hidden'); $('imgErr').classList.remove('hidden'); };
+            img.src = url;
+            const lvl = $('levelSel').value;
+            $('mapTitle').textContent = `${v.name} (${v.unit}) — ${region}`;
+            $('mapMeta').textContent = `Nível: ${lvl ? lvl + ' hPa' : 'Superfície'} | Data: ${$('dateSel').value || 'última'} | Análise: ${$('anaSel').value}Z`;
         } else {
-            loading.classList.add('hidden');
-            error.classList.remove('hidden');
+            $('loading').classList.add('hidden');
+            $('imgErr').classList.remove('hidden');
         }
-    } catch (err) {
-        console.error('Error loading image:', err);
-        loading.classList.add('hidden');
-        error.classList.remove('hidden');
+
+        // Statistics from SQLite
+        const dp = new URLSearchParams({ variable: v.code, region });
+        if (!isSurface(v) && $('levelSel').value) dp.set('level', $('levelSel').value);
+        if ($('dateSel').value) dp.set('date', $('dateSel').value);
+        if ($('anaSel').value) dp.set('analysis', $('anaSel').value);
+        const res = await fetch(`${API}/data/?${dp}`);
+        const data = await res.json();
+        if (data.total) {
+            const d0 = data.data[0];
+            $('sMin').textContent = d0.min_value != null ? (+d0.min_value).toFixed(2) : '-';
+            $('sMax').textContent = d0.max_value != null ? (+d0.max_value).toFixed(2) : '-';
+            $('sMean').textContent = d0.mean_value != null ? (+d0.mean_value).toFixed(2) : '-';
+            $('sDate').textContent = `${d0.data_date || ''} ${d0.analysis_time || ''}Z f${d0.forecast_hour || 0}`;
+            $('statsPanel').classList.remove('hidden');
+            $('csvBtn').disabled = false;
+        }
+    } catch (e) {
+        console.error(e);
+        $('loading').classList.add('hidden');
+        $('imgErr').classList.remove('hidden');
+    } finally {
+        $('loadBtn').disabled = false;
     }
 }
 
-async function loadTimeSeries(variable, level, region) {
-    try {
-        const params = new URLSearchParams({ variable, region, limit: '50' });
-        if (level) params.append('level', level);
-        
-        const res = await fetch(`${API_BASE}/data/?${params}`);
-        const data = await res.json();
-        
-        const labels = data.data.map(d => `${d.data_date} ${d.analysis_time}Z`).reverse();
-        const values = data.data.map(d => d.mean_value).reverse();
-        
-        const levelText = level ? `${level} hPa` : 'Superfície';
-        
-        timeSeriesChart.data.labels = labels;
-        timeSeriesChart.data.datasets = [{
-            label: `${variable} (${levelText}) - ${region}`,
-            data: values,
-            borderColor: '#31688e',
-            backgroundColor: 'rgba(49, 104, 142, 0.1)',
-            fill: true,
-            tension: 0.2
-        }];
-        timeSeriesChart.update();
-        
-    } catch (error) {
-        console.error('Error loading time series:', error);
-    }
+function exportCSV() {
+    const v = currentVar();
+    if (!v) return;
+    const p = new URLSearchParams({ variable: v.code, region: $('regSel').value });
+    if (!isSurface(v) && $('levelSel').value) p.set('level', $('levelSel').value);
+    if ($('dateSel').value) p.set('date', $('dateSel').value);
+    if ($('anaSel').value) p.set('analysis', $('anaSel').value);
+    window.open(`${API}/data/export/csv?${p}`, '_blank');
 }
 
-async function exportCSV() {
-    if (!currentData) return;
-    
-    const params = new URLSearchParams({
-        variable: currentData.variable_code,
-        region: currentData.region_code,
-        ...(currentData.level_value && { level: currentData.level_value }),
-        ...(currentData.data_date && { date: currentData.data_date }),
-        ...(currentData.analysis_time && { analysis: currentData.analysis_time })
-    });
-    
-    window.open(`${API_BASE}/data/export/csv?${params}`, '_blank');
-}
-
-// METAR functionality
-async function loadMETARStations() {
+// ---------- METAR ----------
+async function loadMetarStations() {
     try {
-        const res = await fetch(`${API_BASE}/metar/stations`);
-        const data = await res.json();
-        
-        if (data.stations) {
-            const select = document.getElementById('metarStationSelect');
-            select.innerHTML = '<option value="">Selecione estação...</option>';
-            
-            data.stations.forEach(station => {
-                const option = document.createElement('option');
-                option.value = station.code;
-                option.textContent = `${station.code} - ${station.name}`;
-                select.appendChild(option);
-            });
+        const res = await fetch(`${API}/metar/stations`);
+        const d = await res.json();
+        const opts = (d.stations || []).map(s =>
+            `<option value="${s.code}">${s.code} — ${s.name || ''}</option>`).join('');
+        $('metarSel').innerHTML = '<option value="">Selecione...</option>' + opts;
+        if (d.stations && d.stations.length) {
+            $('metarSel').value = d.stations[0].code;
+            loadMETAR();
         }
-    } catch (error) {
-        console.error('Error loading METAR stations:', error);
+    } catch (e) {
+        console.error(e);
     }
 }
 
 async function loadMETAR() {
-    const station = document.getElementById('metarStationSelect').value;
-    const output = document.getElementById('metarData');
-    
-    if (!station) {
-        output.textContent = '';
-        return;
-    }
-    
-    output.textContent = 'Carregando...';
-    
+    const code = $('metarSel').value;
+    $('metarRaw').textContent = '';
+    $('metarDecoded').textContent = '';
+    if (!code) return;
+    $('metarRaw').textContent = 'Carregando...';
     try {
-        const res = await fetch(`${API_BASE}/metar/${station}`);
-        const data = await res.json();
-        
-        if (data.metar) {
-            output.textContent = `${data.station}\n${data.time}\n${data.metar}`;
-        } else {
-            output.textContent = 'METAR não disponível';
-        }
-    } catch (error) {
-        output.textContent = 'Erro ao carregar METAR';
+        const res = await fetch(`${API}/metar/${code}`);
+        const d = await res.json();
+        $('metarRaw').textContent = d.metar || 'SEM METAR';
+        $('metarDecoded').textContent = d.decoded || 'Sem decodificação disponível';
+    } catch (e) {
+        $('metarRaw').textContent = 'Erro ao carregar METAR';
     }
 }
 
-function formatDate(dateStr) {
-    if (!dateStr || dateStr.length !== 8) return dateStr;
-    return `${dateStr.slice(6,8)}/${dateStr.slice(4,6)}/${dateStr.slice(0,4)}`;
+// ---------- helpers ----------
+function formatDate(s) {
+    if (!s || s.length !== 8) return s;
+    return `${s.slice(6, 8)}/${s.slice(4, 6)}/${s.slice(0, 4)}`;
 }
 
-function showLoading(show) {
-    document.getElementById('loading').classList.toggle('hidden', !show);
-    document.getElementById('loadBtn').disabled = show;
+function autoSelect() {
+    const first = variables.find(v => v.category !== 'pollution');
+    if (first) {
+        $('varSel').value = first.code;
+        onVarChange();
+    }
 }
 
-function showError(msg) {
-    const el = document.getElementById('loading');
-    el.textContent = msg;
-    el.classList.remove('hidden');
-    el.style.color = '#e74c3c';
-}
-
-function hideError() {
-    const el = document.getElementById('loading');
-    el.classList.add('hidden');
-    el.style.color = 'inherit';
-}
+document.addEventListener('DOMContentLoaded', init);

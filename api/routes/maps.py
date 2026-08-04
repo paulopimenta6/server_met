@@ -7,27 +7,49 @@ Serve generated PNG maps
 from fastapi import APIRouter, HTTPException, Response, Request
 from fastapi.responses import FileResponse
 from pathlib import Path
+import re
 import os
+
+from core.config import MAPS_DIR
 
 router = APIRouter(prefix="/maps", tags=["maps"])
 
-MAPS_BASE_DIR = Path("/home/paulo/Documentos/meus_codigos/server_met/maps")
+MAPS_BASE_DIR = MAPS_DIR
 
-def _find_latest_map(variable: str, region: str, level: int = None, date: str = None, analysis: str = None, forecast: str = None):
-    pattern_parts = ["GFS_*", region.upper(), f"N{level or '*'}", variable]
-    if date:
-        pattern_parts.append(date)
-    if analysis:
-        pattern_parts.append(analysis)
-    if forecast:
-        pattern_parts.append(forecast)
-    
-    pattern = "_".join(pattern_parts) + "*.png"
-    
-    matches = list(MAPS_BASE_DIR.rglob(pattern))
+# Filenames produced by core.maps.generate_map:
+#   GFS_<res>_<REGION>_<Nlevel>_<var>_<analysis>_<date>_<forecast>.png
+_FILENAME_RE = re.compile(
+    r"GFS_(?P<res>[^_]+)_(?P<region>[^_]+)_(?P<level>[^_]+)_"
+    r"(?P<var>[^_]+)_(?P<ana>[^_]+)_(?P<date>[^_]+)_(?P<forecast>[^_]+)\.png"
+)
+
+
+def _find_latest_map(variable: str, region: str, level: int = None,
+                     date: str = None, analysis: str = None,
+                     forecast: str = None):
+    region = region.upper()
+    wanted_level = None if level is None else f"N{level}"
+    matches = []
+    for p in MAPS_BASE_DIR.rglob("GFS_*.png"):
+        m = _FILENAME_RE.match(p.name)
+        if not m:
+            continue
+        fields = m.groupdict()
+        if fields["region"] != region or fields["var"] != variable:
+            continue
+        if wanted_level is not None and fields["level"] != wanted_level:
+            continue
+        if date and fields["date"] != date:
+            continue
+        if analysis and fields["ana"] != analysis:
+            continue
+        if forecast and fields["forecast"] != forecast:
+            continue
+        matches.append(p)
+
     if not matches:
         return None
-    
+
     return max(matches, key=lambda p: p.stat().st_mtime)
 
 @router.api_route("/{variable}/{region}", methods=["GET", "HEAD"])

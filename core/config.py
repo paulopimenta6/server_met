@@ -14,13 +14,16 @@ DATA_DIR = BASE_DIR / "data"
 GRIB_DIR = DATA_DIR / "grib"
 SQLITE_DIR = DATA_DIR / "sqlite"
 CSV_DIR = DATA_DIR / "csv"
+METAR_DIR = DATA_DIR / "metar"
 MAPS_DIR = BASE_DIR / "maps"
 FRONTEND_DIR = BASE_DIR / "frontend"
 
-for d in [GRIB_DIR, SQLITE_DIR, CSV_DIR, MAPS_DIR]:
+for d in [GRIB_DIR, SQLITE_DIR, CSV_DIR, MAPS_DIR, METAR_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 NOAA_BASE_URL = os.getenv("NOAA_BASE_URL", "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.")
+NOAA_FILTER_URL = os.getenv("NOAA_FILTER_URL", "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl")
+AVIATION_WEATHER_URL = os.getenv("AVIATION_WEATHER_URL", "https://aviationweather.gov/api/data/metar")
 NOAA_FTP_URL = os.getenv("NOAA_FTP_URL", "ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.")
 ANALYSIS_HOURS = ["00", "06", "12", "18"]
 FORECAST_HOURS = ["00", "06", "12", "18"]

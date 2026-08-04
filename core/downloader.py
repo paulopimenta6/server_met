@@ -184,6 +184,81 @@ async def download_gribs_main(
         return downloaded
 
 
+# --------------------------------------------------------------------------- #
+# Filtered GFS fetch (lightweight - downloads only the required region/variable)
+# --------------------------------------------------------------------------- #
+from core.config import NOAA_FILTER_URL, REGIOES  # noqa: E402
+
+# registry code -> (NOAA GRIB shortName, typeOfLevel)
+NOAA_FILTER_VARS = {
+    "temp":          ("TMP",   "isobaricInhPa"),
+    "umidadeRel":    ("RH",    "isobaricInhPa"),
+    "nuvem":         ("TCDC",  "isobaricInhPa"),
+    "u":             ("UGRD",  "isobaricInhPa"),
+    "v":             ("VGRD",  "isobaricInhPa"),
+    "o3":            ("O3MR",  "isobaricInhPa"),
+    "ps":            ("PRES",  "surface"),
+    "prnm":          ("PRMSL", "meanSea"),
+    "uSupe":         ("UGRD",  "heightAboveGround"),
+    "vSupe":         ("VGRD",  "heightAboveGround"),
+}
+
+def _build_filter_url(date_str: str, analysis: str, forecast: str,
+                      var_code: str, level: int, region_code: str) -> str:
+    """Build a NOAA filter_gfs URL that returns one variable/level for a region."""
+    short_name, level_type = NOAA_FILTER_VARS[var_code]
+    bounds = REGIOES[region_code]
+
+    params = {
+        "file": f"gfs.t{analysis}z.pgrb2.0p25.f{forecast:03d}",
+        f"var_{short_name}": "on",
+        "leftlon": bounds["lon_min"],
+        "rightlon": bounds["lon_max"],
+        "toplat": bounds["lat_max"],
+        "bottomlat": bounds["lat_min"],
+        "dir": f"/gfs.{date_str}/{analysis}/atmos",
+    }
+    if level_type == "isobaricInhPa":
+        params[f"lev_{level}_mb"] = "on"
+    elif level_type == "surface":
+        params["lev_surface"] = "on"
+    elif level_type == "meanSea":
+        params["lev_mean_sea_level"] = "on"
+    elif level_type == "heightAboveGround":
+        params[f"lev_{level}_m_above_ground"] = "on"
+
+    qs = "&".join(f"{k}={v}" for k, v in params.items())
+    return f"{NOAA_FILTER_URL}?{qs}"
+
+
+def fetch_filtered_grib(date_str: str, analysis: str, forecast: int,
+                        var_code: str, level: int, region_code: str,
+                        out_dir: Path = None) -> Path:
+    """Download a single filtered GRIB file (region x variable x level)."""
+    if var_code not in NOAA_FILTER_VARS:
+        raise ValueError(f"Variable {var_code} not supported by NOAA filter endpoint")
+
+    if out_dir is None:
+        out_dir = GRIB_DIR / date_str / analysis
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    dest = out_dir / f"gfs.t{analysis}z.pgrb2.0p25.f{forecast:03d}_{var_code}_{region_code}_{level}.grb2"
+    if dest.exists() and dest.stat().st_size > 0:
+        logger.info(f"Already downloaded: {dest}")
+        return dest
+
+    url = _build_filter_url(date_str, analysis, forecast, var_code, level, region_code)
+    logger.info("Fetching %s", url)
+    with httpx.Client(timeout=DOWNLOAD_TIMEOUT, follow_redirects=True) as client:
+        resp = client.get(url)
+        resp.raise_for_status()
+        if len(resp.content) < 100:
+            raise RuntimeError(f"Empty/short payload for {url}")
+        dest.write_bytes(resp.content)
+    logger.info("Downloaded %s (%d bytes)", dest.name, dest.stat().st_size)
+    return dest
+
+
 if __name__ == "__main__":
     import sys
     date_arg = sys.argv[1] if len(sys.argv) > 1 else None

@@ -9,17 +9,14 @@ services:
     volumes:
       - ./data:/app/data
       - ./maps:/app/maps
-      - ./environment:/app/environment
       - ./.env:/app/.env:ro
     environment:
-      - NOAA_BASE_URL=https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.
+      - NOAA_FILTER_URL=https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl
+      - AVIATION_WEATHER_URL=https://aviationweather.gov/api/data/metar
       - SQLITE_DB_PATH=/app/data/sqlite/met_data.db
       - API_HOST=0.0.0.0
       - API_PORT=8000
-      - API_WORKERS=4
       - LOG_LEVEL=INFO
-      - SCHEDULER_TIMEZONE=America/Sao_Paulo
-      - PIPELINE_SCHEDULE_HOURS=0,6,12,18
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -28,37 +25,18 @@ services:
       retries: 3
       start_period: 40s
 
-  scheduler:
-    build: .
-    container_name: server-met-scheduler
-    command: python scripts/schedule.py
-    volumes:
-      - ./data:/app/data
-      - ./maps:/app/maps
-      - ./environment:/app/environment
-      - ./.env:/app/.env:ro
-    environment:
-      - NOAA_BASE_URL=https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.
-      - SQLITE_DB_PATH=/app/data/sqlite/met_data.db
-      - LOG_LEVEL=INFO
-      - SCHEDULER_TIMEZONE=America/Sao_Paulo
-      - PIPELINE_SCHEDULE_HOURS=0,6,12,18
-    restart: unless-stopped
-    depends_on:
-      - api
-
-  # Optional: Run pipeline manually
+  # Optional: run the data pipeline manually/seamlessly
   pipeline:
     build: .
     container_name: server-met-pipeline
-    command: python scripts/run_pipeline.py
+    command: python scripts/process_data.py
     volumes:
       - ./data:/app/data
       - ./maps:/app/maps
-      - ./environment:/app/environment
       - ./.env:/app/.env:ro
     environment:
-      - NOAA_BASE_URL=https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.
+      - NOAA_FILTER_URL=https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl
+      - AVIATION_WEATHER_URL=https://aviationweather.gov/api/data/metar
       - SQLITE_DB_PATH=/app/data/sqlite/met_data.db
       - LOG_LEVEL=INFO
     profiles:

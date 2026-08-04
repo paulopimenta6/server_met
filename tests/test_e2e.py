@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+End-to-end tests with real data for Server MET v2.0.
+
+Uses FastAPI's in-process TestClient, so no external server is required:
+    PYTHONPATH=. pytest tests/test_e2e.py -v
+"""
+import sys
+from pathlib import Path
+
+import pytest
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from fastapi.testclient import TestClient  # noqa: E402
+from api.main import app  # noqa: E402
+
+API = "/api/v1"
+
+
+@pytest.fixture(scope="module")
+def client():
+    with TestClient(app) as c:
+        yield c
+
+
+def test_health(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "healthy"
+
+
+def test_variables(client):
+    r = client.get(f"{API}/data/variables")
+    assert r.status_code == 200
+    vars = r.json()["variables"]
+    assert len(vars) == 20
+    categories = {v["category"] for v in vars}
+    assert "pollution" in categories
+    assert "temperature" in categories
+
+
+def test_regions(client):
+    r = client.get(f"{API}/data/regions")
+    assert r.status_code == 200
+    assert len(r.json()["regions"]) == 18
+
+
+def test_dashboard(client):
+    r = client.get(f"{API}/data/dashboard")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["total_records"] > 0
+    assert data["metar"]["reports"] > 0
+
+
+def test_data_query(client):
+    r = client.get(f"{API}/data/", params={"variable": "temp", "region": "SP", "level": 1000})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0
+    rec = r.json()["data"][0]
+    assert rec["min_value"] < rec["max_value"]
+
+
+def test_map_png(client):
+    r = client.get(f"{API}/maps/temp/SP", params={"level": 1000})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_map_surface(client):
+    r = client.get(f"{API}/maps/ps/SP")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_data_surface(client):
+    r = client.get(f"{API}/data/", params={"variable": "ps", "region": "SP"})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0
+
+
+def test_metar_stations(client):
+    r = client.get(f"{API}/metar/stations")
+    assert r.status_code == 200
+    assert len(r.json()["stations"]) > 0
+
+
+def test_metar_latest(client):
+    r = client.get(f"{API}/metar/SBGR")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["metar"]
+    assert body["decoded"]
+
+
+def test_metar_all(client):
+    r = client.get(f"{API}/metar/latest/all")
+    assert r.status_code == 200
+    assert len(r.json()["metars"]) > 0
+
+
+def test_frontend(client):
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "Server MET" in r.text
+    # index.html must reference assets through the /static mount (root paths 404)
+    assert 'href="static/style.css"' in r.text
+    assert 'src="static/app.js"' in r.text
+    assert 'href="style.css"' not in r.text
+    assert 'src="app.js"' not in r.text
+
+
+def test_frontend_assets(client):
+    r_css = client.get("/static/style.css")
+    assert r_css.status_code == 200
+    assert "text/css" in r_css.headers["content-type"]
+    r_js = client.get("/static/app.js")
+    assert r_js.status_code == 200
+    assert "text/javascript" in r_js.headers["content-type"]
+
+
+def test_map_with_date_and_analysis(client):
+    # The frontend always requests maps with date+analysis together; this must
+    # not 404 even though the filename embeds analysis before date.
+    r = client.get(f"{API}/maps/temp/SP",
+                   params={"level": 850, "date": "20260804", "analysis": "00"})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_export_csv(client):
+    r = client.get(f"{API}/data/export/csv",
+                   params={"variable": "temp", "region": "SP", "level": 1000})
+    assert r.status_code == 200
+    assert "text/csv" in r.headers["content-type"]
+
+
+def test_export_csv_surface(client):
+    r = client.get(f"{API}/data/export/csv",
+                   params={"variable": "ps", "region": "SP"})
+    assert r.status_code == 200
+    assert "text/csv" in r.headers["content-type"]

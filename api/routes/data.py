@@ -154,6 +154,32 @@ async def get_available():
         "dates": persistence.get_available_dates()
     }
 
+@router.get("/dashboard")
+async def get_dashboard():
+    """Aggregate summary for the frontend statistical dashboard."""
+    import sqlite3
+    with persistence._get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*), COUNT(DISTINCT variable_code), COUNT(DISTINCT region_code) FROM processed_data")
+        total, nvars, nregs = cur.fetchone()
+        cur.execute("SELECT variable_code, COUNT(*) n, AVG(mean_value) avg FROM processed_data GROUP BY variable_code ORDER BY variable_code")
+        by_var = [{"variable": r[0], "records": r[1], "avg": round(r[2], 2)} for r in cur.fetchall()]
+        cur.execute("SELECT region_code, COUNT(*) n FROM processed_data GROUP BY region_code ORDER BY region_code")
+        by_region = [{"region": r[0], "records": r[1]} for r in cur.fetchall()]
+        cur.execute("SELECT data_date, COUNT(*) n FROM grib_metadata GROUP BY data_date ORDER BY data_date DESC")
+        by_date = [{"date": r[0], "records": r[1]} for r in cur.fetchall()]
+
+    metar_stats = persistence.get_metar_stats()
+    return {
+        "total_records": total or 0,
+        "variables": nvars or 0,
+        "regions": nregs or 0,
+        "by_variable": by_var,
+        "by_region": by_region,
+        "by_date": by_date,
+        "metar": metar_stats,
+    }
+
 @router.get("/levels/{variable}")
 async def get_levels(variable: str):
     levels = persistence.get_available_levels(variable)
@@ -163,15 +189,18 @@ async def get_levels(variable: str):
 async def export_csv(
     variable: str = Query(...),
     region: str = Query(...),
-    level: int = Query(...),
+    level: Optional[int] = Query(None, description="Level value; omit for surface variables"),
     date: Optional[str] = Query(None),
     analysis: Optional[str] = Query(None)
 ):
     from pathlib import Path
     import tempfile
     
-    output_path = Path(tempfile.gettempdir()) / f"export_{variable}_{region}_{level}.csv"
-    count = persistence.export_csv(output_path, variable_code=variable, region_code=region, level_value=level, data_date=date, analysis_time=analysis)
+    level_value = level if level is not None else 0
+    output_path = Path(tempfile.gettempdir()) / f"export_{variable}_{region}_{level_value}.csv"
+    count = persistence.export_csv(
+        output_path, variable_code=variable, region_code=region,
+        level_value=level_value, data_date=date, analysis_time=analysis)
     
     if count == 0:
         raise HTTPException(status_code=404, detail="No data to export")

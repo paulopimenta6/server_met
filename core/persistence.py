@@ -47,6 +47,34 @@ CREATE TABLE IF NOT EXISTS processed_data (
 CREATE INDEX IF NOT EXISTS idx_grib_lookup ON grib_metadata(data_date, analysis_time, forecast_hour, resolution);
 CREATE INDEX IF NOT EXISTS idx_processed_lookup ON processed_data(variable_code, level_value, region_code);
 CREATE INDEX IF NOT EXISTS idx_processed_grib ON processed_data(grib_metadata_id);
+
+CREATE TABLE IF NOT EXISTS metar_stations (
+    code TEXT PRIMARY KEY,
+    name TEXT,
+    city TEXT,
+    state TEXT,
+    lat REAL,
+    lon REAL
+);
+
+CREATE TABLE IF NOT EXISTS metar_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    station_code TEXT NOT NULL,
+    observed_at TEXT NOT NULL,
+    raw TEXT NOT NULL,
+    decoded TEXT,
+    temperature_c REAL,
+    dewpoint_c REAL,
+    wind_dir INTEGER,
+    wind_speed_kt INTEGER,
+    visibility_km REAL,
+    altim_hpa REAL,
+    cloud_skc TEXT,
+    flight_category TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(station_code, observed_at)
+);
+CREATE INDEX IF NOT EXISTS idx_metar_station_time ON metar_reports(station_code, observed_at);
 """
 
 class PersistenceManager:
@@ -216,5 +244,86 @@ class PersistenceManager:
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT DISTINCT data_date FROM grib_metadata ORDER BY data_date DESC")
             return [row[0] for row in cursor.fetchall()]
+
+    # ------------------------------------------------------------------ #
+    # METAR persistence
+    # ------------------------------------------------------------------ #
+    def upsert_station(self, code: str, name: str = None, city: str = None,
+                       state: str = None, lat: float = None, lon: float = None) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO metar_stations (code, name, city, state, lat, lon)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(code) DO UPDATE SET
+                    name=excluded.name, city=excluded.city, state=excluded.state,
+                    lat=excluded.lat, lon=excluded.lon
+            """, (code, name, city, state, lat, lon))
+            conn.commit()
+            return cursor.lastrowid
+
+    def save_metar_report(self, report: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO metar_reports
+                (station_code, observed_at, raw, decoded, temperature_c, dewpoint_c,
+                 wind_dir, wind_speed_kt, visibility_km, altim_hpa, cloud_skc, flight_category)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(station_code, observed_at) DO UPDATE SET
+                    raw=excluded.raw, decoded=excluded.decoded,
+                    temperature_c=excluded.temperature_c, dewpoint_c=excluded.dewpoint_c,
+                    wind_dir=excluded.wind_dir, wind_speed_kt=excluded.wind_speed_kt,
+                    visibility_km=excluded.visibility_km, altim_hpa=excluded.altim_hpa,
+                    cloud_skc=excluded.cloud_skc, flight_category=excluded.flight_category
+            """, (
+                report["station_code"], report["observed_at"], report["raw"], report.get("decoded"),
+                report.get("temperature_c"), report.get("dewpoint_c"), report.get("wind_dir"),
+                report.get("wind_speed_kt"), report.get("visibility_km"), report.get("altim_hpa"),
+                report.get("cloud_skc"), report.get("flight_category")
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_latest_metar(self, station_code: str) -> Optional[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT * FROM metar_reports WHERE station_code = ? ORDER BY observed_at DESC LIMIT 1",
+                (station_code,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def get_metar_stations(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT * FROM metar_stations ORDER BY code")
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_all_latest_metar(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("""
+                SELECT r.* FROM metar_reports r
+                JOIN (SELECT station_code, MAX(observed_at) max_t FROM metar_reports
+                      GROUP BY station_code) latest
+                ON r.station_code = latest.station_code AND r.observed_at = latest.max_t
+                ORDER BY r.station_code
+            """)
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_metar_stats(self) -> Dict[str, Any]:
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
+            stations = self.get_metar_stations()
+            reports = conn.execute("SELECT COUNT(*) total, COUNT(DISTINCT station_code) stations FROM metar_reports").fetchone()
+            latest = conn.execute("SELECT MAX(observed_at) latest FROM metar_reports").fetchone()
+            return {
+                "stations": len(stations),
+                "reports": reports["total"] if reports else 0,
+                "stations_with_data": reports["stations"] if reports else 0,
+                "latest_observation": latest["latest"] if latest else None,
+            }
 
 persistence = PersistenceManager()
