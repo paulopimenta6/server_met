@@ -35,6 +35,8 @@ PYTHONPATH=. python - <<'EOF' && ok "Registros persistidos (GRIB + METAR)" || ba
 from core.persistence import persistence
 assert persistence.get_available_regions(), "sem regiões"
 assert persistence.get_available_variables(), "sem variáveis"
+assert "o3" in persistence.get_available_variables(), "sem o3"
+assert "total_o3" in persistence.get_available_variables(), "sem total_o3"
 assert persistence.get_metar_stats()["reports"] > 0, "sem METAR"
 EOF
 
