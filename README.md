@@ -3,10 +3,14 @@
 > **Servidor de Dados Meteorológicos e de Poluição Atmosférica**
 > 
 > Baixa, processa e disponibiliza dados do modelo GFS (NOAA) via API REST e interface web interativa.
+> 
+> [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+> [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com)
+> [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## ✨ O que faz?
+## 🎯 O que este projeto faz?
 
 | Funcionalidade | Descrição |
 |----------------|-----------|
@@ -187,8 +191,8 @@ curl "http://localhost:8000/api/v1/data/latest?variable=o3&level=500&region=RJ"
 # Exportar CSV de vento a 850 hPa
 curl "http://localhost:8000/api/v1/data/export/csv?variable=u&level=850&region=SP" > vento_sp.csv
 
-# Mapa de chuva convectiva
-curl "http://localhost:8000/api/v1/maps/chuvaConvec/SP" --output chuva_sp.png
+# Mapa de ozônio (GeoJSON para Leaflet)
+curl "http://localhost:8000/api/v1/maps/geojson/o3/SP?level=500"
 ```
 
 ---
@@ -228,7 +232,7 @@ PYTHONPATH=. pytest tests/ -v
 # Testes E2E (precisa API rodando em localhost:8000)
 PYTHONPATH=. pytest scripts/test_e2e.py -v
 
-# Validação completa do pipeline (download → process → API)
+# Validação completa do pipeline
 PYTHONPATH=. python scripts/validate_pipeline.py
 ```
 
@@ -243,7 +247,7 @@ server_met/
 │   ├── variables.py        # Registry de variáveis (MET + poluição)
 │   ├── persistence.py      # SQLite + CSV
 │   ├── regions.py          # 18 regiões pré-definidas
-│   ├── downloader.py       # Download GRIB assíncrono (NOAA)
+│   ├── downloader.py       # Download GRIB assíncrono (NOAA HTTPS)
 │   ├── grib_reader.py      # Leitura GRIB com pygrib
 │   └── processor.py        # Extração e estatísticas
 │
@@ -283,6 +287,7 @@ server_met/
 ├── .env / .env.example      # Configuração
 ├── environment/path.conf    # Paths legados
 ├── planejamento_atualizacao.txt
+├── goGribV2.sh              # Script original (referência)
 └── README.md
 ```
 

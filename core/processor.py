@@ -44,6 +44,11 @@ class DataProcessor:
         
         if region_bounds:
             lon_min, lon_max, lat_min, lat_max = region_bounds
+            # Convert longitudes from -180/180 to 0/360 if needed (GRIB uses 0-360)
+            if lon_min < 0:
+                lon_min += 360
+            if lon_max < 0:
+                lon_max += 360
             try:
                 data, lats, lons = msg.data(lat1=lat_min, lat2=lat_max, lon1=lon_min, lon2=lon_max)
             except Exception as e:

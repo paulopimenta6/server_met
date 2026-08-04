@@ -21,6 +21,7 @@ for d in [GRIB_DIR, SQLITE_DIR, CSV_DIR, MAPS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 NOAA_BASE_URL = os.getenv("NOAA_BASE_URL", "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.")
+NOAA_FTP_URL = os.getenv("NOAA_FTP_URL", "ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.")
 ANALYSIS_HOURS = ["00", "06", "12", "18"]
 FORECAST_HOURS = ["00", "06", "12", "18"]
 RESOLUTIONS = ["0p25", "1p00"]

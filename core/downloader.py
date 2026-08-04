@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 Downloader de arquivos GRIB do NOAA GFS - Server MET v2.0
-Substitui o script shell goGribV2.sh
+Baseado no script shell goGribV2.sh original
+Usa HTTPS (nomads.ncep.noaa.gov) conforme script original
 """
 import asyncio
 import httpx
-import os
 from pathlib import Path
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional
 import logging
 from core.config import (
     GRIB_DIR, NOAA_BASE_URL, ANALYSIS_HOURS, FORECAST_HOURS, 
@@ -23,6 +23,8 @@ class GribDownloader:
         self.base_dir = base_dir
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.client: Optional[httpx.AsyncClient] = None
+        # URL base HTTPS do NOAA (conforme goGribV2.sh)
+        self.base_url = NOAA_BASE_URL
     
     async def __aenter__(self):
         headers = {
@@ -48,14 +50,22 @@ class GribDownloader:
         ana_dir.mkdir(parents=True, exist_ok=True)
         return ana_dir
     
+    def _format_forecast(self, forecast: str) -> str:
+        """Formata hora de previsão para padrão f0{forecast}: 00->f000, 06->f006, 12->f012, 18->f018"""
+        return f"f0{forecast}"
+    
     def _build_url(self, date_str: str, analysis: str, forecast: str, resolution: str) -> str:
-        return f"{NOAA_BASE_URL}{date_str}/{analysis}/atmos/gfs.t{analysis}z.pgrb2.{resolution}.f{forecast}"
+        """Constrói URL seguindo padrão exato do goGribV2.sh: gfs.t{analysis}z.pgrb2.{resolution}.f0{forecast}"""
+        forecast_fmt = self._format_forecast(forecast)
+        return f"{self.base_url}{date_str}/{analysis}/atmos/gfs.t{analysis}z.pgrb2.{resolution}.{forecast_fmt}"
     
     def _get_local_path(self, date_dir: Path, analysis: str, forecast: str, resolution: str) -> Path:
         ana_dir = self._get_analysis_dir(date_dir, analysis)
-        return ana_dir / f"gfs.t{analysis}z.pgrb2.{resolution}.f{forecast}"
+        forecast_fmt = self._format_forecast(forecast)
+        return ana_dir / f"gfs.t{analysis}z.pgrb2.{resolution}.{forecast_fmt}"
     
     async def _check_url_exists(self, url: str) -> bool:
+        """Verifica se URL existe (equivalente ao wget --spider)"""
         try:
             response = await self.client.head(url)
             return response.status_code == 200
@@ -87,6 +97,7 @@ class GribDownloader:
         forecast: str,
         resolutions: List[str] = None
     ) -> List[Path]:
+        """Baixa arquivos para uma análise e previsão específica (todas as resoluções)"""
         if resolutions is None:
             resolutions = RESOLUTIONS
         
@@ -94,19 +105,23 @@ class GribDownloader:
         downloaded = []
         
         for resolution in resolutions:
-            url = self._build_url(date_str, analysis, forecast, resolution)
             local_path = self._get_local_path(date_dir, analysis, forecast, resolution)
             
             if local_path.exists():
-                logger.info(f"File already exists: {local_path}")
+                logger.info(f"Arquivo já existe: {local_path}")
                 downloaded.append(local_path)
                 continue
             
+            url = self._build_url(date_str, analysis, forecast, resolution)
+            logger.info(f"Verificando: {url}")
+            
+            # Spider check (equivalente ao wget --spider)
             if await self._check_url_exists(url):
+                logger.info(f"Site OK! Fazendo download...")
                 if await self._download_file(url, local_path):
                     downloaded.append(local_path)
             else:
-                logger.debug(f"URL not found: {url}")
+                logger.warning(f"Arquivo não encontrado: {url}")
         
         return downloaded
     
@@ -117,6 +132,7 @@ class GribDownloader:
         forecasts: List[str] = None,
         resolutions: List[str] = None
     ) -> List[Path]:
+        """Baixa todos os arquivos para uma data (loop aninhado igual ao shell script)"""
         if analyses is None:
             analyses = ANALYSIS_HOURS
         if forecasts is None:
@@ -125,19 +141,18 @@ class GribDownloader:
             resolutions = RESOLUTIONS
         
         all_downloaded = []
-        tasks = []
         
+        # Loop igual ao shell script: for tAnalise in 00 06 12 18
         for analysis in analyses:
+            # Loop igual ao shell script: for tPrev in 00 06 12 18
             for forecast in forecasts:
-                tasks.append(self.download_analysis_forecast(date_str, analysis, forecast, resolutions))
-        
-        results = await asyncio.gather(*tasks)
-        for result in results:
-            all_downloaded.extend(result)
+                downloaded = await self.download_analysis_forecast(date_str, analysis, forecast, resolutions)
+                all_downloaded.extend(downloaded)
         
         return all_downloaded
     
     async def download_latest_cycle(self, resolutions: List[str] = None) -> List[Path]:
+        """Baixa apenas o ciclo mais recente baseado na hora atual"""
         now = datetime.utcnow()
         date_str = now.strftime("%Y%m%d")
         
@@ -147,8 +162,9 @@ class GribDownloader:
             if current_hour >= int(ah):
                 current_analysis = ah
         
-        logger.info(f"Downloading latest cycle: {date_str} {current_analysis}Z")
+        logger.info(f"Baixando ciclo mais recente: {date_str} {current_analysis}Z")
         return await self.download_all_for_date(date_str, analyses=[current_analysis], resolutions=resolutions)
+
 
 async def download_gribs_main(
     date_str: str = None,
@@ -160,12 +176,13 @@ async def download_gribs_main(
         date_str = datetime.utcnow().strftime("%Y%m%d")
     
     logging.basicConfig(level=logging.INFO)
-    logger.info(f"Starting GRIB download for {date_str}")
+    logger.info(f"Iniciando download GRIB para {date_str}")
     
     async with GribDownloader() as downloader:
         downloaded = await downloader.download_all_for_date(date_str, analyses, forecasts, resolutions)
-        logger.info(f"Download complete. {len(downloaded)} files downloaded.")
+        logger.info(f"Download completo. {len(downloaded)} arquivos baixados.")
         return downloaded
+
 
 if __name__ == "__main__":
     import sys
