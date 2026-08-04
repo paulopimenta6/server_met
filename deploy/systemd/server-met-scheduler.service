@@ -1,0 +1,27 @@
+[Unit]
+Description=Server MET v2.0 Scheduler
+After=network.target server-met-api.service
+Wants=network.target
+
+[Service]
+Type=exec
+User=paulo
+Group=paulo
+WorkingDirectory=/home/paulo/Documentos/meus_codigos/server_met
+EnvironmentFile=/home/paulo/Documentos/meus_codigos/server_met/.env
+ExecStart=/home/paulo/envs/met/bin/python scripts/schedule.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=server-met-scheduler
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/paulo/Documentos/meus_codigos/server_met/data /home/paulo/Documentos/meus_codigos/server_met/maps
+
+[Install]
+WantedBy=multi-user.target

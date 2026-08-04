@@ -1,0 +1,317 @@
+PLANO DE ATUALIZAÇÃO - Server MET v2.0
+========================================
+
+Data: 2026-08-04
+Baseado em: requisitos_projeto_server_met.txt
+
+================================================================================
+1. VISÃO GERAL DA ARQUITETURA ATUAL
+================================================================================
+
+Fluxo Original:
+1. Download → goGribV2.sh baixa GRIBs do NOAA (GFS 0.25°/1.00°)
+2. Leitura → leitura_dados_grib_MET.py (classes leitura_dados_gribs_AUT/MAN)
+3. Processamento → processamento_dados_MET.py extrai variáveis por nível/região
+4. Geração → gera_mapas_MET.py (PNG) + gera_matriz_MET.py (CSV) + gera_matriz_vento_MET.py
+
+Variáveis Atuais Suportadas:
+- Pressão: ps (superfície), prnm (nível do mar)
+- Temperatura: temp (isobárico), temps (superfície)
+- Nebulosidade: nuvem
+- Precipitação: chuvaNaoConvec, chuvaConvec
+- Umidade: umidadeRel
+- Vento: u, v (isobárico), uSupe, vSupe (altura)
+
+Variáveis de Poluição Disponíveis no GRIB (já presentes nos dados):
+- Ozone mixing ratio (já existe em variables.txt)
+- Flags: is_chemical, is_aerosol, is_aerosol_optical indicam mais dados químicos/aerossóis
+
+================================================================================
+2. NOVOS REQUISITOS E SOLUÇÕES
+================================================================================
+
+| Requisito | Solução |
+|-----------|---------|
+| 2º - Variáveis de poluição | Adicionar o3 (ozônio), e investigar NO2, SO2, CO, PM2.5, PM10, aerossóis nos GRIBs |
+| 6º - SQLite + CSV | Camada de persistência unificada (SQLite para consultas, CSV para exportação) |
+| 7º - REST API + Frontend | FastAPI + HTML/JS simples (Leaflet/Chart.js) servido pelo Python |
+| 8º - Arquitetura simples/modular | Separação em: core/, api/, frontend/, scripts/ |
+| 9º - Testes E2E | Pytest com dados reais + validação de saída (Playwright) |
+
+================================================================================
+3. ESTRUTURA DE DIRETÓRIOS PROPOSTA
+================================================================================
+
+server_met/
+├── core/                    # Lógica de negócio (existente → refatorado)
+│   ├── __init__.py
+│   ├── config.py            # Configurações centralizadas
+│   ├── downloader.py        # Download GRIB (Python, substitui .sh)
+│   ├── grib_reader.py       # Leitura GRIB (refatorado)
+│   ├── processor.py         # Processamento variáveis (refatorado)
+│   ├── regions.py           # Regiões predefinidas (refatorado + novas regiões)
+│   ├── persistence.py       # NOVO: SQLite + CSV
+│   └── variables.py         # NOVO: Registry de variáveis MET + poluição
+├── api/                     # NOVO: REST API
+│   ├── __init__.py
+│   ├── main.py              # FastAPI app
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── data.py          # Endpoints de dados processados
+│   │   ├── maps.py          # Endpoints de mapas (PNG/GeoJSON)
+│   │   └── health.py        # Health check
+│   └── schemas.py           # Pydantic models
+├── frontend/                # NOVO: Frontend simples (arquivos estáticos servidos por FastAPI)
+│   ├── index.html           # Mapa interativo (Leaflet)
+│   ├── app.js               # Lógica do frontend
+│   ├── style.css            # Estilos
+│   └── chart.js             # Gráficos (Chart.js via CDN)
+├── scripts/                 # Scripts de automação
+│   ├── run_pipeline.py      # Pipeline completo (download→process→persist)
+│   ├── schedule.py          # Agendador (APScheduler em Python)
+│   └── test_e2e.py          # Testes end-to-end
+├── tests/                   # Testes
+│   ├── __init__.py
+│   ├── test_downloader.py
+│   ├── test_processor.py
+│   ├── test_persistence.py
+│   ├── test_api.py
+│   └── fixtures/            # Dados de teste
+├── data/                    # Dados persistidos (gitignore)
+│   ├── grib/                # Arquivos GRIB baixados
+│   ├── sqlite/              # Banco SQLite
+│   └── csv/                 # CSVs exportados
+├── maps/                    # Mapas gerados (gitignore)
+├── environment/
+│   └── path.conf            # Atualizado para novos paths
+├── requirements.txt         # NOVO: Dependências Python
+├── .env                     # NOVO: Configurações sensíveis
+├── .env.example             # NOVO: Template de configuração
+├── docker-compose.yml       # NOVO: Deploy Docker
+├── Dockerfile               # NOVO: Container Python
+├── README.md                # NOVO: Documentação
+└── planejamento_atualizacao.txt  # Este arquivo
+
+================================================================================
+4. MÓDULOS PRINCIPAIS - DETALHAMENTO
+================================================================================
+
+4.1 core/variables.py - Registry de Variáveis (NOVO)
+-----------------------------------------------------
+Mapeamento unificado: código interno → nome GRIB + tipo nível + conversão
+
+VARIABLES_MET = {
+    # Meteorológicas existentes
+    "ps":      {"grib_name": "Surface pressure", "level_type": "surface", "unit_conv": lambda x: x/100, "unit": "hPa"},
+    "prnm":    {"grib_name": "Pressure reduced to MSL", "level_type": "meanSea", "unit_conv": lambda x: x/100, "unit": "hPa"},
+    "temp":    {"grib_name": "Temperature", "level_type": "isobaricInhPa", "unit_conv": lambda x: x-273.15, "unit": "°C"},
+    "temps":   {"grib_name": "Temperature", "level_type": "surface", "unit_conv": lambda x: x-273.15, "unit": "°C"},
+    "nuvem":   {"grib_name": "Total Cloud Cover", "level_type": "isobaricInhPa", "unit_conv": None, "unit": "%"},
+    "chuvaNaoConvec": {"grib_name": "Total Precipitation", "level_type": "surface", "unit_conv": None, "unit": "mm"},
+    "chuvaConvec":    {"grib_name": "Convective precipitation", "level_type": "surface", "unit_conv": None, "unit": "mm"},
+    "umidadeRel":     {"grib_name": "Relative humidity", "level_type": "isobaricInhPa", "unit_conv": None, "unit": "%"},
+    "u":       {"grib_name": "U component of wind", "level_type": "isobaricInhPa", "unit_conv": None, "unit": "m/s"},
+    "v":       {"grib_name": "V component of wind", "level_type": "isobaricInhPa", "unit_conv": None, "unit": "m/s"},
+    "uSupe":   {"grib_name": "U component of wind", "level_type": "heightAboveGround", "unit_conv": None, "unit": "m/s"},
+    "vSupe":   {"grib_name": "V component of wind", "level_type": "heightAboveGround", "unit_conv": None, "unit": "m/s"},
+    
+    # NOVO: Poluição (baseado no GRIB disponível em variables.txt)
+    "o3":      {"grib_name": "Ozone mixing ratio", "level_type": "isobaricInhPa", "unit_conv": lambda x: x*1e9, "unit": "ppbv"},
+    # Investigar disponibilidade no GFS (flags is_chemical, is_aerosol indicam existência):
+    # "no2":   {"grib_name": "Nitrogen dioxide mixing ratio", "level_type": "isobaricInhPa", "unit_conv": lambda x: x*1e9, "unit": "ppbv"},
+    # "so2":   {"grib_name": "Sulfur dioxide mixing ratio", "level_type": "isobaricInhPa", "unit_conv": lambda x: x*1e9, "unit": "ppbv"},
+    # "co":    {"grib_name": "Carbon monoxide mixing ratio", "level_type": "isobaricInhPa", "unit_conv": lambda x: x*1e9, "unit": "ppbv"},
+    # "pm25":  {"grib_name": "PM2.5", "level_type": "surface", "unit_conv": None, "unit": "µg/m³"},
+    # "pm10":  {"grib_name": "PM10", "level_type": "surface", "unit_conv": None, "unit": "µg/m³"},
+    # "aod":   {"grib_name": "Aerosol optical depth", "level_type": "atmosphere", "unit_conv": None, "unit": ""},
+}
+
+4.2 core/persistence.py - Camada de Persistência (NOVO)
+--------------------------------------------------------
+SQLite Schema:
+
+CREATE TABLE IF NOT EXISTS grib_metadata (
+    id INTEGER PRIMARY KEY,
+    file_path TEXT UNIQUE,
+    analysis_time TEXT,  -- 00, 06, 12, 18
+    forecast_hour INTEGER,
+    data_date TEXT,
+    resolution TEXT,  -- 0p25, 1p00
+    downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS processed_data (
+    id INTEGER PRIMARY KEY,
+    grib_metadata_id INTEGER,
+    variable_code TEXT,  -- temp, o3, u, etc.
+    level_type TEXT,     -- surface, isobaricInhPa, heightAboveGround
+    level_value INTEGER, -- 1000, 850, 10, etc.
+    region_code TEXT,    -- SP, RJ, etc.
+    min_value REAL,
+    max_value REAL,
+    mean_value REAL,
+    data_json TEXT,      -- Matriz completa em JSON (opcional)
+    csv_path TEXT,       -- Caminho do arquivo CSV
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (grib_metadata_id) REFERENCES grib_metadata(id)
+);
+
+CREATE INDEX idx_processed_lookup ON processed_data(variable_code, level_value, region_code, analysis_time);
+
+Funcionalidades:
+- save_grib_metadata() - Registra GRIB baixado
+- save_processed_data() - Salva resultados processados (SQLite + CSV)
+- query_data() - Consultas flexíveis (variável, nível, região, data)
+- export_csv() - Exporta consultas para CSV
+
+4.3 core/downloader.py - Download em Python (Substitui .sh)
+-----------------------------------------------------------
+- Usa httpx (já instalado) para download assíncrono
+- Validação de integridade (tamanho, checksum)
+- Retry automático com backoff
+- Log estruturado
+
+4.4 api/main.py - FastAPI Application
+--------------------------------------
+Endpoints principais:
+GET  /api/v1/health                    # Health check
+GET  /api/v1/variables                 # Lista variáveis disponíveis
+GET  /api/v1/regions                   # Lista regiões disponíveis
+GET  /api/v1/data                      # Dados processados (com filtros)
+     ?variable=temp&level=1000&region=SP&date=2024-01-15&analysis=00
+GET  /api/v1/data/latest               # Último dado disponível
+GET  /api/v1/map/{variable}/{region}   # Mapa PNG/GeoJSON
+GET  /api/v1/export/csv                # Exporta CSV filtrado
+
+4.5 frontend/ - Visualização Simples (Arquivos Estáticos)
+----------------------------------------------------------
+- index.html: Mapa base (Leaflet + OpenStreetMap via CDN)
+- Camadas: Seleção de variável, nível, região, horário
+- Controles: Slider temporal (previsões 00/06/12/18h)
+- Popups: Valores ao clicar no mapa
+- Gráficos: Séries temporais (Chart.js via CDN)
+- Responsivo: Mobile-first
+- Servido por FastAPI via StaticFiles
+
+================================================================================
+5. PLANO DE IMPLEMENTAÇÃO POR FASES
+================================================================================
+
+FASE 1: Fundação (Semana 1)
+---------------------------
+[ ] Criar estrutura de diretórios nova
+[ ] core/config.py - Configuração centralizada (paths, URLs, regiões)
+[ ] core/variables.py - Registry completo de variáveis MET + poluição
+[ ] core/persistence.py - SQLite + CSV layer com migrations
+[ ] core/regions.py - Regiões expandidas (18 regiões total)
+[ ] Atualizar environment/path.conf para novos paths
+[ ] requirements.txt - Dependências completas
+[ ] .env.example - Template de configuração
+[ ] Dockerfile + docker-compose.yml - Base
+
+FASE 2: Pipeline de Dados (Semana 2)
+-------------------------------------
+[ ] core/downloader.py - Download GRIB assíncrono (substitui .sh)
+[ ] Refatorar grib_reader.py, processor.py (baseado no código existente)
+[ ] scripts/run_pipeline.py - Orquestra download → processa → persiste
+[ ] Adicionar variáveis de poluição no processador (o3 + outras encontradas)
+[ ] Testes unitários para cada módulo core
+
+FASE 3: API REST (Semana 3)
+---------------------------
+[ ] api/main.py - FastAPI app com CORS, logging, StaticFiles
+[ ] api/routes/data.py - Endpoints de consulta de dados
+[ ] api/routes/maps.py - Endpoints de mapas (servir PNGs gerados)
+[ ] api/schemas.py - Pydantic models para validação
+[ ] Documentação OpenAPI automática (/docs)
+
+FASE 4: Frontend (Semana 4)
+---------------------------
+[ ] frontend/index.html - Mapa Leaflet base
+[ ] frontend/app.js - Integração com API, controles UI
+[ ] frontend/style.css - Estilos responsivos
+[ ] Servir arquivos estáticos via FastAPI (/static, /frontend)
+[ ] Testes manuais de usabilidade
+
+FASE 5: Automação e Testes E2E (Semana 5)
+------------------------------------------
+[ ] scripts/schedule.py - Agendador (APScheduler em Python)
+[ ] scripts/test_e2e.py - Testes ponta-a-ponta com dados reais (Playwright)
+[ ] Validação: download → processamento → persistência → API → frontend
+[ ] Correção de bugs encontrados
+[ ] Documentação final (README.md, planejamento_atualizacao.txt)
+[ ] systemd service files para produção
+
+================================================================================
+6. VARIÁVEIS DE POLUIÇÃO - INVESTIGAÇÃO NECESSÁRIA
+================================================================================
+
+Já confirmado no GRIB (via variables.txt):
+- Ozone mixing ratio (em múltiplos níveis isobáricos: 1, 2, 3, 5, 7, 10, 15, 20, 30, 40, 50, 70, 100, 150, 200, 250, 300, 350, 400 hPa)
+
+A investigar no GFS (verificar se NOAA disponibiliza via flags is_chemical/is_aerosol):
+- NO2 mixing ratio
+- SO2 mixing ratio  
+- CO mixing ratio
+- PM2.5 / PM10
+- Aerosol Optical Depth (AOD)
+- Dust mixing ratio
+
+Ação: Rodar script de inspeção em GRIB real para listar todas as variáveis químicas/aerossóis disponíveis.
+
+================================================================================
+7. REGIÕES EXPANDIDAS (18 total)
+================================================================================
+
+Existentes (11): SP, RJ, AM, DF, PR, RS, MG, PA, PE, CE, SA
+Novas (7):     FOR (Fortaleza), REC (Recife), SSA (Salvador), BEL (Belém), BH (Belo Horizonte), CWB (Curitiba), POA (Porto Alegre)
+
+Coordenadas a definir baseadas no padrão existente.
+
+================================================================================
+8. COMPATIBILIDADE E MIGRAÇÃO
+================================================================================
+
+- Código existente: Mantido como referência em legacy/ ou refatorado in-place
+- Shell scripts: Mantidos para fallback, mas pipeline principal em Python
+- Paths: environment/path.conf atualizado; variáveis de ambiente no .env
+- Regiões: Mantidas as 11 atuais + 7 novas = 18 total
+- Níveis: Mantidos níveis isobáricos padrão (1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10 hPa)
+
+================================================================================
+9. TESTES E VALIDAÇÃO
+================================================================================
+
+| Tipo | Ferramenta | Cobertura |
+|------|------------|-----------|
+| Unitários | pytest | Core modules (downloader, processor, persistence) |
+| Integração | pytest + TestClient | API endpoints |
+| E2E | Playwright (já instalado) | Frontend + API + Pipeline completo |
+| Dados reais | Script custom | Validação numérica vs. esperado |
+
+Critérios de Sucesso:
+- Pipeline roda sem erros com dados reais do NOAA
+- API responde < 500ms para consultas simples
+- Frontend carrega mapa e dados em < 3s
+- SQLite armazena e recupera corretamente
+- CSVs gerados válidos e completos
+
+================================================================================
+10. DEPLOY: DOCKER COMPOSE + SYSTEMD
+================================================================================
+
+Docker Compose:
+- Container Python (FastAPI + Pipeline)
+- Volumes para data/, maps/, sqlite/
+- Health checks
+- Restart policies
+
+Systemd:
+- Service para API (gunicorn/uvicorn workers)
+- Service para Scheduler (APScheduler)
+- Timer para execução periódica (alternativa ao APScheduler)
+- Logs via journald
+
+================================================================================
+FIM DO PLANEJAMENTO
+================================================================================

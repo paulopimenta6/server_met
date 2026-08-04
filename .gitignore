@@ -8,12 +8,18 @@ __pycache__/
 venv/
 envs/
 
-# Runtime data (GRIBs, mapas, matrizes, banco SQLite, tmp)
+# Runtime data (GRIBs, maps, SQLite, CSVs, generated PNGs)
 data/
+maps/
+*.db
+*.sqlite
+*.sqlite3
 
 # Local config / secrets
 .env
 *.env
+.env.local
+.env.*.local
 
 # wget log residuais
 wget-log
@@ -25,3 +31,26 @@ wget-log.*
 *.swp
 .DS_Store
 .Rhistory
+
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Distribution / packaging
+dist/
+build/
+*.whl
+*.tar.gz
+
+# IDE specific
+*.sublime-project
+*.sublime-workspace

@@ -1,0 +1,25 @@
+[Unit]
+Description=Server MET v2.0 Pipeline (Download + Process)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+User=paulo
+Group=paulo
+WorkingDirectory=/home/paulo/Documentos/meus_codigos/server_met
+EnvironmentFile=/home/paulo/Documentos/meus_codigos/server_met/.env
+ExecStart=/home/paulo/envs/met/bin/python scripts/run_pipeline.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=server-met-pipeline
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/paulo/Documentos/meus_codigos/server_met/data /home/paulo/Documentos/meus_codigos/server_met/maps
+
+[Install]
+WantedBy=multi-user.target

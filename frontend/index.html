@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server MET v2.0 - Dados Meteorológicos e de Poluição</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <h1>🌤️ Server MET v2.0</h1>
+        <p class="subtitle">Visualização de Dados Meteorológicos e de Poluição Atmosférica</p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="panel">
+                <h3>🎛️ Controles</h3>
+                
+                <div class="form-group">
+                    <label for="variableSelect">Variável</label>
+                    <select id="variableSelect" class="form-control"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="levelSelect">Nível (hPa/m)</label>
+                    <select id="levelSelect" class="form-control"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regionSelect">Região</label>
+                    <select id="regionSelect" class="form-control"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateSelect">Data</label>
+                    <select id="dateSelect" class="form-control"></select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="analysisSelect">Análise (UTC)</label>
+                    <select id="analysisSelect" class="form-control">
+                        <option value="00">00Z</option>
+                        <option value="06">06Z</option>
+                        <option value="12">12Z</option>
+                        <option value="18">18Z</option>
+                    </select>
+                </div>
+                
+                <button id="loadBtn" class="btn btn-primary btn-block">Carregar Dados</button>
+                <button id="exportBtn" class="btn btn-secondary btn-block" disabled>Exportar CSV</button>
+                
+                <div id="statsPanel" class="stats-panel hidden">
+                    <h4>📊 Estatísticas</h4>
+                    <div class="stat-row"><span>Mín:</span><strong id="statMin">-</strong></div>
+                    <div class="stat-row"><span>Máx:</span><strong id="statMax">-</strong></div>
+                    <div class="stat-row"><span>Média:</span><strong id="statMean">-</strong></div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>📈 Série Temporal</h3>
+                <canvas id="timeSeriesChart" height="200"></canvas>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="map" class="map-container"></div>
+            <div id="loading" class="loading hidden">Carregando...</div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>Server MET v2.0 | Dados: NOAA GFS | <a href="/docs" target="_blank">API Docs</a></p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

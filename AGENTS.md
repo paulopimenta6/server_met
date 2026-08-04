@@ -1,92 +1,73 @@
-# AGENTS.md
+# Server MET v2.0 - Agent Instructions
 
-Servidor meteorológico **FastAPI v4.4.1** (API REST + interface web) com pipeline modular: **captação** (NOAA GFS GRIB2 + METAR, scheduler contínuo), **tratamento** (pygrib/numpy), **análise** (estatística, perfis, séries com statsmodels, dashboard OLS/HC3), **persistência** (SQLite WAL, dupla persistência CSV + `grid_data` + tabela `statistics`) e **distribuição** (mapas PNG, GIFs, matrizes CSV, BlueSky). Pacote: `server_MET`, entrypoint `server_MET.api.app:app` (uvicorn, porta 8000).
+## Project Overview
+Meteorological & pollution data server: downloads GRIB from NOAA GFS, processes variables, stores in SQLite+CSV, serves via FastAPI REST + Leaflet frontend.
 
-## README.md
-
-`README.md` é a fonte única de documentação (v4.4.1, em português — linguagem simples + referência técnica no apêndice). Se mudar comportamento, atualize-o.
-
-## Comandos
-
+## Quick Start
 ```bash
-~/envs/met/bin/python -m pytest tests/ -v   # venv do projeto; 135 testes, offline
-./scripts/run.sh server          # uvicorn server_MET.api.app:app --port 8000 (scheduler incluso)
-./scripts/run.sh download [YYYYMMDD] [HH] [0p25|0p50|1p00]   # GFS download
-./scripts/run.sh analysis [YYYYMMDD]   # exemplo de análise (SP)
-./scripts/run.sh db-status       # tabelas/contagens do SQLite
-./scripts/run.sh scheduler       # uma verificação de ciclo GFS (worker avulso)
-./scripts/run.sh scheduler-status
-./scripts/run.sh clean [days]    # remove dados antigos (default 2)
+cd /home/paulo/Documentos/meus_codigos/server_met
+source ~/envs/met/bin/activate
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-O venv é `~/envs/met` (inclui pandas, statsmodels, Pillow, Cartopy). Sem toolchain de lint/typecheck configurado (ruff/black em `pyproject.toml` apenas); não invente comandos de lint.
+## Key Commands
+| Task | Command |
+|------|---------|
+| Run API (dev) | `uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload` |
+| Run pipeline | `PYTHONPATH=. python scripts/run_pipeline.py` |
+| Run scheduler | `PYTHONPATH=. python scripts/schedule.py` |
+| Validate | `PYTHONPATH=. python scripts/validate_pipeline.py` |
+| Docker | `docker-compose up -d` |
+| Systemd install | `sudo ./deploy/install_systemd.sh` |
 
-## Arquitetura (camadas)
-
+## Architecture
 ```
-server_MET/
-├── core/            # Settings (path.conf), constants (VAR_MAP, VAR_LABELS_PT, níveis, horas),
-│                    #   models Pydantic, logging_conf
-├── acquisition/     # [captação] grib_downloader (wget + registro), grib_reader (pygrib),
-│                    #   metar_client (aviationweather + parser), scheduler (contínuo + pipeline)
-├── processing/      # [tratamento] processor (seleção, unidades, níveis, extração),
-│                    #   wind (cálculos centralizados), regions (estados + cidades + países)
-├── analysis/        # [análise] statistics, profiles, timeseries (statsmodels OLS), charts, summary, dashboard
-├── persistence/     # [persistência] database (sqlite3 WAL), schemas, repositories (+ ingest_state)
-├── output/          # [resultados] maps (Cartopy/Basemap), animation (GIF/Pillow),
-│                    #   matrices (+ BlueSky), base
-├── api/             # [servidor] app.py (lifespan) + routers/
-│   └── routers/     # health, catalog, gribs, maps, matrices, analysis, metar, files, history, scheduler
-└── METAR/           # parser PythonMETAR vendado (import from server_MET.METAR)
+core/           # Business logic (config, variables, persistence, regions, downloader, grib_reader, processor)
+api/            # FastAPI app + routes (health, data, maps)
+frontend/       # Static files served by FastAPI (index.html, app.js, style.css)
+scripts/        # Automation (run_pipeline, schedule, validate_pipeline, test_e2e)
+data/           # Runtime: grib/, sqlite/, csv/ (gitignored)
+maps/           # Generated PNGs (gitignored)
+deploy/         # systemd services + Docker
+legacy/         # Original shell scripts & classes_MET/ (reference only)
 ```
 
-## Regiões (v4)
+## Environment
+- Python venv: `~/envs/met/bin/activate` (required)
+- Config: `.env` (copy from `.env.example`)
+- Paths: `environment/path.conf` → points to `data/grib`, `maps`, `data/csv`
 
-- `REGIOES_PREDEFINIDAS` = **estados** com bboxes precisas.
-- `PAISES_AMERICA_DO_SUL` = **12 países** (BR, AR, BO, CL, CO, EC, GY, PY, PEU, SR, UY, VE) com bboxes precisas.
-- `CIDADES_PREDEFINIDAS` = chaves `SP-CIDADE`... (centro da capital ±0.5°, via `CIDADE_RAIO_GRAUS`).
-- `Region` tem `kind` (estado/cidade/pais/visao_geral/bbox/centro) e `full_name` — usado em títulos e nomes de arquivo.
-- `todas_as_regioes()` e `cidades_predefinidas()` auxiliam pipeline e catálogo. `REGIOES_ICAO` → `AERODROMOS` mapeia região → aeródromo.
+## Variables (20 total)
+**Meteorological (12):** ps, prnm, temp, temps, nuvem, chuvaNaoConvec, chuvaConvec, umidadeRel, u, v, uSupe, vSupe
+**Pollution (8):** o3 (confirmed in GFS), no2, so2, co, pm25, pm10, aod, dust (experimental)
+
+## Regions (18)
+Original: SP, RJ, AM, DF, PR, RS, MG, PA, PE, CE, SA
+New: FOR, REC, SSA, BEL, BH, CWB, POA
+
+## API Endpoints (prefix `/api/v1`)
+- `GET /health` - health check
+- `GET /data/variables` - list all variables
+- `GET /data/regions` - list all regions
+- `GET /data/available` - available data summary
+- `GET /data/` - query with filters (?variable=&level=&region=&date=&analysis=&limit=)
+- `GET /data/latest` - latest record
+- `GET /data/stats` - statistics
+- `GET /data/levels/{var}` - available levels
+- `GET /data/export/csv` - export CSV
+- `GET /maps/{var}/{region}` - PNG map
+- `GET /maps/geojson/{var}/{region}` - GeoJSON
+
+## Testing
+```bash
+PYTHONPATH=. pytest tests/ -v          # unit tests
+PYTHONPATH=. pytest scripts/test_e2e.py -v  # E2E (needs API running)
+PYTHONPATH=. python scripts/validate_pipeline.py  # full validation
+```
 
 ## Gotchas
-
-- `Settings` (server_MET/core/config.py) é singleton lendo `environment/path.conf` (`chave=valor`); caminhos relativos a `PROJECT_ROOT`. **Nunca hardcode `data/...`** — use `Settings`. `ensure_dirs()` roda no lifespan. Chaves: `scheduler_enabled`, `scheduler_grib_interval_min`, `scheduler_metar_interval_min`, `scheduler_auto_pipeline`, `scheduler_auto_statistics`, `scheduler_resolution` (default `0p25`), `forecast_hours` (CSV `00,06,12,18`), `pipeline_levels` (CSV `850,500,200`).
-- Diretórios de dados: `data/gribs`, `data/mapasGrib`, `data/matrizGrib/{bluesky}`, `data/analise`, `data/tmp`. Banco: `data/met_server.db`.
-- GRIBs: `data/gribs/YYYYMMDD/HH/gfs.t{HH}z.pgrb2.{0p25|0p50|1p00}.f0{FF}`. Download usa `wget` via subprocess (obrigatório; `check_url_exists` falha silenciosamente sem ele). **Download atômico**: wget grava em `<arquivo>.part` e `download_file` só renomeia para o nome final após sucesso — download interrompido nunca deixa arquivo parcial com nome válido.
-- **Validação GRIB obrigatória em subprocesso** (`GribDownloader.validate_grib`, `GribReader.is_healthy`/`filter_healthy`): pygrib/eccodes travam em loop infinito em arquivo corrompido — try/except no mesmo processo não funciona. A checagem percorre **todas** as mensagens (`for _ in g`), detectando truncamentos no final que passariam lendo só um campo.
-- **`extract_data` (v4)**: `_normalize_lat` inverte DADOS e latitude juntos (S→N). Não altere só a latitude.
-- `VAR_MAP` em `server_MET/core/constants.py` (não em processor). Inclui superfície/próximas da superfície (2m/10m/100m, CAPE, CIN, helicidade, rajada, neve, precipitação), **poluição** (`ozonio` por nível, `ozonioTot` coluna) e **níveis médios/altos** (`gh`, `omega`, `vortabs` — `isobaricInhPa`). `VAR_FIXED_LEVEL` fixa nível (2/10/100m). `wind`/`winds` calculados (u/v) — **não** estão no VAR_MAP.
-- Níveis de pressão: clamp 1–1000 hPa com snap para `PRESSURE_LEVELS` (GFS 0.25°). Variáveis de superfície esperam `level=None`. `GribReader.available_levels()` descobre níveis via subprocesso.
-- `load_gribs` retorna `pygrib.open` (nível arquivo), sem `.dataDate`/`.forecastTime` — use mensagens de `select_variable_from_gribs` para metadados. Feche com `close_gribs()`.
-- `Region.name` preserva nome predefinido; `Region.full_name` para exibição. Arquivos usam slug de `full_name`.
-- Vento só em `WindProcessor`. Unidades só em `DataProcessor.convert_units`.
-- Repos em `persistence/repositories.py` (SQL parametrizado, nunca f-string). Conexão única `check_same_thread=False` + RLock; WAL. `get_database()` cria schema; `set_database()` para testes. `SCHEMA_VERSION = 3`.
-- Análises cacheadas em `analysis_results` com `"**cached**": true`. Limpar registros para forçar recálculo.
-- **Persistência dupla**: `MatrixGenerator` salva CSV + pontos em `grid_data`. Consulta via `GET /matrices/data`.
-- **Dashboard/estatísticas**: `DashboardAnalyzer` → cards/hora + OLS (HC3, IC95, R², p-valor, Jarque-Bera) + perfil. Grava em tabela `statistics` + CSV em `data/analise`. API: `POST /analysis/dashboard` (computa+cache), `GET /analysis/dashboard` (cache), `GET /analysis/statistics` (tabela). Pipeline popula auto (`scheduler_auto_statistics`, `PIPELINE_STATS_VARS`).
-- **Ciclos reais**: `GribReader.latest_available_cycle()`/`available_cycles()` lêem do disco. `GET /catalog/cycles` alimenta seletores — nunca inventar horas; vêm de `msg.forecastTime`/`msg.dataDate`.
-- **Scheduler** (`acquisition/scheduler.py`): `SchedulerRunner` no lifespan (asyncio); `get_scheduler_runner()` singleton. `latest_published_cycle()` = agora − 5h (atraso NOMADS). Baixa resolução `scheduler_resolution` (default `0p25`). **Ciclo só marcado processado quando TODAS as `forecast_hours` existem e saudáveis** (`_cycle_has_complete_forecast`); parcial → re-verifica. Pipeline: `PIPELINE_VARS` = `MAIN_VARIABLES` + `winds`; `PIPELINE_LEVELED_VARS` = `temp,umidadeRel,ozonio` expandidas nos `pipeline_levels` (850,500,200). Mapas+matrizes para **todas regiões** (`todas_as_regioes()` exceto SA). Summary/timeseries sob demanda. `_run_pipeline`/`_run_statistics` compartilham `DataProcessor` (validação 1x/ciclo). Regiões restringíveis por `scheduler_auto_pipeline`. Estado em `ingest_state.processed_cycles` (JSON).
-- **Startup imediato**: scheduler dispara verificação GRIB+METAR no lifespan
-  **antes** de aceitar requests. `initial_acquisition()` é **bloqueante**:
-  garante GRIBs do ciclo publicado **completo e saudável** (todas as horas
-  `forecast_hours` 00/06/12/18 validadas por `_cycle_has_complete_forecast`) e
-  METARs no disco antes de servir — valida rápido arquivos existentes, baixa
-  só o que falta; se o ciclo publicado estiver incompleto tenta o anterior, e
-  se nenhum estiver completo o servidor inicia mesmo assim (summary vazio) com
-  a captação contínua completando em segundo plano via `start()`.
-- Animação GIF: `AnimationGenerator` usa `MapGenerator` + Pillow (`_compose_gif`). Kind `"gif"`. `.gif` → `image/gif` em `files.py`.
-- METAR: API JSON `https://aviationweather.gov/api/data/metar?ids={icao}&format=json&hours=2`. Parser offline vendado. `MetarClient` extrai **todos** campos (runway, recent, trend, qfe, pressure_tendency, max/min_temp, precipitation, sunshine, snow_depth, present_weather, cloud_type/base/amount, wind_shear, icing, turbulence, remarks, metar_type, corrected) + derivados (vento km/h, direção cardinal, umidade, QNH inHg).
-- API: `POST /gribs/download` usa **query params**, retorna `task_id`; `GET /gribs/download/{task_id}` persiste. `POST /maps/generate`, `/maps/animate`, `/matrices/generate`, `/analysis/charts` retornam JSON com caminhos `data/tmp/<uuid>`. Frontend converte para `/files/tmp/<rel>` (regex `/tmp/(.+)$`). `/maps/generate` e `/matrices/generate` respeitam `request.forecast`.
-- Servir arquivos: `GET /files/{kind}/{path}` com `safe_join` (anti path-traversal). Kinds: `mapas`, `matrizes`, `bluesky`, `analise`, `tmp`.
-- Mapas: matplotlib Agg + Cartopy (primário); Basemap fallback. Feições degradam offline. `HAS_MAP_BACKEND` em `output/maps.py`.
-- Testes: httpx `ASGITransport`; `conftest` isola SQLite + **todos `Settings.dir_*`** em `tmp_path` por teste (`set_database` + monkeypatch) e limpa `dependencies._services`. Rede tolera status variáveis. Scheduler usa `FakeDownloader`.
-- Dockerfile: `wget` + `libgfortran5` + `libgomp1` (pygrib prebuilt). docker-compose monta volumes dados + banco + `environment/`.
-
-## Não versionar
-
-`data/` inteiro gitignored (GRIBs, saídas, banco `met_server.db`). Artefatos legados deletados na v3 — não recriar.
-
-## Misc
-
-- Docs/strings para usuário em português.
-- opencode MCP servers (context7, github) em `opencode.json` — reinicie opencode após alterar.
+- **Always set `PYTHONPATH=.`** when running scripts (imports use absolute `core.*`, `api.*`)
+- NOAA GFS HTTPS returns 403; FTP also blocked. Use test GRIBs or mock for dev.
+- Scheduler runs at 00:30, 06:30, 12:30, 18:30 (America/Sao_Paulo)
+- Frontend served at `/` via FastAPI StaticFiles mount
+- Legacy code in `classes_MET/`, `bash/`, `goGribV2.sh` - reference only, not used
