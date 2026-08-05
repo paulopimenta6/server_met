@@ -1,27 +1,99 @@
 # 🌤️ Server MET v2.0
 
-> Servidor de dados **meteorológicos** e de **poluição atmosférica**.
-> Baixa dados reais de **GFS (NOAA)** e **METAR (AviationWeather)**, processa as variáveis,
-> gera **mapas PNG**, armazena tudo em **SQLite + CSV** e disponibiliza via **API REST (FastAPI)**
-> com um **frontend web** simples e um **dashboard estatístico**.
+> Servidor de dados **meteorológicos** e de **poluição atmosférica** com dados reais.
+> Baixa previsões do **GFS (NOAA)**, boletins **METAR** ao vivo, gera **mapas PNG**,
+> armazena tudo em **SQLite + CSV** e serve via **API REST (FastAPI)** com um **dashboard web**.
+
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white&style=flat-square">
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-0.110+-009688?logo=fastapi&logoColor=white&style=flat-square">
+  <img alt="GFS" src="https://img.shields.io/badge/GFS-NOAA-blue?style=flat-square">
+  <img alt="SQLite" src="https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white&style=flat-square">
+  <img alt="METAR" src="https://img.shields.io/badge/METAR-AviationWeather-yellowgreen?style=flat-square">
+  <br>
+  <img alt="Visitas" src="https://visitor-badge.laobi.icu/badge?page_id=paulopimenta6.server_met">
+</p>
 
 ---
 
-## 📋 Sumário
+## 📖 Sumário
 
-1. [Funcionalidades](#-funcionalidades)
-2. [Arquitetura](#-arquitetura)
-3. [Pré-requisitos](#-pré-requisitos)
-4. [Instalação](#-instalação)
-5. [Configuração (.env)](#-configuração-env)
-6. [Como usar](#-como-usar)
-7. [Endpoints da API](#-endpoints-da-api)
-8. [Variáveis (21)](#-variáveis-21)
-9. [Regiões (18)](#-regiões-18)
-10. [Frontend](#-frontend)
-11. [Testes e validação](#-testes-e-validação)
-12. [Solução de problemas](#-solução-de-problemas)
-13. [Estrutura do projeto](#-estrutura-do-projeto)
+1. [O que é o Server MET?](#-o-que-é-o-server-met)
+2. [Como o sistema funciona](#-como-o-sistema-funciona)
+3. [Funcionalidades](#-funcionalidades)
+4. [Pré-requisitos](#-pré-requisitos)
+5. [Tutorial passo a passo](#-tutorial-passo-a-passo-primeira-vez)
+6. [Configuração (.env)](#-configuração-env)
+7. [O pipeline em detalhes](#-o-pipeline-em-detalhes)
+8. [Entendendo os dados](#-entendendo-os-dados)
+9. [Onde os dados ficam armazenados](#-onde-os-dados-ficam-armazenados)
+10. [A API REST](#-a-api-rest)
+11. [O frontend e o dashboard](#-o-frontend-e-o-dashboard)
+12. [Docker (opcional)](#-docker-opcional)
+13. [Testes e validação](#-testes-e-validação)
+14. [Estrutura do projeto](#-estrutura-do-projeto)
+15. [Solução de problemas](#-solução-de-problemas)
+16. [Dúvidas frequentes (FAQ)](#-dúvidas-frequentes-faq)
+
+---
+
+## 🌍 O que é o Server MET?
+
+O Server MET é um **servidor completo de dados meteorológicos e de poluição do ar**.
+Ele faz sozinho (quase) todo o trabalho:
+
+1. **Baixa previsões reais** do modelo GFS da NOAA (dados de temperatura, umidade, vento, ozônio...)
+   já recortadas por região e variável;
+2. **Busca boletins METAR ao vivo** das principais estações brasileiras (condições atuais de aeroportos);
+3. **Processa** esses dados em estatísticas (mínimo, máximo, média);
+4. **Gera mapas PNG** com a distribuição espacial de cada variável;
+5. **Salva tudo** em um banco SQLite (e exporta em CSV);
+6. **Entrega** os dados e mapas por meio de uma **API REST** e um **frontend** com dashboard.
+
+> 💡 **Em uma frase:** digite um comando, e o Server MET baixa previsões do tempo reais,
+> gera mapas do Brasil e deixa tudo pronto para consultar na web ou via API.
+
+---
+
+## 🧭 Como o sistema funciona
+
+O sistema é organizado em **4 etapas**: *ingestão → processamento → armazenamento → exposição*.
+
+```mermaid
+flowchart LR
+    subgraph Ingestão
+        A[NOAA GFS<br/>endpoint filter] -->|GRIB por região/variável| B[(data/grib)]
+        C[AviationWeather<br/>API METAR] -->|boletins ao vivo| D[(data/metar)]
+    end
+
+    subgraph Processamento
+        B --> E[core/processor<br/>extrai variáveis e estatísticas]
+        D --> F[core/metar<br/>decodifica boletins]
+    end
+
+    subgraph Armazenamento
+        E --> G[(SQLite met_data.db)]
+        E --> H[data/csv]
+        E --> I[maps/*.png]
+        F --> G
+    end
+
+    subgraph Exposição
+        G --> J[FastAPI api/main.py]
+        H --> J
+        I --> J
+        J --> K[Frontend + Dashboard<br/>http://localhost:8000]
+    end
+```
+
+### Passo a passo, em palavras simples
+
+| Etapa | O que acontece | Onde |
+|-------|----------------|------|
+| ① **Ingestão** | O `downloader` pede à NOAA apenas a variável, o nível e a região que você quer (arquivos GRIB pequenos, ~1 MB). Em paralelo, o `metar` consulta os boletins ao vivo. | `core/downloader.py`, `core/metar.py` |
+| ② **Processamento** | O `processor` lê cada GRIB, recorta a região, calcula mínimo/máximo/média e monta a matriz de valores. | `core/grib_reader.py`, `core/processor.py` |
+| ③ **Armazenamento** | A `persistence` grava os resultados no SQLite e exporta CSV. O `maps` gera o PNG da região. | `core/persistence.py`, `core/maps.py` |
+| ④ **Exposição** | A API FastAPI serve consultas, estatísticas, CSVs e mapas. O frontend consome a API e mostra o dashboard. | `api/main.py`, `frontend/` |
 
 ---
 
@@ -29,274 +101,307 @@
 
 | Funcionalidade | Descrição |
 |----------------|-----------|
-| 📥 **Ingestão de dados reais** | GRIB do GFS (endpoint *filter* da NOAA, por variável/região) + METAR ao vivo |
-| ⚙️ **Processamento** | Extrai variáveis meteorológicas e de poluição por região e nível |
-| 🗺️ **Mapas PNG** | Geração automática de mapas com matplotlib + Basemap |
-| 💾 **Persistência** | SQLite (consultas) + CSV (exportação) + snapshots JSON de METAR |
+| 📥 **Ingestão de dados reais** | GFS (NOAA) por variável/região + METAR ao vivo |
+| 🗺️ **Mapas PNG** | Mapas do Brasil com a distribuição espacial de cada variável |
+| 🧮 **Estatísticas** | Mínimo, máximo e média por variável/região/nível |
+| 💾 **Persistência** | SQLite para consultas + CSV para exportação + snapshots JSON de METAR |
 | 🔌 **API REST** | FastAPI com documentação interativa automática em `/docs` |
-| 📊 **Dashboard** | Frontend simples com estatísticas agregadas por variável/região |
-| ⚙️ **Orquestração** | Shell scripts prontos para pipeline, servidor e validação |
+| 📊 **Dashboard web** | Frontend simples com cartões, mapas, METAR e exportação CSV |
+| ⚙️ **Orquestração** | Scripts prontos: pipeline, servidor e validação (e Docker opcional) |
 
-**Stack:** Python · SQLite · Shell Script · FastAPI · matplotlib · pygrib
-
----
-
-## 🏗️ Arquitetura
-
-```
-server_met/
-├── core/                 # Lógica de negócio (módulos puros)
-│   ├── config.py         #   Caminhos, regiões, níveis e URLs
-│   ├── variables.py      #   Registro das 21 variáveis (meteo + poluição)
-│   ├── regions.py        #   Classes auxiliares das 18 regiões
-│   ├── persistence.py    #   Camada SQLite + CSV (dados e METAR)
-│   ├── downloader.py     #   Download GFS (endpoint filter da NOAA)
-│   ├── grib_reader.py    #   Leitor de arquivos GRIB (pygrib)
-│   ├── processor.py      #   Extração de variáveis + estatísticas
-│   ├── maps.py           #   Geração de mapas PNG
-│   └── metar.py          #   Busca/decodificação de METAR ao vivo
-├── api/                  # Aplicação FastAPI
-│   ├── main.py           #   App, rotas e montagem do frontend
-│   ├── schemas.py        #   Modelos Pydantic (contratos da API)
-│   └── routes/           #   health · data · maps · metar
-├── frontend/             # Interface web estática (index.html, style.css, app.js)
-├── scripts/              # Automação (Python + shell)
-│   ├── process_data.py   #   Pipeline GFS + METAR (configurável)
-│   ├── pipeline.sh       #   Wrapper shell do pipeline
-│   ├── server.sh         #   start / stop / restart / status
-│   └── validate.sh       #   Validação E2E com dados reais
-├── tests/                # Testes end-to-end (test_e2e.py)
-├── data/                 # Runtime (ignorado pelo Git): grib/ sqlite/ csv/ metar/
-├── maps/                 # Mapas PNG gerados (ignorado pelo Git)
-└── README.md
-```
-
-### Fluxo dos dados
-
-```
- NOOA GFS (filter)      ──► core/downloader ──►  data/grib/*.grb2
- AviationWeather        ──► core/metar    ──►  data/metar/*.json
-                                        │
-     core/processor   (extrai variáveis + calcula estatísticas)
-                                        │
-     core/persistence (grava em SQLite  + exporta CSV)
-                                        │
-     core/maps        (gera PNG em maps/)
-                                        │
-                    FastAPI (api/main.py)
-                                        │
-              Frontend + Dashboard  ◄───┘   (http://localhost:8000)
-```
+**Stack:** Python · FastAPI · SQLite · matplotlib + Basemap · pygrib · Shell Script
 
 ---
 
 ## 🔧 Pré-requisitos
 
-- **Python 3.11+**
-- **SQLite** (já embutido no Python)
-- Acesso à **internet** (a ingestão baixa dados reais da NOAA)
-- Dependências do sistema para `pygrib` (eccodes) e `Basemap` (proj/geos):
-  ```bash
-  sudo apt-get install -y gcc g++ libeccodes-dev libproj-dev libgeos-dev libsqlite3-dev curl
-  ```
+- **Python 3.11+** e `pip`
+- **Internet** — a ingestão baixa dados reais da NOAA e da AviationWeather
+- **SQLite** — já embutido no Python, não precisa instalar nada
+
+Instale as bibliotecas de sistema necessárias para o `pygrib` (eccodes) e o `Basemap` (proj/geos):
+
+```bash
+sudo apt-get install -y gcc g++ libeccodes-dev libproj-dev libgeos-dev libsqlite3-dev curl
+```
+
+> 🐧 Se você usa Windows ou macOS, o caminho é usar o **Docker** (veja a seção [Docker](#-docker-opcional)).
 
 ---
 
-## 📦 Instalação
+## 🚀 Tutorial passo a passo (primeira vez)
+
+Siga na ordem. No fim você terá um servidor rodando com dados reais.
+
+### Passo 1 — Crie e ative o ambiente virtual
 
 ```bash
-# 1. Criar e ativar o ambiente virtual (exemplo com o venv deste projeto)
 python -m venv ~/envs/met
 source ~/envs/met/bin/activate
+```
 
-# 2. Instalar dependências
+### Passo 2 — Instale as dependências
+
+```bash
 pip install -r requirements.txt
+```
 
-# 3. Preparar configuração
-cp .env.example .env       # ajuste os valores se necessário
+### Passo 3 — Prepare a configuração
 
-# 4. Verificar que os principais módulos importam
-source ~/envs/met/bin/activate
+```bash
+cp .env.example .env
+```
+
+O arquivo `.env` já vem com valores padrão sensatos — você só precisa editá-lo se quiser mudar portas, URLs ou o banco.
+
+### Passo 4 — Verifique se tudo importa
+
+```bash
 PYTHONPATH=. python -c "import api.main, core.maps, core.metar, core.persistence; print('OK')"
+```
+
+> ⚠️ **Importante:** os scripts usam imports absolutos (`core.*`, `api.*`).
+> **Sempre** rode com `PYTHONPATH=.` no comando.
+
+### Passo 5 — Rode o pipeline (dados reais)
+
+A primeira vez, use um escopo **pequeno** para não bombardear a NOAA:
+
+```bash
+PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --forecast 00 --regions SP RJ
+```
+
+Esse comando baixa o ciclo das 00Z de 04/08/2026 para SP e RJ, processa as variáveis padrão,
+gera os mapas e ainda busca os METAR ao vivo.
+
+> 💡 Quando quiser rodar tudo (todas as análises e previsões), use o atalho:
+>
+> ```bash
+> bash scripts/pipeline.sh
+> ```
+>
+> ⚠️ Atenção: o escopo padrão é grande (4 análises × 4 previsões × variáveis × regiões = **centenas** de downloads).
+
+### Passo 6 — Suba o servidor
+
+```bash
+bash scripts/server.sh start        # ou: stop | restart | status
+```
+
+Ou, em modo de desenvolvimento (com reload automático):
+
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Passo 7 — Explore!
+
+Abra no navegador:
+
+| O quê | Endereço |
+|-------|----------|
+| 🖥️ **Frontend + Dashboard** | <http://localhost:8000/> |
+| 📘 **Documentação da API (Swagger)** | <http://localhost:8000/docs> |
+| 📑 **Documentação alternativa (ReDoc)** | <http://localhost:8000/redoc> |
+
+Teste a API pelo terminal:
+
+```bash
+curl -s http://localhost:8000/health
+curl -s "http://localhost:8000/api/v1/data/?variable=temp&level=1000&region=SP"
 ```
 
 ---
 
 ## ⚙️ Configuração (.env)
 
-Copie `.env.example` para `.env`. As variáveis têm valores padrão sensatos em `core/config.py`,
+Copie `.env.example` para `.env`. Todas as variáveis têm padrões sensatos em `core/config.py`,
 então o `.env` só é necessário para personalizar:
 
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
-| `NOAA_BASE_URL` | `https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.` | Base do GFS completo |
-| `NOAA_FILTER_URL` | `https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl` | Endpoint filter (subconjuntos) |
-| `NOAA_FTP_URL` | `ftp://ftp.ncep.noaa.gov/.../gfs.` | Alternativa FTP |
-| `AVIATION_WEATHER_URL` | `https://aviationweather.gov/api/data/metar` | Fonte dos METAR |
+| `NOAA_BASE_URL` | `https://nomads.ncep.noaa.gov/...` | Base do GFS completo |
+| `NOAA_FILTER_URL` | `https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl` | Endpoint filter (subconjuntos por região) |
+| `NOAA_FTP_URL` | `ftp://ftp.ncep.noaa.gov/...` | Alternativa FTP |
+| `AVIATION_WEATHER_URL` | `https://aviationweather.gov/api/data/metar` | Fonte dos boletins METAR |
+| `SQLITE_DB_PATH` | `data/sqlite/met_data.db` | Caminho do banco |
 | `API_HOST` | `0.0.0.0` | Endereço do servidor |
 | `API_PORT` | `8000` | Porta do servidor |
 | `API_WORKERS` | `4` | Workers do uvicorn |
 | `LOG_LEVEL` | `INFO` | Nível de log |
 
-> **Importante:** todos os caminhos de arquivos são calculados em `core/config.py` a partir do
-> diretório do projeto (`BASE_DIR`) — não há caminhos absolutos codificados.
+> 📌 Todos os caminhos de arquivo são calculados a partir de `core/config.py` (`BASE_DIR`),
+> sem caminhos absolutos codificados. O próprio `core/config.py` cria os diretórios ao ser importado.
 
 ---
 
-## 🚀 Como usar
+## 🗺️ O pipeline em detalhes
 
-### 1. Ingestão de dados (pipeline)
-
-```bash
-# Pipeline completo: baixa GFS real + METAR real, gera mapas e povoa o SQLite
-bash scripts/pipeline.sh
-```
-
-Para controlar data, ciclo (análise) e regiões:
+O pipeline (`scripts/process_data.py`) executa: **download → processamento → SQLite → mapas → METAR**.
 
 ```bash
-PYTHONPATH=. python scripts/process_data.py \
-    --date 20260804 --analysis 00 --regions SP RJ PR
+PYTHONPATH=. python scripts/process_data.py [opções]
 ```
-
-**Argumentos do pipeline:**
 
 | Flag | Padrão | Descrição |
 |------|--------|-----------|
-| `--date` | última disponível | Data no formato `YYYYMMDD` |
-| `--analysis` | detecta recente | Ciclo sinótico `00`, `06`, `12`, `18` |
-| `--regions` | `SP RJ PR RS MG AM` | Códigos de região |
-| `--all-variables` | — | Processa **todas** as 21 variáveis de `core/variables.py` (as que não existem no GFS são ignoradas com erro registrado) |
-| `--skip-metar` | — | Não busca METAR |
+| `--date YYYYMMDD` | hoje, depois ontem | Data do ciclo GFS |
+| `--analysis 00 06` | todas (00 06 12 18) | Ciclos sinóticos (aceita vários) |
+| `--forecast 00 06` | todas (f000–f018) | Horas de previsão (aceita vários) |
+| `--regions SP RJ` | `SP RJ PR RS MG AM` | Regiões (18 disponíveis) |
+| `--all-variables` | desligado | Processa as 21 variáveis (as ausentes no GFS são puladas com erro logado) |
+| `--skip-metar` | desligado | Não busca METAR |
 
-> O conjunto padrão de variáveis/ níveis processado está em `DEFAULT_VARIABLES`
-> em `scripts/process_data.py` (ex.: `temp` em 1000/850/500 hPa, `o3` em 500 hPa, `ps` superfície).
->
-> Exemplo com todas as variáveis:
->
-> ```bash
-> PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --regions SP RJ PR --all-variables
-> ```
+### Comportamento que você precisa saber
 
-### 2. Subir o servidor
+- **Escopo padrão é grande**: 4 análises × 4 previsões × variáveis × regiões. **Narrow com `--analysis` e `--forecast`**.
+- **Ciclos indisponíveis** na NOAA são detectados e pulados automaticamente (com aviso no log).
+- **Arquivos já baixados são reutilizados** (cache em `data/grib/<data>/<análise>/`) — o pipeline é idempotente.
+- Regiões desconhecidas são **silenciosamente ignoradas**.
+- Variáveis fora do produto GFS são registradas no log como **erros** (não derrubam o pipeline).
 
-```bash
-bash scripts/server.sh start      # ou: stop | restart | status
-```
-
-Também é possível rodar em modo de desenvolvimento:
-
-```bash
-uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 3. Acessar
-
-- **Frontend/Dashboard:** <http://localhost:8000/>
-- **Documentação da API (Swagger):** <http://localhost:8000/docs>
-- **Documentação alternativa (ReDoc):** <http://localhost:8000/redoc>
+> 💡 O conjunto padrão de variáveis fica em `DEFAULT_VARIABLES` no topo de `scripts/process_data.py`:
+> `temp` (1000/850/500 hPa), `umidadeRel`, `u` e `v` (850), `o3` (500), `total_o3` e `ps` (superfície).
 
 ---
 
-## 🌐 Endpoints da API
+## 📊 Entendendo os dados
 
-Base: `/api/v1` (exceto `/health` e `/docs`).
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/health` | Status do servidor e do banco |
-| GET | `/data/variables` | Catálogo das 21 variáveis |
-| GET | `/data/regions` | As 18 regiões |
-| GET | `/data/dashboard` | Resumo estatístico agregado |
-| GET | `/data/available` | Variáveis/regiões/datas disponíveis no banco |
-| GET | `/data/` | Consulta de dados (`?variable&level&region&date&analysis&limit`) |
-| GET | `/data/latest` | Registro mais recente de uma seleção |
-| GET | `/data/stats` | Estatísticas (min/max/média) de uma seleção |
-| GET | `/data/levels/{var}` | Níveis disponíveis para a variável |
-| GET | `/data/export/csv` | Exportação em CSV |
-| GET | `/maps/{var}/{region}` | Mapa PNG (opcional `?level=`, `?date=`, `?analysis=`) |
-| GET | `/maps/list/{var}/{region}` | Lista os mapas disponíveis |
-| GET | `/metar/stations` | Estações METAR |
-| GET | `/metar/{code}` | METAR mais recente + decodificação |
-| GET | `/metar/latest/all` | METAR de todas as estações |
-
-### Exemplos com `curl`
-
-```bash
-BASE=http://localhost:8000/api/v1
-
-# Status do servidor
-curl -s http://localhost:8000/health
-
-# Consultar temperatura no nível 1000 hPa na região SP
-curl -s "$BASE/data/?variable=temp&level=1000&region=SP"
-
-# Estatísticas da seleção
-curl -s "$BASE/data/stats?variable=temp&level=850&region=SP"
-
-# Exportar CSV
-curl -s "$BASE/data/export/csv?variable=temp&level=850&region=SP" -o dados.csv
-
-# Baixar o mapa PNG (data + análise)
-curl -s "$BASE/maps/temp/SP?level=850&date=20260804&analysis=00" -o mapa.png
-
-# Listar mapas disponíveis
-curl -s "$BASE/maps/list/temp/SP"
-
-# METAR mais recente de Guarulhos (SBGR)
-curl -s "$BASE/metar/SBGR"
-
-# Dashboard agregado
-curl -s "$BASE/data/dashboard"
-```
-
-> **Dica:** para variáveis de superfície (ex.: `ps`), não use o parâmetro `level` —
-> elas são gravadas com nível `0`. O frontend já gerencia isso automaticamente.
-
----
-
-## 🎯 Variáveis (21)
+### Variáveis (21 no total)
 
 **Meteorológicas (12):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `chuvaNaoConvec`,
 `chuvaConvec`, `umidadeRel`, `u`, `v`, `uSupe`, `vSupe`
 
 **Poluição (9):** `o3`, `total_o3`, `no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`
 
-> As variáveis **confirmadas no GFS pgrb2** (`ps`, `prnm`, `temp`, `temps`, `nuvem`,
-> `umidadeRel`, `u`, `v`, `uSupe`, `vSupe`, `o3`, `total_o3`) são processáveis com dados
-> reais. As demais estão registradas no catálogo (`core/variables.py`) mas **não existem**
-> no produto GFS pgrb2 0p25 (confirmado via inventário `varMET` do próprio arquivo), ficando
-> disponíveis assim que o dado existir na fonte.
+> ⚠️ **Importante:** apenas **12 variáveis existem no produto GFS pgrb2 0p25** e são as mesmas
+> conectadas ao endpoint filter da NOAA: `ps`, `prnm`, `temp`, `temps`, `nuvem`, `umidadeRel`,
+> `u`, `v`, `uSupe`, `vSupe`, `o3`, `total_o3`.
 >
-> O endpoint `/data/variables` retorna o campo `available` para cada variável; o frontend
-> exibe **apenas as disponíveis** — na categoria **Poluição**, apenas `o3` e `total_o3`.
+> Da categoria **poluição**, somente **`o3` e `total_o3`** têm dados reais. As demais
+> (`no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`) e as de chuva ficam no catálogo como
+> *experimentais* — o endpoint `/data/variables` marca isso no campo `available`, e o frontend
+> só exibe as disponíveis.
+>
+> Essa lista foi **confirmada pelo inventário `varMET`** (dump ASCII do conteúdo do arquivo GRIB,
+> na raiz do projeto). Testes garantem exatamente `{o3, total_o3}` como poluição disponível —
+> então não altere `AVAILABLE_IN_GFS` em `core/variables.py` por conta própria.
 
-Níveis isobáricos suportados: `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa.
-Níveis de altura (`uSupe`/`vSupe`): `10, 20, 30, 40, 50, 80, 100` m.
+**Níveis isobáricos suportados:** `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa
+**Níveis de altura (`uSupe`/`vSupe`):** `10, 20, 30, 40, 50, 80, 100` m
+**Superfície** (`ps`, `temps`, `total_o3`): nível `0` (sem parâmetro `level` em consultas/mapas)
 
----
-
-## 📍 Regiões (18)
+### Regiões (18)
 
 `SP, RJ, AM, DF, PR, RS, MG, PA, PE, CE, SA, FOR, REC, SSA, BEL, BH, CWB, POA`
 
-Cada região é um retângulo de coordenadas (min/max de longitude e latitude) definido
-em `core/config.py` (`REGIOES`).
+Cada região é um retângulo de coordenadas (min/max de longitude e latitude) definido em
+`core/config.py` (`REGIOES`). Inclui capitais e cidades com aeroportos.
 
 ---
 
-## 🖥️ Frontend
+## 🗃️ Onde os dados ficam armazenados
 
-O frontend é servido pela própria API em `/` e contém:
+| Caminho | Conteúdo |
+|---------|----------|
+| `data/grib/<data>/<análise>/` | Arquivos GRIB baixados da NOAA (cache) |
+| `data/sqlite/met_data.db` | Banco principal: dados processados + METAR |
+| `data/csv/` | Exportações CSV |
+| `data/metar/` | Snapshots JSON dos boletins METAR |
+| `maps/` | Mapas PNG gerados |
 
-- **Dashboard** — cartões com o total de registros, variáveis, regiões e estatísticas METAR;
+Os mapas seguem o padrão de nome:
+`GFS_<resolução>_<REGIÃO>_N<nível|SFC>_<variável>_<análise>_<data>_<previsão>.png`
+
+> ⚠️ Os códigos de variável podem conter **underscores** (`total_o3`, `umidadeRel`, `uSupe`).
+> O parser de nomes em `api/routes/maps.py` (`_FILENAME_RE`) já lida com isso.
+
+---
+
+## 🌐 A API REST
+
+A base das rotas é `/api/v1` (exceto `/health` e `/docs`, que ficam na raiz).
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/health` | Status do servidor e do banco (+ `/health/ready`) |
+| GET | `/api/v1/data/variables` | Catálogo das 21 variáveis (com campo `available`) |
+| GET | `/api/v1/data/regions` | As 18 regiões |
+| GET | `/api/v1/data/dashboard` | Resumo estatístico agregado |
+| GET | `/api/v1/data/available` | Variáveis/regiões/datas disponíveis no banco |
+| GET | `/api/v1/data/` | Consulta de dados (`?variable&level&region&date&analysis&limit`) |
+| GET | `/api/v1/data/latest` | Registro mais recente |
+| GET | `/api/v1/data/stats` | Estatísticas (mín/máx/média) |
+| GET | `/api/v1/data/levels/{var}` | Níveis disponíveis para a variável |
+| GET | `/api/v1/data/export/csv` | Exportação CSV |
+| GET | `/api/v1/maps/{var}/{region}` | Mapa PNG (`?level&date&analysis`) |
+| GET | `/api/v1/maps/list/{var}/{region}` | Lista de mapas disponíveis |
+| GET | `/api/v1/metar/stations` | Estações METAR |
+| GET | `/api/v1/metar/{code}` | Último METAR + decodificação |
+| GET | `/api/v1/metar/latest/all` | METAR de todas as estações |
+| GET | `/api/v1/info` | Metadados do app |
+
+### Exemplos com `curl`
+
+```bash
+BASE=http://localhost:8000/api/v1
+
+# Status
+curl -s http://localhost:8000/health
+
+# Temperatura em 1000 hPa na região SP
+curl -s "$BASE/data/?variable=temp&level=1000&region=SP"
+
+# Estatísticas
+curl -s "$BASE/data/stats?variable=temp&level=850&region=SP"
+
+# Exportar CSV
+curl -s "$BASE/data/export/csv?variable=temp&level=850&region=SP" -o dados.csv
+
+# Baixar mapa PNG (data + análise juntas)
+curl -s "$BASE/maps/temp/SP?level=850&date=20260804&analysis=00" -o mapa.png
+
+# Último METAR de Guarulhos (SBGR)
+curl -s "$BASE/metar/SBGR"
+
+# Dashboard agregado
+curl -s "$BASE/data/dashboard"
+```
+
+> 💡 **Dica:** para variáveis de superfície (ex.: `ps`), **não** use o parâmetro `level` —
+> elas são gravadas com nível `0`. O frontend já lida com isso automaticamente.
+
+---
+
+## 🖥️ O frontend e o dashboard
+
+O frontend é servido pela própria API em `/` e tem três áreas:
+
+- **Dashboard** — cartões com total de registros, variáveis, regiões e estatísticas METAR;
   tabelas agregadas por variável e por região.
 - **Mapa** — seleção de categoria (Meteorológicas/Poluição), variável, nível, região, data e
-  análise; carrega o mapa PNG e mostra min/max/média da seleção; botão **CSV** exporta os dados.
+  análise; carrega o mapa PNG e mostra mín/máx/média; botão **CSV** exporta os dados.
 - **METAR** — seleção de estação e visualização do boletim cru + decodificado.
 
-> Os ativos estáticos são servidos sob `/static`. O `index.html` referencia
-> `static/style.css` e `static/app.js` (não caminhos de raiz, o que evita 404).
+> ⚠️ Os ativos estáticos são servidos sob `/static`. O `index.html` referencia
+> `static/style.css` e `static/app.js` (sem `/` na frente, e **não** `style.css` puro) —
+> isso é garantido por testes, então não troque esses caminhos.
+
+---
+
+## 🐳 Docker (opcional)
+
+Você pode rodar sem instalar nada localmente:
+
+```bash
+docker compose up -d api                       # sobe a API (sempre ativa)
+docker compose --profile manual run pipeline   # roda o pipeline manualmente
+```
+
+- O serviço `api` sobe sozinho e fica de pé com healthcheck.
+- O serviço `pipeline` só roda quando você pede (via perfil `manual`).
+- `data/` e `maps/` são montados como volumes — os dados persistem entre execuções.
+- O Dockerfile instala as libs de sistema necessárias (eccodes, proj, geos) automaticamente.
 
 ---
 
@@ -310,48 +415,120 @@ PYTHONPATH=. pytest tests/test_e2e.py -v
 bash scripts/validate.sh
 ```
 
-O `validate.sh` faz, nesta ordem:
-
-1. Verifica se as dependências Python estão instaladas.
-2. Executa o pipeline com dados reais (GFS região SP + METAR).
-3. Confere que há registros no SQLite (GRIB e METAR) e que mapas PNG foram gerados.
-4. Roda a suíte de testes E2E da API.
-
----
-
-## 🛠️ Solução de problemas
-
-| Problema | Causa provável | Solução |
-|----------|----------------|---------|
-| Pip falha em `pygrib`/`basemap` | Faltam libs de sistema | `sudo apt-get install -y gcc g++ libeccodes-dev libproj-dev libgeos-dev libsqlite3-dev` |
-| `ModuleNotFoundError: core...` | `PYTHONPATH` não aponta para o projeto | Rode sempre com `PYTHONPATH=.` (ex.: `PYTHONPATH=. python scripts/process_data.py ...`) |
-| Pipeline não encontra ciclo GFS | Data/ciclo ainda indisponível na NOAA | Use `--date` de um dia anterior ou rode mais tarde; o script tenta a data atual e a anterior |
-| Mapa retorna 404 | Não há mapa gerado para var/região/nível/data | Rode o pipeline para esse conjunto; consulte `/maps/list/{var}/{region}` |
-| Dados "vazios" em variáveis de poluição | Variável ainda não existe no GRIB pgrb2 | Só `o3` está confirmada; as demais ficam no catálogo até existirem |
-| Porta 8000 em uso | Outro processo | `bash scripts/server.sh stop` ou troque `API_PORT` no `.env` |
+> ⚠️ **Os testes E2E leem o SQLite e os mapas — você precisa rodar o pipeline antes.**
+> Eles verificam `total_records > 0`, boletins METAR e PNGs. Depois de populado o banco,
+> os testes não precisam de internet.
+>
+> ⚠️ O `validate.sh` **fixa a data `20260804`** no pipeline. Quando a NOAA retirar esse ciclo
+> do ar, ele falhará. Para uma checagem independente de data, rode o pipeline + pytest diretamente.
 
 ---
 
 ## 📁 Estrutura do projeto
 
-Veja a seção [Arquitetura](#-arquitetura). Resumo dos diretórios relevantes:
-
 ```
-core/          Lógica de negócio (import absolutos core.*)
-api/           FastAPI (import absolutos api.*)
-frontend/      Interface web estática
-scripts/       Automação (process_data.py, pipeline.sh, server.sh, validate.sh)
-tests/         Testes end-to-end
+core/          Lógica de negócio (config, variáveis, regiões, download, GRIB, processamento, mapas, METAR)
+api/           FastAPI (main, schemas, rotas: health, data, maps, metar)
+frontend/      Interface web estática (index.html, app.js, style.css)
+scripts/       process_data.py + wrappers shell (pipeline.sh, server.sh, validate.sh)
+tests/         Testes end-to-end (test_e2e.py)
 data/          Runtime (grib/, sqlite/, csv/, metar/) — ignorado pelo Git
 maps/          Mapas PNG gerados — ignorado pelo Git
+varMET         Inventário GRIB (dump ASCII) — referência das variáveis disponíveis
 ```
 
 ---
 
-## 📓 Notas finais
+## 🆘 Solução de problemas
 
-- `data/` e `maps/` são ignorados pelo Git (artefatos gerados em execução).
-- Não há scheduler/systemd embutido: para agendamento use `cron` com
-  `bash scripts/pipeline.sh` (ex.: executar a cada 6h).
-- Para produção use `bash scripts/server.sh start` ou `uvicorn api.main:app`.
-- A API é somente leitura; em ambiente local não exige autenticação.
+| Problema | Causa provável | Solução |
+|----------|----------------|---------|
+| Pip falha em `pygrib`/`basemap` | Faltam libs de sistema | `sudo apt-get install -y gcc g++ libeccodes-dev libproj-dev libgeos-dev libsqlite3-dev` |
+| `ModuleNotFoundError: core...` | `PYTHONPATH` não aponta para o projeto | Rode sempre com `PYTHONPATH=.` |
+| Pipeline não encontra ciclo GFS | Data/ciclo ainda indisponível na NOAA | Use `--date` de um dia anterior ou rode mais tarde (o script tenta hoje e ontem) |
+| Pipeline demora muito | Escopo padrão grande | Use `--analysis 00` e `--forecast 00` |
+| Mapa retorna 404 | Não há mapa gerado para aquela seleção | Rode o pipeline para o conjunto; consulte `/maps/list/{var}/{region}` |
+| Dados "vazios" de poluição | Variável não existe no GRIB pgrb2 | Só `o3` e `total_o3` estão confirmadas |
+| Porta 8000 em uso | Outro processo | `bash scripts/server.sh stop` ou mude `API_PORT` no `.env` |
+| Testes E2E falham sem dados | Banco/mapas ainda não populados | Rode o pipeline antes dos testes |
+| METAR de Guarulhos aparece como "PR" | A AviationWeather devolve o estado errado | Já corrigido em `core/metar.py` (registro local `DEFAULT_STATIONS`) |
+
+---
+
+## ❓ Dúvidas frequentes (FAQ)
+
+### 1. Por que só vejo `o3` e `total_o3` na categoria Poluição?
+
+Porque são as **únicas variáveis de poluição que existem no produto GFS pgrb2 0p25**.
+Confirmei isso cruzando o catálogo com o inventário `varMET` (dump do arquivo GRIB).
+As outras (`no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`) ficam registradas no catálogo,
+marcadas como `available: false`, prontas para quando a fonte tiver o dado.
+
+### 2. O pipeline demora muito. O que posso fazer?
+
+Por padrão ele processa **4 análises × 4 previsões** para cada variável e região — centenas de
+downloads. Restrinja com `--analysis 00` e `--forecast 00`, e use poucas regiões com `--regions SP`.
+Os arquivos já baixados são reutilizados, então re-executar é mais rápido.
+
+### 3. Preciso de internet para usar a API?
+
+A **API e o frontend** não: eles leem o SQLite e os mapas já gerados. A **internet só é necessária
+na ingestão** (pipeline). Por isso os testes E2E funcionam offline após um pipeline.
+
+### 4. O que é o arquivo `varMET` na raiz?
+
+É um **dump ASCII do inventário do arquivo GRIB** — a lista de variáveis/ níveis que existem no
+produto. É a fonte de verdade usada para decidir quais variáveis marcar como `available`.
+Você não precisa abri-lo no dia a dia.
+
+### 5. Como agendo o pipeline para rodar sozinho?
+
+Não há scheduler embutido (de propósito). Use o `cron` do sistema:
+
+```bash
+0 */6 * * * bash /home/paulo/Documentos/meus_codigos/server_met/scripts/pipeline.sh
+```
+
+O exemplo acima roda a cada 6 horas (ciclos 00/06/12/18Z).
+
+### 6. Quero adicionar uma nova variável. O que preciso saber?
+
+1. Ela precisa existir no GFS pgrb2 0p25 (verifique no `varMET`);
+2. Adicione o registro em `core/variables.py` (nome GRIB, tipo de nível, conversão de unidade);
+3. Se usar o endpoint filter, mapeie o short name em `NOAA_FILTER_VARS` em `core/downloader.py`;
+4. Adicione em `AVAILABLE_IN_GFS` **somente** se o dado realmente existir — os testes E2E
+   garantem que as variáveis de poluição disponíveis sejam exatamente `{o3, total_o3}`.
+
+### 7. O mapa retorna 404. O que fazer?
+
+Significa que não há PNG para aquela combinação variável/região/nível/data/análise.
+Rode o pipeline para esse conjunto (ex.: `--date 20260804 --analysis 00 --forecast 00 --regions SP`)
+e confira em `/maps/list/{var}/{region}`.
+
+### 8. A API precisa de autenticação?
+
+Não. A API é **somente leitura** e, em ambiente local, não exige autenticação.
+Para expor em produção, coloque atrás de um proxy com `HTTPS` e controle de acesso.
+
+### 9. Por que o METAR do SBGR aparece como estado "PR"?
+
+Um erro conhecido da **AviationWeather**: ela às vezes devolve o estado errado no nome da
+estação (ex.: Guarulhos → "PR"). O `core/metar.py` corrige o nome usando o registro local
+`DEFAULT_STATIONS`, e um teste garante que SBGR fique como "SP".
+
+### 10. Os dados são reais ou simulados?
+
+**Reais.** O pipeline baixa as previsões vigentes do modelo GFS da NOAA e boletins METAR ao vivo
+da AviationWeather. A qualidade depende da disponibilidade dessas fontes (ciclos indisponíveis são
+pulados com aviso).
+
+---
+
+## 🔮 Notas finais
+
+- `data/` e `maps/` são **ignorados pelo Git** (artefatos gerados em execução).
+- Para produção, use `bash scripts/server.sh start` ou Docker.
+- A API é somente leitura e não exige autenticação em ambiente local.
+- Quer saber mais? A documentação interativa da API está em `/docs` quando o servidor estiver no ar.
+
+Feito com ☕, Python e dados abertos da NOAA. 🛰️
