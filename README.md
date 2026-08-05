@@ -283,6 +283,13 @@ então o `.env` só é necessário para personalizar:
 
 O pipeline (`scripts/process_data.py`) executa: **download → processamento → SQLite → mapas → METAR**.
 
+> 🏭 **A regra de ouro da fábrica:** a API e o frontend são apenas a **vitrine de atendimento** —
+> eles **nunca saem à rua para buscar dados**, somente mostram o que já está no estoque
+> (SQLite e mapas). **Todo dado novo entra pela porta da fábrica: o pipeline.** Quer manter a
+> vitrine sempre atualizada? Agende o pipeline — por exemplo, via `cron` a cada 6h, cobrindo os
+> ciclos 00/06/12/18Z (veja a [FAQ](#-dúvidas-frequentes-faq)). E lembre: `scripts/pipeline.sh` é
+> só o porteiro — ele ativa o ambiente e chama o `scripts/process_data.py` por você.
+
 ```bash
 PYTHONPATH=. python scripts/process_data.py [opções]
 ```
