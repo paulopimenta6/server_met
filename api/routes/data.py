@@ -51,6 +51,7 @@ async def query_data(
     region: Optional[str] = Query(None, description="Region code (e.g., SP, RJ)"),
     date: Optional[str] = Query(None, description="Date in YYYYMMDD format"),
     analysis: Optional[str] = Query(None, description="Analysis time (00, 06, 12, 18)"),
+    forecast: Optional[int] = Query(None, description="Forecast hour (0, 6, 12, 18)"),
     limit: int = Query(100, ge=1, le=10000)
 ):
     data = persistence.query_data(
@@ -59,6 +60,7 @@ async def query_data(
         region_code=region,
         data_date=date,
         analysis_time=analysis,
+        forecast_hour=forecast,
         limit=limit
     )
     
@@ -192,16 +194,18 @@ async def export_csv(
     region: str = Query(...),
     level: Optional[int] = Query(None, description="Level value; omit for surface variables"),
     date: Optional[str] = Query(None),
-    analysis: Optional[str] = Query(None)
+    analysis: Optional[str] = Query(None),
+    forecast: Optional[int] = Query(None, description="Forecast hour (0, 6, 12, 18)")
 ):
     from pathlib import Path
     import tempfile
     
     level_value = level if level is not None else 0
-    output_path = Path(tempfile.gettempdir()) / f"export_{variable}_{region}_{level_value}.csv"
+    output_path = Path(tempfile.gettempdir()) / f"export_{variable}_{region}_{level_value}_{forecast or 0}.csv"
     count = persistence.export_csv(
         output_path, variable_code=variable, region_code=region,
-        level_value=level_value, data_date=date, analysis_time=analysis)
+        level_value=level_value, data_date=date, analysis_time=analysis,
+        forecast_hour=forecast)
     
     if count == 0:
         raise HTTPException(status_code=404, detail="No data to export")

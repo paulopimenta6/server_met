@@ -90,12 +90,12 @@ def generate_map(data, lats, lons, variable, level, region, date_str,
     cbar.set_label(unit)
 
     level_str = f"{variable.upper()} - {level} hPa" if level and level > 0 else f"{variable.upper()} - Superfície"
-    plt.title(f"GFS 0.25° - {region} - {level_str}\nData: {date_str} Análise: {analysis}Z Previsão: {forecast}h",
+    plt.title(f"GFS 0.25° - {region} - {level_str}\nData: {date_str} Análise: {analysis}Z Previsão: f{forecast:03d}",
               fontsize=10)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     level_file = str(level) if level and level > 0 else "SFC"
-    filename = f"GFS_0p25_{region.upper()}_N{level_file}_{variable}_{analysis}_{date_str}_{forecast}.png"
+    filename = f"GFS_0p25_{region.upper()}_N{level_file}_{variable}_{analysis}_{date_str}_{forecast:03d}.png"
     filepath = out_dir / filename
     plt.savefig(filepath, dpi=100, bbox_inches="tight", facecolor="white")
     plt.close()

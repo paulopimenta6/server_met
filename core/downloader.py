@@ -51,8 +51,8 @@ class GribDownloader:
         return ana_dir
     
     def _format_forecast(self, forecast: str) -> str:
-        """Formata hora de previsão para padrão f0{forecast}: 00->f000, 06->f006, 12->f012, 18->f018"""
-        return f"f0{forecast}"
+        """Formata hora de previsão para padrão f000/f006/f012/f018 (sempre 3 dígitos)."""
+        return f"f{int(forecast):03d}"
     
     def _build_url(self, date_str: str, analysis: str, forecast: str, resolution: str) -> str:
         """Constrói URL seguindo padrão exato do goGribV2.sh: gfs.t{analysis}z.pgrb2.{resolution}.f0{forecast}"""

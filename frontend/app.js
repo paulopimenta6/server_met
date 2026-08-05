@@ -98,6 +98,7 @@ function wireEvents() {
     $('categorySel').onchange = e => renderVariables(e.target.value);
     $('varSel').onchange = onVarChange;
     $('regSel').onchange = () => {};
+    $('forecastSel').onchange = loadData;
     $('loadBtn').onclick = loadData;
     $('csvBtn').onclick = exportCSV;
     $('metarSel').onchange = loadMETAR;
@@ -145,6 +146,7 @@ function params() {
     if ($('regSel').value) p.set('region', $('regSel').value);
     if ($('dateSel').value) p.set('date', $('dateSel').value);
     if ($('anaSel').value) p.set('analysis', $('anaSel').value);
+    if ($('forecastSel').value) p.set('forecast', $('forecastSel').value);
     return p;
 }
 
@@ -169,7 +171,7 @@ async function loadData() {
             img.src = url;
             const lvl = $('levelSel').value;
             $('mapTitle').textContent = `${v.name} (${v.unit}) — ${region}`;
-            $('mapMeta').textContent = `Nível: ${lvl ? lvl + ' hPa' : 'Superfície'} | Data: ${$('dateSel').value || 'última'} | Análise: ${$('anaSel').value}Z`;
+            $('mapMeta').textContent = `Nível: ${lvl ? lvl + ' hPa' : 'Superfície'} | Data: ${$('dateSel').value || 'última'} | Análise: ${$('anaSel').value}Z | Previsão: ${$('forecastSel').value ? 'f' + $('forecastSel').value : 'última'}`;
         } else {
             $('loading').classList.add('hidden');
             $('imgErr').classList.remove('hidden');
@@ -180,6 +182,7 @@ async function loadData() {
         if (!isSurface(v) && $('levelSel').value) dp.set('level', $('levelSel').value);
         if ($('dateSel').value) dp.set('date', $('dateSel').value);
         if ($('anaSel').value) dp.set('analysis', $('anaSel').value);
+        if ($('forecastSel').value) dp.set('forecast', $('forecastSel').value);
         const res = await fetch(`${API}/data/?${dp}`);
         const data = await res.json();
         if (data.total) {
@@ -207,6 +210,7 @@ function exportCSV() {
     if (!isSurface(v) && $('levelSel').value) p.set('level', $('levelSel').value);
     if ($('dateSel').value) p.set('date', $('dateSel').value);
     if ($('anaSel').value) p.set('analysis', $('anaSel').value);
+    if ($('forecastSel').value) p.set('forecast', $('forecastSel').value);
     window.open(`${API}/data/export/csv?${p}`, '_blank');
 }
 

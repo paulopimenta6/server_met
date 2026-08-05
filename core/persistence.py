@@ -172,6 +172,7 @@ class PersistenceManager:
         region_code: Optional[str] = None,
         data_date: Optional[str] = None,
         analysis_time: Optional[str] = None,
+        forecast_hour: Optional[int] = None,
         limit: int = 100
     ) -> List[Dict[str, Any]]:
         query = """
@@ -197,6 +198,9 @@ class PersistenceManager:
         if analysis_time:
             query += " AND gm.analysis_time = ?"
             params.append(analysis_time)
+        if forecast_hour is not None:
+            query += " AND gm.forecast_hour = ?"
+            params.append(forecast_hour)
         
         query += " ORDER BY gm.data_date DESC, gm.analysis_time DESC, gm.forecast_hour DESC LIMIT ?"
         params.append(limit)

@@ -44,7 +44,7 @@ def _find_latest_map(variable: str, region: str, level: int = None,
             continue
         if analysis and fields["ana"] != analysis:
             continue
-        if forecast and fields["forecast"] != forecast:
+        if forecast and int(fields["forecast"]) != int(forecast):
             continue
         matches.append(p)
 
