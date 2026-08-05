@@ -27,8 +27,8 @@ python -c "import pygrib, fastapi, uvicorn, httpx, matplotlib" \
     && ok "Módulos Python instalados" || bad "Faltam módulos Python"
 
 # ---- 2. pipeline com dados reais ----
-log "Executando pipeline (GFS + METAR) para SP"
-PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --regions SP >/tmp/pipeline_out.txt 2>&1 \
+log "Executando pipeline (GFS + METAR) para SP (todas as análises 00/06/12/18)"
+PYTHONPATH=. python scripts/process_data.py --date 20260804 --regions SP >/tmp/pipeline_out.txt 2>&1 \
     && ok "Pipeline executado" || bad "Pipeline falhou ($(tail -1 /tmp/pipeline_out.txt))"
 
 PYTHONPATH=. python - <<'EOF' && ok "Registros persistidos (GRIB + METAR)" || bad "Sem registros no banco"

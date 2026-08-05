@@ -39,6 +39,10 @@ async function loadDashboard() {
             `<tr><td>${v.variable}</td><td>${v.records}</td><td>${v.avg}</td></tr>`).join('');
         $('dByRegion').innerHTML = (d.by_region || []).map(r =>
             `<tr><td>${r.region}</td><td>${r.records}</td></tr>`).join('');
+        $('dByAnalysis').innerHTML = (d.by_analysis || []).map(a =>
+            `<tr><td>${a.analysis}Z</td><td>${a.records}</td></tr>`).join('');
+        $('dByForecast').innerHTML = (d.by_forecast || []).map(f =>
+            `<tr><td>f${String(f.forecast).padStart(3, '0')}</td><td>${f.records}</td></tr>`).join('');
     } catch (e) {
         console.error('Dashboard load failed', e);
     }
@@ -61,11 +65,21 @@ async function loadConfig() {
     $('dateSel').innerHTML = '<option value="">Mais recente</option>' +
         dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
 
+    const analyses = (avail.analyses && avail.analyses.length) ? avail.analyses : ['00', '06', '12', '18'];
+    $('anaSel').innerHTML = analyses.map(a => `<option value="${a}">${a}Z</option>`).join('');
+
+    const forecasts = (avail.forecasts && avail.forecasts.length) ? avail.forecasts : [0, 6, 12, 18];
+    $('forecastSel').innerHTML = '<option value="">Mais recente</option>' +
+        forecasts.map(f => {
+            const ff = String(f).padStart(3, '0');
+            return `<option value="${ff}">f${ff}</option>`;
+        }).join('');
+
     renderVariables('');
 
     if (regions.length) $('regSel').value = regions[0].code;
     if (dates.length) $('dateSel').value = dates[0];
-    $('anaSel').value = '00';
+    $('anaSel').value = analyses[analyses.length - 1];
 }
 
 function renderVariables(category) {

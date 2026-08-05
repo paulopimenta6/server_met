@@ -249,6 +249,16 @@ class PersistenceManager:
             cursor = conn.execute("SELECT DISTINCT data_date FROM grib_metadata ORDER BY data_date DESC")
             return [row[0] for row in cursor.fetchall()]
 
+    def get_available_analyses(self) -> List[str]:
+        with self._get_connection() as conn:
+            cursor = conn.execute("SELECT DISTINCT analysis_time FROM grib_metadata ORDER BY analysis_time")
+            return [row[0] for row in cursor.fetchall()]
+
+    def get_available_forecasts(self) -> List[int]:
+        with self._get_connection() as conn:
+            cursor = conn.execute("SELECT DISTINCT forecast_hour FROM grib_metadata ORDER BY forecast_hour")
+            return [row[0] for row in cursor.fetchall()]
+
     # ------------------------------------------------------------------ #
     # METAR persistence
     # ------------------------------------------------------------------ #

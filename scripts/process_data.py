@@ -17,6 +17,7 @@ import argparse
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import List, Optional
 
 from core.config import GRIB_DIR, ANALYSIS_HOURS, FORECAST_HOURS, REGIOES
 from core.downloader import fetch_filtered_grib
@@ -56,26 +57,34 @@ def build_all_variables_map() -> dict:
     return levels
 
 
-def find_latest_cycle(date: str = None, analysis: str = None):
-    """Return (date_str, analysis) for a GFS cycle that actually exists on NOAA."""
-    if date is None:
-        date = datetime.utcnow().strftime("%Y%m%d")
-    candidates_dates = [date]
+def find_latest_date() -> str:
+    """Return the most recent date with at least one available GFS cycle."""
+    date = datetime.utcnow().strftime("%Y%m%d")
+    candidates = [date]
     try:
-        candidates_dates.append((datetime.strptime(date, "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d"))
+        candidates.append((datetime.strptime(date, "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d"))
     except Exception:
         pass
-    if analysis:
-        for d in candidates_dates:
-            for a in [analysis]:
-                if _cycle_exists(d, a):
-                    return d, a
-        raise RuntimeError(f"No GFS cycle found for analysis {analysis}")
-    for d in candidates_dates:
+    for d in candidates:
         for a in ANALYSIS_HOURS:
             if _cycle_exists(d, a):
-                return d, a
+                return d
     raise RuntimeError("No GFS cycle available on NOAA (check date)")
+
+
+def resolve_analyses(date_str: str, requested: Optional[List[str]] = None) -> List[str]:
+    """Return the requested GFS cycles that actually exist for the date."""
+    if not requested:
+        requested = list(ANALYSIS_HOURS)
+    available = []
+    for a in requested:
+        if _cycle_exists(date_str, a):
+            available.append(a)
+        else:
+            logger.warning("Ciclo %sZ não disponível para %s; ignorado", a, date_str)
+    if not available:
+        raise RuntimeError(f"No GFS cycle found for date {date_str}")
+    return available
 
 
 def _cycle_exists(date: str, analysis: str) -> bool:
@@ -168,7 +177,8 @@ def process_metar(regions) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Process real GFS + METAR data")
     parser.add_argument("--date", help="GFS date YYYYMMDD (default: latest available)")
-    parser.add_argument("--analysis", choices=["00", "06", "12", "18"], help="GFS cycle")
+    parser.add_argument("--analysis", nargs="*", choices=["00", "06", "12", "18"],
+                        default=None, help="GFS cycles (default: all 00 06 12 18)")
     parser.add_argument("--forecast", nargs="+", choices=["00", "06", "12", "18"],
                         default=FORECAST_HOURS,
                         help="GFS forecast hours (default: all f000-f018)")
@@ -179,8 +189,11 @@ def main():
     parser.add_argument("--skip-metar", action="store_true", help="Do not fetch METAR")
     args = parser.parse_args()
 
-    date_str, analysis = find_latest_cycle(args.date, args.analysis)
-    logger.info("Using GFS cycle: %s %sZ", date_str, analysis)
+    date_str = args.date if args.date else find_latest_date()
+    logger.info("Using GFS date: %s", date_str)
+
+    analyses = resolve_analyses(date_str, args.analysis)
+    logger.info("Analyses: %s", analyses)
 
     regions = [r.upper() for r in args.regions if r.upper() in REGIOES]
     logger.info("Regions: %s", regions)
@@ -189,17 +202,25 @@ def main():
     logger.info("Variables: %s", variables)
     logger.info("Forecasts: %s", args.forecast)
 
-    grib_results = process_grib(date_str, analysis, regions, variables, args.forecast)
-    logger.info("GRIB results: %s", grib_results)
+    aggregate = {"files": 0, "records": 0, "maps": 0, "errors": []}
+    for analysis in analyses:
+        logger.info("Processando ciclo %sZ de %s", analysis, date_str)
+        grib_results = process_grib(date_str, analysis, regions, variables, args.forecast)
+        for key in aggregate:
+            if key == "errors":
+                aggregate[key].extend(grib_results[key])
+            else:
+                aggregate[key] += grib_results[key]
+    logger.info("GRIB results: %s", aggregate)
 
     if not args.skip_metar:
         metar_results = process_metar(regions)
         logger.info("METAR results: %s", metar_results)
 
-    grib_errors = len(grib_results["errors"])
+    grib_errors = len(aggregate["errors"])
     if grib_errors:
         logger.warning("%d GRIB errors", grib_errors)
-        for err in grib_results["errors"][:5]:
+        for err in aggregate["errors"][:5]:
             logger.warning("  %s", err)
 
 

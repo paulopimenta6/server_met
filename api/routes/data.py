@@ -154,7 +154,9 @@ async def get_available():
     return {
         "variables": persistence.get_available_variables(),
         "regions": persistence.get_available_regions(),
-        "dates": persistence.get_available_dates()
+        "dates": persistence.get_available_dates(),
+        "analyses": persistence.get_available_analyses(),
+        "forecasts": persistence.get_available_forecasts()
     }
 
 @router.get("/dashboard")
@@ -171,6 +173,10 @@ async def get_dashboard():
         by_region = [{"region": r[0], "records": r[1]} for r in cur.fetchall()]
         cur.execute("SELECT data_date, COUNT(*) n FROM grib_metadata GROUP BY data_date ORDER BY data_date DESC")
         by_date = [{"date": r[0], "records": r[1]} for r in cur.fetchall()]
+        cur.execute("SELECT analysis_time, COUNT(*) n FROM grib_metadata GROUP BY analysis_time ORDER BY analysis_time")
+        by_analysis = [{"analysis": r[0], "records": r[1]} for r in cur.fetchall()]
+        cur.execute("SELECT forecast_hour, COUNT(*) n FROM grib_metadata GROUP BY forecast_hour ORDER BY forecast_hour")
+        by_forecast = [{"forecast": r[0], "records": r[1]} for r in cur.fetchall()]
 
     metar_stats = persistence.get_metar_stats()
     return {
@@ -180,6 +186,8 @@ async def get_dashboard():
         "by_variable": by_var,
         "by_region": by_region,
         "by_date": by_date,
+        "by_analysis": by_analysis,
+        "by_forecast": by_forecast,
         "metar": metar_stats,
     }
 
