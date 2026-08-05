@@ -57,37 +57,34 @@ Ele faz sozinho (quase) todo o trabalho:
 
 ## 🧭 Como o sistema funciona
 
-O sistema é organizado em **4 etapas**: *ingestão → processamento → armazenamento → exposição*.
+Pense no Server MET como uma **pequena fábrica de previsões do tempo**. Ela trabalha em
+4 setores, um depois do outro:
+
+**1. Ingestão — os entregadores buscam a matéria-prima.**
+O pipeline vai até as fontes reais e traz os dados: previsões do modelo GFS da NOAA
+(arquivos GRIB, já recortados por região e variável) e boletins METAR ao vivo da
+AviationWeather. Os arquivos crus ficam guardados em `data/grib/` e `data/metar/`.
+
+**2. Processamento — a cozinha transforma os dados crus.**
+O `core/processor.py` lê cada arquivo, recorta a região pedida e calcula o que importa:
+o mínimo, o máximo e a média de cada variável.
+
+**3. Armazenamento — o almoxarifado organiza tudo.**
+Os resultados viram registros no banco **SQLite**, exportações **CSV** e **mapas PNG** na
+pasta `maps/`.
+
+**4. Exposição — o balcão de atendimento.**
+O **FastAPI** serve tudo para o mundo: o frontend com dashboard em `http://localhost:8000`,
+a API REST (base `/api/v1`) e a documentação interativa em `/docs`.
+
+Em uma linha, o caminho dos dados é:
 
 ```text
-                 ┌──────────────────────────────────┐
-                 │          1. INGESTÃO             │
-                 └──────────────────────────────────┘
-   NOAA GFS (filter) ──► core/downloader.py ──► data/grib/*.grb2
-   AviationWeather   ──► core/metar.py      ──► data/metar/*.json
-
-                 ┌──────────────────────────────────┐
-                 │        2. PROCESSAMENTO          │
-                 └──────────────────────────────────┘
-                      core/processor.py
-                        ├─► extrai variáveis da região
-                        └─► calcula min / max / média
-
-                 ┌──────────────────────────────────┐
-                 │        3. ARMAZENAMENTO          │
-                 └──────────────────────────────────┘
-                      core/persistence.py ──► SQLite (met_data.db)
-                      core/persistence.py ──► data/csv/
-                      core/maps.py        ──► maps/*.png
-
-                 ┌──────────────────────────────────┐
-                 │          4. EXPOSIÇÃO            │
-                 └──────────────────────────────────┘
-                      FastAPI (api/main.py)
-                        ├─► Frontend + Dashboard (http://localhost:8000)
-                        ├─► API REST (/api/v1)
-                        └─► Swagger (/docs)
+NOAA GFS -> downloader -> processor -> SQLite / CSV / Mapas -> FastAPI -> Frontend
+AviationWeather -> metar -> SQLite -> FastAPI -> Frontend
 ```
+
+A tabela abaixo resume cada etapa:
 
 ### Passo a passo, em palavras simples
 
