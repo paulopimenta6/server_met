@@ -59,31 +59,34 @@ Ele faz sozinho (quase) todo o trabalho:
 
 O sistema é organizado em **4 etapas**: *ingestão → processamento → armazenamento → exposição*.
 
-```mermaid
-flowchart LR
-    subgraph Ingestão
-        A[NOAA GFS<br/>endpoint filter] -->|GRIB por região/variável| B[(data/grib)]
-        C[AviationWeather<br/>API METAR] -->|boletins ao vivo| D[(data/metar)]
-    end
+```text
+                 ┌──────────────────────────────────┐
+                 │          1. INGESTÃO             │
+                 └──────────────────────────────────┘
+   NOAA GFS (filter) ──► core/downloader.py ──► data/grib/*.grb2
+   AviationWeather   ──► core/metar.py      ──► data/metar/*.json
 
-    subgraph Processamento
-        B --> E[core/processor<br/>extrai variáveis e estatísticas]
-        D --> F[core/metar<br/>decodifica boletins]
-    end
+                 ┌──────────────────────────────────┐
+                 │        2. PROCESSAMENTO          │
+                 └──────────────────────────────────┘
+                      core/processor.py
+                        ├─► extrai variáveis da região
+                        └─► calcula min / max / média
 
-    subgraph Armazenamento
-        E --> G[(SQLite met_data.db)]
-        E --> H[data/csv]
-        E --> I[maps/*.png]
-        F --> G
-    end
+                 ┌──────────────────────────────────┐
+                 │        3. ARMAZENAMENTO          │
+                 └──────────────────────────────────┘
+                      core/persistence.py ──► SQLite (met_data.db)
+                      core/persistence.py ──► data/csv/
+                      core/maps.py        ──► maps/*.png
 
-    subgraph Exposição
-        G --> J[FastAPI api/main.py]
-        H --> J
-        I --> J
-        J --> K[Frontend + Dashboard<br/>http://localhost:8000]
-    end
+                 ┌──────────────────────────────────┐
+                 │          4. EXPOSIÇÃO            │
+                 └──────────────────────────────────┘
+                      FastAPI (api/main.py)
+                        ├─► Frontend + Dashboard (http://localhost:8000)
+                        ├─► API REST (/api/v1)
+                        └─► Swagger (/docs)
 ```
 
 ### Passo a passo, em palavras simples
@@ -94,6 +97,50 @@ flowchart LR
 | ② **Processamento** | O `processor` lê cada GRIB, recorta a região, calcula mínimo/máximo/média e monta a matriz de valores. | `core/grib_reader.py`, `core/processor.py` |
 | ③ **Armazenamento** | A `persistence` grava os resultados no SQLite e exporta CSV. O `maps` gera o PNG da região. | `core/persistence.py`, `core/maps.py` |
 | ④ **Exposição** | A API FastAPI serve consultas, estatísticas, CSVs e mapas. O frontend consome a API e mostra o dashboard. | `api/main.py`, `frontend/` |
+
+### 🤖 Como o sistema adquire os dados automaticamente
+
+#### Dados GRIB (previsões do GFS)
+
+Para cada combinação **data × análise × previsão × variável × nível × região**, o pipeline
+chama `fetch_filtered_grib()` de `core/downloader.py`, que monta uma URL para o **endpoint
+filter** da NOAA pedindo **apenas** aquele recorte:
+
+```text
+https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t00z.pgrb2.0p25.f000&dir=/gfs.20260804/00/atmos&var_TMP=on&lev_1000_mb=on&leftlon=-56&rightlon=-42&toplat=-18&bottomlat=-28
+```
+
+Os parâmetros são preenchidos automaticamente a partir do catálogo `NOAA_FILTER_VARS`
+(em `core/downloader.py`), que mapeia cada código interno ao nome GRIB (ex.: `temp` → `TMP`,
+`umidadeRel` → `RH`, `u`/`v` → `UGRD`/`VGRD`, `o3` → `O3MR`, `total_o3` → `TOZNE`) e ao tipo
+de nível (que define o seletor `lev_*_mb=on`, `lev_surface`, `lev_mean_sea_level` ou
+`lev_*_m_above_ground`; o `total_o3` não usa seletor de nível).
+
+Antes de baixar, o pipeline **verifica se o ciclo existe** na NOAA (requisição `HEAD` ao arquivo)
+— ciclos indisponíveis são pulados com aviso. Se o arquivo já estiver em
+`data/grib/<data>/<análise>/`, ele é **reutilizado** (o pipeline é idempotente, ideal para
+agendamentos). Cada GRIB baixado segue para `core/grib_reader.py` → `core/processor.py`
+(recorte da região + estatísticas) → SQLite/CSV → mapa PNG.
+
+#### Boletins METAR (condições atuais)
+
+No fim do pipeline, `core/metar.py` (`fetch_and_store()`) consulta a **AviationWeather** com
+todos os códigos ICAO do registro local `DEFAULT_STATIONS`:
+
+```text
+https://aviationweather.gov/api/data/metar?ids=SBGR,SBGL,SBBR,...&format=json
+```
+
+Cada boletim JSON é então processado automaticamente:
+
+1. **Decodificado** para um resumo legível (`_decoded`): temperatura, ponto de orvalho, vento,
+   visibilidade, QNH, nuvens e categoria de voo;
+2. **Corrigido** quanto ao estado (a API às vezes devolve o estado errado, ex.: SBGR como "PR"
+   — o registro local `DEFAULT_STATIONS` corrige para "SP");
+3. **Persistido** no SQLite (`save_metar_report` + `upsert_station`);
+4. **Snapshotted** como JSON em `data/metar/<CODIGO>/`.
+
+Passe `--skip-metar` no pipeline se não quiser essa etapa.
 
 ---
 
