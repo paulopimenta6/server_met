@@ -31,24 +31,62 @@ import core.metar as metar_mod
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Default dataset: representative mix of meteorological + pollution variables.
+# Default dataset: representative mix based on the variables chosen in
+# analise_variaveis_meteorologicas_grib_025.txt and mapped to the GFS pgrb2
+# 0p25 inventory (see core/variables.py AVAILABLE_IN_GFS).
 # vento/ventoSup are derived from the u/v wind components; precipRate,
 # chuvaNaoConvec and categChuva come from the GFS precipitation fields;
-# nuvemMistura is the cloud mixing ratio.
+# nuvemMistura is the cloud mixing ratio. The rest are the document's
+# thermodynamic, wind, cloud, hydrometeor, convection, radar, visibility,
+# soil and dynamics variables available in the GFS files.
 DEFAULT_VARIABLES = {
-    "temp":        [1000, 850, 500],
-    "umidadeRel":  [850],
-    "u":           [850],
-    "v":           [850],
-    "vento":       [850],
-    "ventoSup":    [10],
-    "o3":          [500],
-    "total_o3":    [0],
-    "ps":          [0],
-    "precipRate":  [0],
-    "chuvaNaoConvec": [0],
-    "categChuva":  [0],
-    "nuvemMistura": [850],
+    # --- Termodinâmica ---
+    "ps":            [0],
+    "prnm":          [0],
+    "temp":          [1000, 850, 500],
+    "temps":         [0],
+    "umidadeRel":    [850],
+    "umidadeEsp":    [850],
+    "alturaGeo":     [850],
+    # --- Vento ---
+    "u":             [850],
+    "v":             [850],
+    "vento":         [850],
+    "ventoSup":      [10],
+    "ventoRajada":   [0],
+    "cisalhamentoVertical": [0],
+    # --- Nuvens ---
+    "nuvem":         [850],
+    "nuvemMistura":  [850],
+    # --- Hidrometeoros ---
+    "chuvaRazao":    [850],
+    "geloRazao":     [850],
+    "neveRazao":     [850],
+    "granizoRazao":  [850],
+    # --- Convecção ---
+    "cape":          [0],
+    "cin":           [0],
+    "indiceLift":    [0],
+    # --- Radar ---
+    "reflectividade":    [0],
+    "reflectividadeMax": [0],
+    # --- Visibilidade ---
+    "visibilidade":  [0],
+    # --- Solo ---
+    "tempSolo":      [0],
+    "umidadeSolo":   [0],
+    # --- Dinâmica ---
+    "vorticidade":   [850],
+    "velVertical":   [850],
+    "velVerticalGeo":[850],
+    "umidadePrecipitavel": [0],
+    # --- Precipitação ---
+    "precipRate":    [0],
+    "chuvaNaoConvec":[0],
+    "categChuva":    [0],
+    # --- Poluição ---
+    "o3":            [500],
+    "total_o3":      [0],
 }
 
 
@@ -62,6 +100,8 @@ def build_all_variables_map() -> dict:
         elif ltype == "heightAboveGround":
             levels[var] = [10]
         else:
+            # surface / meanSea / atmosphere / atmosphereSingleLayer /
+            # hybrid / tropopause / depthBelowLandLayer -> single level 0
             levels[var] = [0]
     return levels
 

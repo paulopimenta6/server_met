@@ -54,6 +54,15 @@ NIVEIS_ISOBARICOS = [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10]
 NIVEIS_SUPERFICIE = ["surface", "meanSea"]
 NIVEIS_ALTURA = [10, 20, 30, 40, 50, 80, 100]
 
+# Camadas de solo (depthBelowLandLayer) do GFS pgrb2 0p25: índice -> faixa em metros
+# usada no seletor `lev_<a>-<b>_m_below_ground` do filtro NOAA e nos rótulos de mapa.
+SOIL_DEPTH_LEVELS = {
+    0: "0-0.1",
+    1: "0.1-0.4",
+    2: "0.4-1",
+    3: "1-2",
+}
+
 SQLITE_DB_PATH = SQLITE_DIR / "met_data.db"
 CSV_EXPORT_DIR = CSV_DIR
 

@@ -187,7 +187,7 @@ async def download_gribs_main(
 # --------------------------------------------------------------------------- #
 # Filtered GFS fetch (lightweight - downloads only the required region/variable)
 # --------------------------------------------------------------------------- #
-from core.config import NOAA_FILTER_URL, REGIOES  # noqa: E402
+from core.config import NOAA_FILTER_URL, REGIOES, SOIL_DEPTH_LEVELS  # noqa: E402
 
 # registry code -> (NOAA GRIB shortName, typeOfLevel)
 NOAA_FILTER_VARS = {
@@ -207,7 +207,32 @@ NOAA_FILTER_VARS = {
     "precipRate":    ("PRATE", "surface"),
     "chuvaNaoConvec": ("APCP", "surface"),
     "categChuva":    ("CRAIN", "surface"),
+    # v2.1 - variáveis do documento analise_variaveis_meteorologicas_grib_025.txt
+    "umidadeEsp":        ("SPFH",  "isobaricInhPa"),
+    "alturaGeo":         ("HGT",   "isobaricInhPa"),
+    "ventoRajada":       ("GUST",  "surface"),
+    "cisalhamentoVertical": ("VWSH", "tropopause"),
+    "chuvaRazao":        ("RWMR",  "isobaricInhPa"),
+    "geloRazao":         ("ICMR",  "isobaricInhPa"),
+    "neveRazao":         ("SNMR",  "isobaricInhPa"),
+    "granizoRazao":      ("GRLE",  "isobaricInhPa"),
+    "cape":              ("CAPE",  "surface"),
+    "cin":               ("CIN",   "surface"),
+    "indiceLift":        ("LFTX",  "surface"),
+    "reflectividade":    ("REFD",  "hybrid"),
+    "reflectividadeMax": ("REFC",  "atmosphere"),
+    "visibilidade":      ("VIS",   "surface"),
+    "tempSolo":          ("TSOIL", "depthBelowLandLayer"),
+    "umidadeSolo":       ("SOILW", "depthBelowLandLayer"),
+    "vorticidade":       ("ABSV",  "isobaricInhPa"),
+    "velVertical":       ("VVEL",  "isobaricInhPa"),
+    "velVerticalGeo":    ("DZDT",  "isobaricInhPa"),
+    "umidadePrecipitavel": ("PWAT", "atmosphereSingleLayer"),
 }
+
+# Level types that do NOT take a level selector in the NOAA filter endpoint
+# (e.g. Total ozone, radar reflectivity, vertical speed shear, precipitable water).
+_NO_LEVEL_SELECTOR_TYPES = {"atmosphere", "atmosphereSingleLayer", "hybrid", "tropopause"}
 
 def _build_filter_url(date_str: str, analysis: str, forecast: str,
                       var_code: str, level: int, region_code: str) -> str:
@@ -232,7 +257,15 @@ def _build_filter_url(date_str: str, analysis: str, forecast: str,
         params["lev_mean_sea_level"] = "on"
     elif level_type == "heightAboveGround":
         params[f"lev_{level}_m_above_ground"] = "on"
-    # atmosphereSingleLayer (e.g. Total ozone) needs no level selector.
+    elif level_type == "depthBelowLandLayer":
+        depth = SOIL_DEPTH_LEVELS.get(level, "0-0.1")
+        params[f"lev_{depth}_m_below_ground"] = "on"
+    elif level_type in _NO_LEVEL_SELECTOR_TYPES:
+        # Single-field variables (Total ozone, radar reflectivity, Vertical
+        # speed shear, Precipitable water) need no level selector.
+        pass
+    else:
+        raise ValueError(f"Unsupported level type {level_type!r} for {var_code}")
 
     qs = "&".join(f"{k}={v}" for k, v in params.items())
     return f"{NOAA_FILTER_URL}?{qs}"

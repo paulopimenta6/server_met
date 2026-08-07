@@ -152,6 +152,7 @@ Passe `--skip-metar` no pipeline se não quiser essa etapa.
 | 🌬️ **Vento resultante** | `vento`/`ventoSup` calculados a partir das componentes `u`/`v` do GFS |
 | 🌧️ **Precipitação** | Taxa de chuva, precipitação acumulada e chuva categórica |
 | ☁️ **Nuvens** | Cobertura total (`nuvem`) e razão de mistura de nuvens (`nuvemMistura`) |
+| 🌡️ **Catálogo v2.1** | 47 variáveis (38 com dados GFS): termodinâmica, vento, nuvens, hidrometeoros, convecção, radar, visibilidade, solo, dinâmica e poluição |
 | 🗺️ **Mapas PNG** | Mapas do Brasil com a distribuição espacial de cada variável |
 | 🧮 **Estatísticas** | Mínimo, máximo e média por variável/região/nível |
 | 💾 **Persistência** | SQLite para consultas + CSV para exportação + snapshots JSON de METAR |
@@ -306,7 +307,7 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 | `--analysis 00 06` | todas (00 06 12 18) | Ciclos sinóticos (aceita vários) |
 | `--forecast 00 06` | todas (f000–f018) | Horas de previsão (aceita vários) |
 | `--regions SP RJ` | `SP RJ PR RS MG AM` | Regiões (18 disponíveis) |
-| `--all-variables` | desligado | Processa as 26 variáveis (as ausentes no GFS são puladas com erro logado) |
+| `--all-variables` | desligado | Processa as 47 variáveis do catálogo (as ausentes no GFS são puladas com erro logado) |
 | `--skip-metar` | desligado | Não busca METAR |
 
 ### Comportamento que você precisa saber
@@ -318,8 +319,13 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 - Variáveis fora do produto GFS são registradas no log como **erros** (não derrubam o pipeline).
 
 > 💡 O conjunto padrão de variáveis fica em `DEFAULT_VARIABLES` no topo de `scripts/process_data.py`:
-> `temp` (1000/850/500 hPa), `umidadeRel`, `u`, `v` e `vento` (850), `ventoSup` (10 m), `o3` (500),
-> `total_o3`, `ps`, `precipRate`, `chuvaNaoConvec` e `categChuva` (superfície) e `nuvemMistura` (850).
+> termodinâmica (`ps`, `prnm`, `temp` 1000/850/500, `temps`, `umidadeRel`, `umidadeEsp`, `alturaGeo`),
+> vento (`u`, `v`, `vento` 850; `ventoSup` 10 m; `ventoRajada`; `cisalhamentoVertical`), nuvens
+> (`nuvem`, `nuvemMistura`), hidrometeoros (`chuvaRazao`, `geloRazao`, `neveRazao`, `granizoRazao`),
+> convecção (`cape`, `cin`, `indiceLift`), radar (`reflectividade`, `reflectividadeMax`),
+> visibilidade (`visibilidade`), solo (`tempSolo`, `umidadeSolo`), dinâmica (`vorticidade`,
+> `velVertical`, `velVerticalGeo`, `umidadePrecipitavel`) e precipitação (`precipRate`,
+> `chuvaNaoConvec`, `categChuva`).
 > As variáveis de chuva (`precipRate`, `chuvaNaoConvec`) só têm valor em horários com chuva — em
 > áreas/tempos secos os mínimos são `0`.
 
@@ -327,25 +333,31 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 
 ## 📊 Entendendo os dados
 
-### Variáveis (26 no total)
+### Variáveis (47 no total)
 
-**Meteorológicas (17):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `nuvemMistura`,
-`chuvaNaoConvec`, `chuvaConvec`, `precipRate`, `categChuva`, `umidadeRel`, `u`, `v`,
-`uSupe`, `vSupe`, `vento`, `ventoSup`
+**Meteorológicas (38):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `nuvemMistura`,
+`chuvaNaoConvec`, `chuvaConvec`, `precipRate`, `categChuva`, `umidadeRel`, `umidadeEsp`,
+`alturaGeo`, `u`, `v`, `uSupe`, `vSupe`, `vento`, `ventoSup`, `ventoRajada`,
+`cisalhamentoVertical`, `chuvaRazao`, `geloRazao`, `neveRazao`, `granizoRazao`, `cape`, `cin`,
+`indiceLift`, `reflectividade`, `reflectividadeMax`, `visibilidade`, `tempSolo`, `umidadeSolo`,
+`aguaLiquidaSolo`, `vorticidade`, `velVertical`, `velVerticalGeo`, `umidadePrecipitavel`
 
 **Poluição (9):** `o3`, `total_o3`, `no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`
 
-> ⚠️ **Importante:** **18 variáveis têm dados no produto GFS pgrb2 0p25** e estão conectadas ao
-> endpoint filter da NOAA: `ps`, `prnm`, `temp`, `temps`, `nuvem`, `nuvemMistura`, `umidadeRel`,
-> `u`, `v`, `uSupe`, `vSupe`, `vento`, `ventoSup`, `precipRate`, `chuvaNaoConvec`, `categChuva`,
-> `o3`, `total_o3`.
+> ⚠️ **Importante:** **38 variáveis têm dados no produto GFS pgrb2 0p25** e estão conectadas ao
+> endpoint filter da NOAA (36 meteorológicas + `o3`, `total_o3`): `ps`, `prnm`, `temp`, `temps`,
+> `nuvem`, `nuvemMistura`, `umidadeRel`, `umidadeEsp`, `alturaGeo`, `u`, `v`, `uSupe`, `vSupe`,
+> `vento`, `ventoSup`, `ventoRajada`, `cisalhamentoVertical`, `chuvaRazao`, `geloRazao`,
+> `neveRazao`, `granizoRazao`, `cape`, `cin`, `indiceLift`, `reflectividade`,
+> `reflectividadeMax`, `visibilidade`, `tempSolo`, `umidadeSolo`, `vorticidade`, `velVertical`,
+> `velVerticalGeo`, `umidadePrecipitavel`, `precipRate`, `chuvaNaoConvec`, `categChuva`.
 >
 > - **`vento` e `ventoSup`** são **derivadas**: a resultante do vento (magnitude) é calculada em
 >   `core/processor.py` a partir das componentes `u`/`v` (`vento`) e `uSupe`/`vSupe` (`ventoSup`)
 >   — o GFS fornece apenas as componentes direcionais.
 > - **Chuva:** `precipRate` (*Precipitation rate*, `PRATE`), `chuvaNaoConvec` (*Total
 >   precipitation*, `APCP`) e `categChuva` (*Categorical rain*, `CRAIN`) são confirmadas no
->   inventário `varMET` e verificadas ao vivo no endpoint filter. O `APCP` acumulado só existe
+>   inventário `varMET.txt` e verificadas ao vivo no endpoint filter. O `APCP` acumulado só existe
 >   a partir de `f006` (no `f000` é vazio/zero) — por isso o pipeline loga erro nesse caso.
 > - **Nuvens:** além da cobertura total `nuvem` (`TCDC`), adicionamos `nuvemMistura`
 >   (*Cloud mixing ratio*, `CLWMR`) em níveis isobáricos.
@@ -355,13 +367,22 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 > *experimentais* — o endpoint `/data/variables` marca isso no campo `available`, e o frontend
 > só exibe as disponíveis.
 >
-> Essa lista foi **confirmada pelo inventário `varMET`** (dump ASCII do conteúdo do arquivo GRIB,
+> Essa lista foi **confirmada pelo inventário `varMET.txt`** (dump ASCII do conteúdo do arquivo GRIB,
 > na raiz do projeto) e **verificada ao vivo** contra o endpoint filter da NOAA. Testes garantem
 > exatamente `{o3, total_o3}` como poluição disponível — então não altere `AVAILABLE_IN_GFS` em
 > `core/variables.py` por conta própria.
+>
+> **v2.1:** as variáveis recomendadas no documento `analise_variaveis_meteorologicas_grib_025.txt`
+> foram mapeadas para os correspondentes do GFS pgrb2 0p25 e **validadas ao vivo** no endpoint
+> filter: termodinâmica (`umidadeEsp`, `alturaGeo`), vento (`ventoRajada`, `cisalhamentoVertical`),
+> hidrometeoros (`chuvaRazao`, `geloRazao`, `neveRazao`, `granizoRazao`), convecção (`cape`, `cin`,
+> `indiceLift`), radar (`reflectividade`, `reflectividadeMax`), visibilidade (`visibilidade`), solo
+> (`tempSolo`, `umidadeSolo`; `aguaLiquidaSolo` fica catálogo-only) e dinâmica (`vorticidade`,
+> `velVertical`, `velVerticalGeo`, `umidadePrecipitavel`).
 
 **Níveis isobáricos suportados:** `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa
 **Níveis de altura (`uSupe`/`vSupe`):** `10, 20, 30, 40, 50, 80, 100` m
+**Camadas de solo** (`tempSolo`, `umidadeSolo`): `0-0.1, 0.1-0.4, 0.4-1, 1-2` m
 **Superfície** (`ps`, `temps`, `total_o3`): nível `0` (sem parâmetro `level` em consultas/mapas)
 
 ### Regiões (18)
@@ -398,7 +419,7 @@ A base das rotas é `/api/v1` (exceto `/health` e `/docs`, que ficam na raiz).
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/health` | Status do servidor e do banco (+ `/health/ready`) |
-| GET | `/api/v1/data/variables` | Catálogo das 26 variáveis (com campo `available`) |
+| GET | `/api/v1/data/variables` | Catálogo das 47 variáveis (com campo `available`) |
 | GET | `/api/v1/data/regions` | As 18 regiões |
 | GET | `/api/v1/data/dashboard` | Resumo estatístico agregado |
 | GET | `/api/v1/data/available` | Variáveis/regiões/datas disponíveis no banco |
@@ -484,8 +505,8 @@ docker compose --profile manual run pipeline   # roda o pipeline manualmente
 # Suíte de testes end-to-end (TestClient in-process, sem servidor externo)
 PYTHONPATH=. pytest tests/test_e2e.py -v
 
-# Unit tests (sem rede/dados) — ex.: lógica do vento resultante
-PYTHONPATH=. pytest tests/test_processor.py -v
+# Unit tests (sem rede/dados) — registro de variáveis e lógica do vento resultante
+PYTHONPATH=. pytest tests/test_registry.py tests/test_processor.py -v
 
 # Validação completa: dependências + pipeline real + banco + mapas + testes
 bash scripts/validate.sh
@@ -507,10 +528,11 @@ core/          Lógica de negócio (config, variáveis, regiões, download, GRIB
 api/           FastAPI (main, schemas, rotas: health, data, maps, metar)
 frontend/      Interface web estática (index.html, app.js, style.css)
 scripts/       process_data.py + wrappers shell (pipeline.sh, server.sh, validate.sh)
-tests/         Testes end-to-end (test_e2e.py) + unit (test_processor.py)
+tests/         Testes end-to-end (test_e2e.py) + unit (test_registry.py, test_processor.py)
 data/          Runtime (grib/, sqlite/, csv/, metar/) — ignorado pelo Git
 maps/          Mapas PNG gerados — ignorado pelo Git
-varMET         Inventário GRIB (dump ASCII) — referência das variáveis disponíveis
+varMET.txt     Inventário GRIB (dump ASCII) — referência das variáveis disponíveis
+analise_variaveis_meteorologicas_grib_025.txt  Documento de análise das variáveis (referência v2.1)
 ```
 
 ---
@@ -536,7 +558,7 @@ varMET         Inventário GRIB (dump ASCII) — referência das variáveis disp
 ### 1. Por que só vejo `o3` e `total_o3` na categoria Poluição?
 
 Porque são as **únicas variáveis de poluição que existem no produto GFS pgrb2 0p25**.
-Confirmei isso cruzando o catálogo com o inventário `varMET` (dump do arquivo GRIB).
+Confirmei isso cruzando o catálogo com o inventário `varMET.txt` (dump do arquivo GRIB).
 As outras (`no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`) ficam registradas no catálogo,
 marcadas como `available: false`, prontas para quando a fonte tiver o dado.
 
@@ -551,9 +573,9 @@ Os arquivos já baixados são reutilizados, então re-executar é mais rápido.
 A **API e o frontend** não: eles leem o SQLite e os mapas já gerados. A **internet só é necessária
 na ingestão** (pipeline). Por isso os testes E2E funcionam offline após um pipeline.
 
-### 4. O que é o arquivo `varMET` na raiz?
+### 4. O que é o arquivo `varMET.txt` na raiz?
 
-É um **dump ASCII do inventário do arquivo GRIB** — a lista de variáveis/ níveis que existem no
+É um **dump ASCII do inventário do arquivo GRIB** — a lista de variáveis/níveis que existem no
 produto. É a fonte de verdade usada para decidir quais variáveis marcar como `available`.
 Você não precisa abri-lo no dia a dia.
 
@@ -569,7 +591,7 @@ O exemplo acima roda a cada 6 horas (ciclos 00/06/12/18Z).
 
 ### 6. Quero adicionar uma nova variável. O que preciso saber?
 
-1. Ela precisa existir no GFS pgrb2 0p25 (verifique no `varMET` e, de preferência, teste a URL do
+1. Ela precisa existir no GFS pgrb2 0p25 (verifique no `varMET.txt` e, de preferência, teste a URL do
    endpoint filter ao vivo — alguns campos só existem a partir de `f006`, como o `APCP`);
 2. Adicione o registro em `core/variables.py` (nome GRIB, tipo de nível, conversão de unidade);
 3. Se usar o endpoint filter, mapeie o short name em `NOAA_FILTER_VARS` em `core/downloader.py`;

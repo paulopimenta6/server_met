@@ -45,10 +45,56 @@ def test_variables(client):
     r = client.get(f"{API}/data/variables")
     assert r.status_code == 200
     vars = r.json()["variables"]
-    assert len(vars) == 26
+    assert len(vars) == 47  # 26 originais + 20 novas + 1 catalog-only (aguaLiquidaSolo)
     categories = {v["category"] for v in vars}
     assert "pollution" in categories
     assert "temperature" in categories
+    assert "convection" in categories
+    assert "radar" in categories
+    assert "soil" in categories
+    assert "dynamics" in categories
+
+
+def test_document_ml_variables(client):
+    # Conjunto recomendado para Machine Learning no documento de análise
+    # (analise_variaveis_meteorologicas_grib_025.txt), mapeado para o GFS.
+    r = client.get(f"{API}/data/variables")
+    assert r.status_code == 200
+    by_code = {v["code"]: v for v in r.json()["variables"]}
+
+    expected_available = {
+        # Termodinâmica
+        "prnm", "temp", "umidadeRel", "umidadeEsp", "alturaGeo",
+        # Vento
+        "u", "v", "ventoRajada",
+        # Nuvens
+        "nuvem",
+        # Hidrometeoros
+        "chuvaRazao", "geloRazao", "neveRazao", "granizoRazao",
+        # Convecção
+        "cape", "cin",
+        # Radar
+        "reflectividade",
+        # Solo
+        "umidadeSolo", "tempSolo",
+        # Dinâmica
+        "velVertical", "vorticidade",
+    }
+    for code in expected_available:
+        assert code in by_code, f"variável {code} ausente do catálogo"
+        assert by_code[code]["available"] is True, f"{code} deveria estar disponível"
+
+    # Agrupamentos do documento também mapeados
+    extra = {
+        "reflectividadeMax", "visibilidade", "cisalhamentoVertical",
+        "velVerticalGeo", "umidadePrecipitavel", "indiceLift", "ventoSup", "nuvemMistura",
+    }
+    for code in extra:
+        assert by_code[code]["available"] is True, f"{code} deveria estar disponível"
+
+    # Água líquida do solo não é exposta pelo filtro NOAA (catalog-only)
+    assert by_code["aguaLiquidaSolo"]["available"] is False
+    assert by_code["aguaLiquidaSolo"]["category"] == "soil"
 
 
 def test_new_variables(client):
@@ -235,3 +281,60 @@ def test_rain_and_cloud_data(client):
     r2 = client.get(f"{API}/data/", params={"variable": "nuvemMistura", "region": "SP", "level": 850})
     assert r2.status_code == 200
     assert r2.json()["total"] > 0
+
+
+# --------------------------------------------------------------------------- #
+# v2.1 - variáveis do documento analise_variaveis_meteorologicas_grib_025.txt
+# --------------------------------------------------------------------------- #
+_DOC_ISOBARIC_850 = [
+    "umidadeEsp", "alturaGeo", "vorticidade", "velVertical",
+    "velVerticalGeo", "chuvaRazao", "geloRazao", "neveRazao", "granizoRazao",
+]
+_DOC_SURFACE = [
+    "cape", "cin", "indiceLift", "reflectividade", "reflectividadeMax",
+    "visibilidade", "tempSolo", "umidadeSolo", "umidadePrecipitavel",
+    "ventoRajada", "cisalhamentoVertical",
+]
+
+
+@pytest.mark.parametrize("var", _DOC_ISOBARIC_850)
+def test_doc_isobaric_850_data(client, var):
+    r = client.get(f"{API}/data/", params={"variable": var, "region": "SP", "level": 850})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0, f"sem dados para {var} em 850 hPa"
+
+
+@pytest.mark.parametrize("var", _DOC_SURFACE)
+def test_doc_surface_data(client, var):
+    r = client.get(f"{API}/data/", params={"variable": var, "region": "SP"})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0, f"sem dados para {var}"
+
+
+def test_doc_convection_units(client):
+    r = client.get(f"{API}/data/", params={"variable": "cape", "region": "SP"})
+    rec = r.json()["data"][0]
+    assert rec["variable_code"] == "cape"
+    r2 = client.get(f"{API}/data/", params={"variable": "cin", "region": "SP"})
+    assert r2.json()["total"] > 0
+
+
+def test_doc_radar_map(client):
+    r = client.get(f"{API}/maps/reflectividade/SP",
+                   params={"date": _latest_date(client), "analysis": "00"})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_doc_soil_map(client):
+    r = client.get(f"{API}/maps/tempSolo/SP",
+                   params={"date": _latest_date(client), "analysis": "00"})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_doc_humidity_map(client):
+    r = client.get(f"{API}/maps/umidadeEsp/SP",
+                   params={"level": 850, "date": _latest_date(client), "analysis": "00"})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")

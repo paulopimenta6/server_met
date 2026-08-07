@@ -12,17 +12,27 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 
-from core.config import MAPS_DIR
+from core.config import MAPS_DIR, SOIL_DEPTH_LEVELS
+from core.variables import get_variable_info
 
 # Variables that have isobaric levels
 ISOBARIC_VARIABLES = {
     "temp":       {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu_r", "unit": "°C"},
     "umidadeRel": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "Blues", "unit": "%"},
+    "umidadeEsp": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "GnBu", "unit": "g/kg"},
     "nuvem":      {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "Greys", "unit": "%"},
     "u":          {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "m/s"},
     "v":          {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "m/s"},
     "vento":      {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "viridis", "unit": "m/s"},
     "nuvemMistura": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "Greys", "unit": "g/kg"},
+    "alturaGeo":  {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "terrain", "unit": "gpm"},
+    "chuvaRazao": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "PuBu", "unit": "g/kg"},
+    "geloRazao":  {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "PuBu", "unit": "g/kg"},
+    "neveRazao":  {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "PuBu", "unit": "g/kg"},
+    "granizoRazao": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "PuBu", "unit": "g/kg"},
+    "vorticidade": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "s-1"},
+    "velVertical": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "Pa/s"},
+    "velVerticalGeo": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "m/s"},
     "o3":         {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
     "no2":        {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
     "so2":        {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
@@ -44,6 +54,17 @@ SURFACE_VARIABLES = {
     "vSupe":         {"cmap": "RdBu", "unit": "m/s"},
     "ventoSup":      {"cmap": "viridis", "unit": "m/s"},
     "total_o3":      {"cmap": "viridis", "unit": "DU"},
+    "ventoRajada":   {"cmap": "YlOrRd", "unit": "m/s"},
+    "cisalhamentoVertical": {"cmap": "PuOr", "unit": "s-1"},
+    "cape":          {"cmap": "OrRd", "unit": "J/kg"},
+    "cin":           {"cmap": "PuBu_r", "unit": "J/kg"},
+    "indiceLift":    {"cmap": "RdBu_r", "unit": "K"},
+    "reflectividade": {"cmap": "jet", "unit": "dBZ"},
+    "reflectividadeMax": {"cmap": "jet", "unit": "dBZ"},
+    "visibilidade":  {"cmap": "YlGnBu", "unit": "km"},
+    "tempSolo":      {"cmap": "RdBu_r", "unit": "°C"},
+    "umidadeSolo":   {"cmap": "BrBG", "unit": ""},
+    "umidadePrecipitavel": {"cmap": "Blues", "unit": "mm"},
 }
 
 
@@ -94,7 +115,17 @@ def generate_map(data, lats, lons, variable, level, region, date_str,
     cbar = plt.colorbar(cs, orientation="horizontal", pad=0.05, shrink=0.8)
     cbar.set_label(unit)
 
-    level_str = f"{variable.upper()} - {level} hPa" if level and level > 0 else f"{variable.upper()} - Superfície"
+    info = get_variable_info(variable)
+    ltype = info["level_type"] if info else None
+    if ltype == "isobaricInhPa":
+        level_str = f"{variable.upper()} - {level} hPa"
+    elif ltype == "heightAboveGround":
+        level_str = f"{variable.upper()} - {level} m"
+    elif ltype == "depthBelowLandLayer":
+        depth = SOIL_DEPTH_LEVELS.get(level, str(level))
+        level_str = f"{variable.upper()} - Solo {depth} m"
+    else:
+        level_str = f"{variable.upper()} - Superfície"
     plt.title(f"GFS 0.25° - {region} - {level_str}\nData: {date_str} Análise: {analysis}Z Previsão: f{forecast:03d}",
               fontsize=10)
 

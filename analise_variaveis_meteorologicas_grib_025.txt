@@ -1,0 +1,128 @@
+Análise de Variáveis Meteorológicas Disponíveis em Dados GRIB (0,25°)
+
+Principais grupos de variáveis disponíveis
+
+1.  Termodinâmica
+
+-   Temperatura
+-   Umidade relativa
+-   Umidade específica
+-   Pressão
+-   Pressão reduzida ao nível médio do mar (MSLP)
+-   Altura geopotencial
+
+Aplicações: - Previsão de temperatura - Análise sinótica - Identificação
+de frentes - Cavados - Cristas - Espessura atmosférica
+
+2.  Vento
+
+-   Componente U
+-   Componente V
+-   Rajada de vento
+-   Cisalhamento vertical
+
+Aplicações: - Velocidade do vento - Direção do vento - Convergência -
+Divergência - Advecção - Transporte de umidade - Helcidade (com outros
+níveis) - Perfis verticais
+
+3.  Nuvens
+
+-   Cloud Mixing Ratio
+-   Total Cloud Cover
+
+Aplicações: - Nebulosidade - Desenvolvimento convectivo - Cobertura de
+nuvens - Radiação solar
+
+4.  Hidrometeoros
+
+-   Rain Mixing Ratio
+-   Snow Mixing Ratio
+-   Graupel
+-   Ice Water Mixing Ratio
+
+Aplicações: - Tipo de precipitação - Intensidade convectiva -
+Tempestades severas - Granizo
+
+5.  Convecção
+
+-   CAPE
+-   CIN
+
+Aplicações: - Potencial convectivo - Energia disponível - Estabilidade
+atmosférica
+
+6.  Radar
+
+-   Reflectividade
+-   Reflectividade máxima (Composite Reflectivity)
+
+Aplicações: - Estimativa de chuva - Monitoramento de tempestades -
+Linhas de instabilidade
+
+7.  Visibilidade
+
+-   Visibility
+
+Aplicações: - Meteorologia aeronáutica - Nevoeiro - Fumaça
+
+8.  Solo
+
+-   Temperatura do solo
+-   Umidade volumétrica
+-   Água líquida no solo
+
+Aplicações: - Agricultura - Evapotranspiração - Hidrologia
+
+9.  Dinâmica Atmosférica
+
+-   Vorticidade absoluta
+-   Velocidade vertical
+-   Velocidade vertical geométrica
+-   Altura geopotencial
+
+Aplicações: - Ciclones - Anticiclones - Cavados - Bloqueios
+atmosféricos - Movimentos ascendentes e descendentes
+
+Variáveis derivadas recomendadas
+
+-   Velocidade do vento (U + V)
+-   Direção do vento (U + V)
+-   Divergência (U + V)
+-   Convergência (U + V)
+-   Advecção de temperatura (T + U + V)
+-   Advecção de umidade (q + U + V)
+-   Espessura 1000–500 hPa
+-   Índice Lifted
+-   Totals Totals
+-   Showalter
+-   Umidade precipitável
+-   Fluxo de vapor d’água
+-   Cisalhamento 0–6 km
+
+Conjunto recomendado para Machine Learning
+
+-   Pressão ao nível do mar
+-   Temperatura
+-   Umidade relativa
+-   Umidade específica
+-   Componentes U e V do vento
+-   Altura geopotencial
+-   Velocidade vertical
+-   Vorticidade
+-   CAPE
+-   CIN
+-   Cobertura de nuvens
+-   Reflectividade
+-   Razões de mistura de chuva, gelo, neve e graupel
+-   Umidade do solo
+-   Temperatura do solo
+
+Conclusão
+
+O conjunto de dados oferece uma representação bastante completa da
+atmosfera, contemplando variáveis termodinâmicas, dinâmicas,
+microfísicas e de superfície. Para aplicações em Inteligência Artificial
+e Ciência de Dados, recomenda-se complementar as variáveis originais com
+variáveis derivadas, como velocidade e direção do vento, divergência,
+convergência, advecções, espessura atmosférica e fluxo de vapor d’água,
+pois elas frequentemente melhoram o desempenho de modelos preditivos.

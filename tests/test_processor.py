@@ -56,3 +56,53 @@ def test_wind_resultant_requires_both_components():
     assert processor.combine_wind_resultant(None, _fake_extracted([1.0])) is None
     empty = _fake_extracted(np.array([]))
     assert processor.combine_wind_resultant(empty, _fake_extracted([1.0])) is None
+
+
+class _FakeMessage:
+    level = 850
+    forecastTime = 6
+    dataDate = 20260807
+    validDate = 20260807
+    analDate = 20260807
+
+    def data(self, lat1=None, lat2=None, lon1=None, lon2=None):
+        return np.array([[1.0]]), np.array([[-20.0]]), np.array([[-45.0]])
+
+    @property
+    def values(self):
+        return np.array([[1.0]])
+
+    def latlons(self):
+        return np.array([[-20.0]]), np.array([[-45.0]])
+
+
+class _FakeReader:
+    def __init__(self):
+        self.calls = []
+
+    def select_messages(self, file_path, name=None, level_type=None, level=None):
+        self.calls.append({"name": name, "level_type": level_type, "level": level})
+        return [_FakeMessage()]
+
+
+def test_extract_level_meaningful_passes_level():
+    reader = _FakeReader()
+    out = DataProcessor(reader).extract_variable("/x.grb2", "temp", level=850)
+    assert reader.calls[-1]["level"] == 850
+    assert out is not None
+    assert out["level_type"] == "isobaricInhPa"
+
+
+@pytest.mark.parametrize("var_code", ["tempSolo", "umidadeSolo", "total_o3", "cisalhamentoVertical"])
+def test_extract_level_not_meaningful_ignores_level(var_code):
+    reader = _FakeReader()
+    out = DataProcessor(reader).extract_variable("/x.grb2", var_code, level=0)
+    assert reader.calls[-1]["level"] is None
+    assert out is not None
+
+
+def test_extract_unknown_variable_returns_none():
+    reader = _FakeReader()
+    out = DataProcessor(reader).extract_variable("/x.grb2", "naoExiste", level=0)
+    assert out is None
+    assert reader.calls == []

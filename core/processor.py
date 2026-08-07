@@ -7,7 +7,7 @@ Refatorado de processamento_dados_MET.py
 import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 import logging
-from core.variables import get_variable_info, convert_value, get_pollution_variables
+from core.variables import get_variable_info, convert_value, get_pollution_variables, level_is_meaningful
 from core.grib_reader import GribReader
 from core.config import NIVEIS_ISOBARICOS
 
@@ -29,17 +29,20 @@ class DataProcessor:
             logger.error(f"Unknown variable code: {var_code}")
             return None
         
+        # For level types without a meaningful numeric level (atmosphere,
+        # hybrid, tropopause, depthBelowLandLayer, ...) match on name + type only.
+        sel_level = level if level_is_meaningful(var_info["level_type"]) else None
         messages = self.reader.select_messages(
             file_path,
             name=var_info["grib_name"],
             level_type=var_info["level_type"],
-            level=level
+            level=sel_level
         )
-        
+
         if not messages:
             logger.warning(f"No messages found for {var_code} at level {level} in {file_path}")
             return None
-        
+
         msg = messages[0]
         
         if region_bounds:
@@ -64,7 +67,7 @@ class DataProcessor:
             "variable_code": var_code,
             "variable_name": var_info["grib_name"],
             "level_type": var_info["level_type"],
-            "level": level or msg.level,
+            "level": level if level is not None else msg.level,
             "unit": var_info["unit"],
             "data": converted_data,
             "lats": lats,

@@ -1,6 +1,7 @@
 // Server MET v2.0 - Frontend Application
 const API = '/api/v1';
-const SURFACE_TYPES = ['surface', 'meanSea', 'atmosphere', 'atmosphereSingleLayer'];
+const SURFACE_TYPES = ['surface', 'meanSea', 'atmosphere', 'atmosphereSingleLayer',
+                       'hybrid', 'tropopause', 'depthBelowLandLayer'];
 
 const CATEGORY_LABELS = {
     pressure: 'Pressão',
@@ -10,6 +11,12 @@ const CATEGORY_LABELS = {
     humidity: 'Umidade',
     wind: 'Vento',
     pollution: 'Poluição',
+    geopotential: 'Geopotencial',
+    convection: 'Convecção',
+    radar: 'Radar',
+    visibility: 'Visibilidade',
+    soil: 'Solo',
+    dynamics: 'Dinâmica',
 };
 
 let variables = [];
