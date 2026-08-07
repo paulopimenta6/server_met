@@ -10,6 +10,8 @@ def conv_k_to_c(x): return x - 273.15
 def conv_pa_to_hpa(x): return x / 100
 def conv_kgkg_to_ppbv(x): return x * 1e9
 def conv_kgm2_to_mm(x): return x
+def conv_kgm2s_to_mmh(x): return x * 3600  # kg m-2 s-1 (Precipitation rate) -> mm/h
+def conv_kgkg_to_gkg(x): return x * 1000   # kg kg-1 (mixing ratios) -> g kg-1
 def identity(x): return x
 
 VARIABLES_MET: Dict[str, Dict[str, Any]] = {
@@ -121,6 +123,53 @@ VARIABLES_MET: Dict[str, Dict[str, Any]] = {
         "description": "Componente V do vento (altura acima do solo)",
         "category": "wind",
     },
+    "vento": {
+        "grib_name": "Wind speed",
+        "level_type": "isobaricInhPa",
+        "level_values": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10],
+        "unit_conv": identity,
+        "unit": "m/s",
+        "description": "Vento resultante (magnitude) em níveis isobáricos, calculado a partir das componentes u e v",
+        "category": "wind",
+        "derived": ["u", "v"],
+    },
+    "ventoSup": {
+        "grib_name": "Wind speed",
+        "level_type": "heightAboveGround",
+        "level_values": [10, 20, 30, 40, 50, 80, 100],
+        "unit_conv": identity,
+        "unit": "m/s",
+        "description": "Vento resultante (magnitude) em alturas acima do solo, calculado a partir de uSupe e vSupe",
+        "category": "wind",
+        "derived": ["uSupe", "vSupe"],
+    },
+    "precipRate": {
+        "grib_name": "Precipitation rate",
+        "level_type": "surface",
+        "level_values": [0],
+        "unit_conv": conv_kgm2s_to_mmh,
+        "unit": "mm/h",
+        "description": "Taxa de precipitação instantânea",
+        "category": "precipitation",
+    },
+    "categChuva": {
+        "grib_name": "Categorical rain",
+        "level_type": "surface",
+        "level_values": [0],
+        "unit_conv": identity,
+        "unit": "0/1",
+        "description": "Chuva categórica (0 = sem chuva, 1 = chuva)",
+        "category": "precipitation",
+    },
+    "nuvemMistura": {
+        "grib_name": "Cloud mixing ratio",
+        "level_type": "isobaricInhPa",
+        "level_values": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10],
+        "unit_conv": conv_kgkg_to_gkg,
+        "unit": "g/kg",
+        "description": "Razão de mistura de nuvens (água de nuvem em níveis isobáricos)",
+        "category": "cloud",
+    },
     "o3": {
         "grib_name": "Ozone mixing ratio",
         "level_type": "isobaricInhPa",
@@ -214,19 +263,26 @@ VARIABLES_MET: Dict[str, Dict[str, Any]] = {
 VARIABLE_CATEGORIES = {
     "pressure": ["ps", "prnm"],
     "temperature": ["temp", "temps"],
-    "cloud": ["nuvem"],
-    "precipitation": ["chuvaNaoConvec", "chuvaConvec"],
+    "cloud": ["nuvem", "nuvemMistura"],
+    "precipitation": ["chuvaNaoConvec", "chuvaConvec", "precipRate", "categChuva"],
     "humidity": ["umidadeRel"],
-    "wind": ["u", "v", "uSupe", "vSupe"],
+    "wind": ["u", "v", "uSupe", "vSupe", "vento", "ventoSup"],
     "pollution": ["o3", "total_o3", "no2", "so2", "co", "pm25", "pm10", "aod", "dust"],
 }
 
 # Variables confirmed present in the GFS pgrb2 0p25 product, cross-checked
-# against the file inventory `varMET` at the project root. Pollution available
-# there: Ozone mixing ratio (o3) and Total ozone (total_o3) only.
+# against the file inventory `varMET` at the project root and verified live
+# against the NOAA filter endpoint. Pollution available there: Ozone mixing
+# ratio (o3) and Total ozone (total_o3) only. Precipitation availability:
+# Precipitation rate (precipRate), Total precipitation (chuvaNaoConvec, APCP)
+# and Categorical rain (categChuva) are present from f006 onwards; Cloud
+# mixing ratio (nuvemMistura) is present on isobaric levels. vento/ventoSup
+# are derived from the u/v wind components.
 AVAILABLE_IN_GFS = {
-    "ps", "prnm", "temp", "temps", "nuvem", "umidadeRel", "u", "v",
-    "uSupe", "vSupe", "o3", "total_o3",
+    "ps", "prnm", "temp", "temps", "nuvem", "nuvemMistura", "umidadeRel",
+    "u", "v", "uSupe", "vSupe", "vento", "ventoSup",
+    "precipRate", "chuvaNaoConvec", "categChuva",
+    "o3", "total_o3",
 }
 
 def is_variable_available(var_code: str) -> bool:

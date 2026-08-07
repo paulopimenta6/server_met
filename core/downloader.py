@@ -194,6 +194,7 @@ NOAA_FILTER_VARS = {
     "temp":          ("TMP",   "isobaricInhPa"),
     "umidadeRel":    ("RH",    "isobaricInhPa"),
     "nuvem":         ("TCDC",  "isobaricInhPa"),
+    "nuvemMistura":  ("CLWMR", "isobaricInhPa"),
     "u":             ("UGRD",  "isobaricInhPa"),
     "v":             ("VGRD",  "isobaricInhPa"),
     "o3":            ("O3MR",  "isobaricInhPa"),
@@ -203,6 +204,9 @@ NOAA_FILTER_VARS = {
     "prnm":          ("PRMSL", "meanSea"),
     "uSupe":         ("UGRD",  "heightAboveGround"),
     "vSupe":         ("VGRD",  "heightAboveGround"),
+    "precipRate":    ("PRATE", "surface"),
+    "chuvaNaoConvec": ("APCP", "surface"),
+    "categChuva":    ("CRAIN", "surface"),
 }
 
 def _build_filter_url(date_str: str, analysis: str, forecast: str,

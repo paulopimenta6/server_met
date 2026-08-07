@@ -25,21 +25,30 @@ from core.grib_reader import GribReader
 from core.processor import DataProcessor
 from core.persistence import persistence
 from core.maps import generate_map
-from core.variables import VARIABLES_MET
+from core.variables import VARIABLES_MET, get_variable_info
 import core.metar as metar_mod
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Default dataset: representative mix of meteorological + pollution variables.
+# vento/ventoSup are derived from the u/v wind components; precipRate,
+# chuvaNaoConvec and categChuva come from the GFS precipitation fields;
+# nuvemMistura is the cloud mixing ratio.
 DEFAULT_VARIABLES = {
     "temp":        [1000, 850, 500],
     "umidadeRel":  [850],
     "u":           [850],
     "v":           [850],
+    "vento":       [850],
+    "ventoSup":    [10],
     "o3":          [500],
     "total_o3":    [0],
     "ps":          [0],
+    "precipRate":  [0],
+    "chuvaNaoConvec": [0],
+    "categChuva":  [0],
+    "nuvemMistura": [850],
 }
 
 
@@ -99,6 +108,103 @@ def _cycle_exists(date: str, analysis: str) -> bool:
         return False
 
 
+def _region_bounds(region_code: str):
+    bounds = REGIOES[region_code]
+    return (bounds["lon_min"], bounds["lon_max"], bounds["lat_min"], bounds["lat_max"])
+
+
+def _persist_and_map(processor: DataProcessor, date_str: str, analysis: str,
+                     forecast_hour: int, extracted, var_code: str, level: int,
+                     region_code: str, file_path: Path) -> tuple:
+    """Compute stats/matrix, persist to SQLite and generate the PNG map.
+
+    Returns (files, records, maps) counts for the combination.
+    """
+    stats = processor.compute_statistics(extracted["data"])
+    matrix, lats, lons = processor.data_to_matrix(
+        extracted["data"], extracted["lats"], extracted["lons"])
+    if not matrix or not matrix[0]:
+        return 1, 0, 0
+
+    grib_id = persistence.save_grib_metadata(
+        file_path=str(file_path), analysis_time=analysis,
+        forecast_hour=forecast_hour, data_date=date_str, resolution="0p25",
+    )
+    persistence.save_processed_data(
+        grib_metadata_id=grib_id, variable_code=var_code,
+        level_type=extracted["level_type"], level_value=level,
+        region_code=region_code, min_value=stats["min"],
+        max_value=stats["max"], mean_value=stats["mean"],
+        data_matrix=matrix, lats=lats, lons=lons,
+    )
+    generate_map(matrix, lats, lons, var_code, level, region_code,
+                 date_str, analysis, forecast=forecast_hour)
+    logger.info("OK %s %s %s f%03d lvl=%s min=%.2f max=%.2f",
+                var_code, region_code, analysis, forecast_hour,
+                level, stats["min"], stats["max"])
+    return 1, 1, 1
+
+
+def _process_derived(processor: DataProcessor, date_str: str, analysis: str,
+                     forecast_hour: int, var_code: str, var_info: dict,
+                     level: int, region_code: str) -> tuple:
+    """Process a derived variable (wind resultant) by combining its sources.
+
+    Downloads the u/v (or uSupe/vSupe) components for the same level/region,
+    combines them into the wind magnitude and persists/maps the result.
+    Returns (files, records, maps).
+    """
+    region_bounds = _region_bounds(region_code)
+    sources = var_info["derived"]
+    extracted_parts = {}
+    file_path = None
+    files = 0
+
+    for src in sources:
+        fp = fetch_filtered_grib(
+            date_str, analysis, forecast_hour, src, level, region_code,
+            out_dir=GRIB_DIR / date_str / analysis,
+        )
+        files += 1
+        file_path = file_path or fp
+        ex = processor.extract_variable(str(fp), src, level, region_bounds)
+        if not ex or ex["data"].size == 0:
+            return files, 0, 0
+        extracted_parts[src] = ex
+
+    combined = processor.combine_wind_resultant(
+        extracted_parts[sources[0]], extracted_parts[sources[1]],
+        var_code=var_code, name=var_info["grib_name"], unit=var_info["unit"])
+    if not combined or combined["data"].size == 0:
+        return files, 0, 0
+
+    records, maps = _persist_and_map(processor, date_str, analysis, forecast_hour,
+                                     combined, var_code, level, region_code, file_path)[1:]
+    return files, records, maps
+
+
+def _process_combination(processor: DataProcessor, date_str: str, analysis: str,
+                         forecast_hour: int, var_code: str, level: int,
+                         region_code: str) -> tuple:
+    """Download (or derive) one variable/level/region and persist + map it."""
+    var_info = get_variable_info(var_code)
+    if var_info and var_info.get("derived"):
+        return _process_derived(processor, date_str, analysis, forecast_hour,
+                                var_code, var_info, level, region_code)
+
+    region_bounds = _region_bounds(region_code)
+    file_path = fetch_filtered_grib(
+        date_str, analysis, forecast_hour, var_code, level, region_code,
+        out_dir=GRIB_DIR / date_str / analysis,
+    )
+    extracted = processor.extract_variable(str(file_path), var_code, level, region_bounds)
+    if not extracted or extracted["data"].size == 0:
+        return 1, 0, 0
+
+    return _persist_and_map(processor, date_str, analysis, forecast_hour,
+                            extracted, var_code, level, region_code, file_path)
+
+
 def process_grib(date_str: str, analysis: str, regions, variables,
                  forecasts=None) -> dict:
     """Download, extract, persist and map GFS data for the requested set."""
@@ -114,47 +220,12 @@ def process_grib(date_str: str, analysis: str, regions, variables,
             for level in levels:
                 for region_code in regions:
                     try:
-                        file_path = fetch_filtered_grib(
-                            date_str, analysis, forecast_hour, var_code, level, region_code,
-                            out_dir=GRIB_DIR / date_str / analysis,
-                        )
-                        results["files"] += 1
-                        bounds = REGIOES[region_code]
-                        region_bounds = (bounds["lon_min"], bounds["lon_max"],
-                                         bounds["lat_min"], bounds["lat_max"])
-
-                        extracted = processor.extract_variable(
-                            str(file_path), var_code, level, region_bounds)
-                        if not extracted or extracted["data"].size == 0:
-                            continue
-
-                        stats = processor.compute_statistics(extracted["data"])
-                        matrix, lats, lons = processor.data_to_matrix(
-                            extracted["data"], extracted["lats"], extracted["lons"])
-                        if not matrix or not matrix[0]:
-                            continue
-
-                        grib_id = persistence.save_grib_metadata(
-                            file_path=str(file_path), analysis_time=analysis,
-                            forecast_hour=forecast_hour, data_date=date_str,
-                            resolution="0p25",
-                        )
-                        persistence.save_processed_data(
-                            grib_metadata_id=grib_id, variable_code=var_code,
-                            level_type=extracted["level_type"], level_value=level,
-                            region_code=region_code, min_value=stats["min"],
-                            max_value=stats["max"], mean_value=stats["mean"],
-                            data_matrix=matrix, lats=lats, lons=lons,
-                        )
-                        results["records"] += 1
-
-                        generate_map(matrix, lats, lons, var_code, level, region_code,
-                                     date_str, analysis, forecast=forecast_hour)
-                        results["maps"] += 1
-                        logger.info("OK %s %s %s f%03d lvl=%s min=%.2f max=%.2f",
-                                    var_code, region_code, analysis, forecast_hour,
-                                    level, stats["min"], stats["max"])
-
+                        files, records, maps = _process_combination(
+                            processor, date_str, analysis, forecast_hour,
+                            var_code, level, region_code)
+                        results["files"] += files
+                        results["records"] += records
+                        results["maps"] += maps
                     except Exception as e:
                         results["errors"].append(f"{var_code}/{level}/{region_code}/f{forecast_hour}: {e}")
                         logger.error("FAIL %s %s lvl=%s f%03d: %s", var_code,

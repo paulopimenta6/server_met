@@ -42,7 +42,7 @@
 O Server MET é um **servidor completo de dados meteorológicos e de poluição do ar**.
 Ele faz sozinho (quase) todo o trabalho:
 
-1. **Baixa previsões reais** do modelo GFS da NOAA (dados de temperatura, umidade, vento, ozônio...)
+1. **Baixa previsões reais** do modelo GFS da NOAA (temperatura, umidade, vento, chuva, nuvens, ozônio...)
    já recortadas por região e variável;
 2. **Busca boletins METAR ao vivo** das principais estações brasileiras (condições atuais de aeroportos);
 3. **Processa** esses dados em estatísticas (mínimo, máximo, média);
@@ -104,14 +104,17 @@ chama `fetch_filtered_grib()` de `core/downloader.py`, que monta uma URL para o 
 filter** da NOAA pedindo **apenas** aquele recorte:
 
 ```text
-https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t00z.pgrb2.0p25.f000&dir=/gfs.20260804/00/atmos&var_TMP=on&lev_1000_mb=on&leftlon=-56&rightlon=-42&toplat=-18&bottomlat=-28
+https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t00z.pgrb2.0p25.f000&dir=/gfs.20260807/00/atmos&var_TMP=on&lev_1000_mb=on&leftlon=-56&rightlon=-42&toplat=-18&bottomlat=-28
 ```
 
 Os parâmetros são preenchidos automaticamente a partir do catálogo `NOAA_FILTER_VARS`
 (em `core/downloader.py`), que mapeia cada código interno ao nome GRIB (ex.: `temp` → `TMP`,
-`umidadeRel` → `RH`, `u`/`v` → `UGRD`/`VGRD`, `o3` → `O3MR`, `total_o3` → `TOZNE`) e ao tipo
-de nível (que define o seletor `lev_*_mb=on`, `lev_surface`, `lev_mean_sea_level` ou
-`lev_*_m_above_ground`; o `total_o3` não usa seletor de nível).
+`umidadeRel` → `RH`, `u`/`v` → `UGRD`/`VGRD`, `o3` → `O3MR`, `total_o3` → `TOZNE`,
+`precipRate` → `PRATE`, `chuvaNaoConvec` → `APCP`, `categChuva` → `CRAIN`,
+`nuvemMistura` → `CLWMR`) e ao tipo de nível (que define o seletor `lev_*_mb=on`,
+`lev_surface`, `lev_mean_sea_level` ou `lev_*_m_above_ground`; o `total_o3` não usa seletor de
+nível). As variáveis derivadas `vento`/`ventoSup` não têm entrada no filter — o pipeline baixa
+as componentes `u`/`v` e calcula a magnitude localmente.
 
 Antes de baixar, o pipeline **verifica se o ciclo existe** na NOAA (requisição `HEAD` ao arquivo)
 — ciclos indisponíveis são pulados com aviso. Se o arquivo já estiver em
@@ -146,6 +149,9 @@ Passe `--skip-metar` no pipeline se não quiser essa etapa.
 | Funcionalidade | Descrição |
 |----------------|-----------|
 | 📥 **Ingestão de dados reais** | GFS (NOAA) por variável/região + METAR ao vivo |
+| 🌬️ **Vento resultante** | `vento`/`ventoSup` calculados a partir das componentes `u`/`v` do GFS |
+| 🌧️ **Precipitação** | Taxa de chuva, precipitação acumulada e chuva categórica |
+| ☁️ **Nuvens** | Cobertura total (`nuvem`) e razão de mistura de nuvens (`nuvemMistura`) |
 | 🗺️ **Mapas PNG** | Mapas do Brasil com a distribuição espacial de cada variável |
 | 🧮 **Estatísticas** | Mínimo, máximo e média por variável/região/nível |
 | 💾 **Persistência** | SQLite para consultas + CSV para exportação + snapshots JSON de METAR |
@@ -212,10 +218,10 @@ PYTHONPATH=. python -c "import api.main, core.maps, core.metar, core.persistence
 A primeira vez, use um escopo **pequeno** para não bombardear a NOAA:
 
 ```bash
-PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --forecast 00 --regions SP RJ
+PYTHONPATH=. python scripts/process_data.py --date 20260807 --analysis 00 --forecast 00 --regions SP RJ
 ```
 
-Esse comando baixa o ciclo das 00Z de 04/08/2026 para SP e RJ, processa as variáveis padrão,
+Esse comando baixa o ciclo das 00Z de 07/08/2026 para SP e RJ, processa as variáveis padrão,
 gera os mapas e ainda busca os METAR ao vivo.
 
 > 💡 Quando quiser rodar tudo (todas as análises e previsões), use o atalho:
@@ -300,7 +306,7 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 | `--analysis 00 06` | todas (00 06 12 18) | Ciclos sinóticos (aceita vários) |
 | `--forecast 00 06` | todas (f000–f018) | Horas de previsão (aceita vários) |
 | `--regions SP RJ` | `SP RJ PR RS MG AM` | Regiões (18 disponíveis) |
-| `--all-variables` | desligado | Processa as 21 variáveis (as ausentes no GFS são puladas com erro logado) |
+| `--all-variables` | desligado | Processa as 26 variáveis (as ausentes no GFS são puladas com erro logado) |
 | `--skip-metar` | desligado | Não busca METAR |
 
 ### Comportamento que você precisa saber
@@ -312,31 +318,47 @@ PYTHONPATH=. python scripts/process_data.py [opções]
 - Variáveis fora do produto GFS são registradas no log como **erros** (não derrubam o pipeline).
 
 > 💡 O conjunto padrão de variáveis fica em `DEFAULT_VARIABLES` no topo de `scripts/process_data.py`:
-> `temp` (1000/850/500 hPa), `umidadeRel`, `u` e `v` (850), `o3` (500), `total_o3` e `ps` (superfície).
+> `temp` (1000/850/500 hPa), `umidadeRel`, `u`, `v` e `vento` (850), `ventoSup` (10 m), `o3` (500),
+> `total_o3`, `ps`, `precipRate`, `chuvaNaoConvec` e `categChuva` (superfície) e `nuvemMistura` (850).
+> As variáveis de chuva (`precipRate`, `chuvaNaoConvec`) só têm valor em horários com chuva — em
+> áreas/tempos secos os mínimos são `0`.
 
 ---
 
 ## 📊 Entendendo os dados
 
-### Variáveis (21 no total)
+### Variáveis (26 no total)
 
-**Meteorológicas (12):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `chuvaNaoConvec`,
-`chuvaConvec`, `umidadeRel`, `u`, `v`, `uSupe`, `vSupe`
+**Meteorológicas (17):** `ps`, `prnm`, `temp`, `temps`, `nuvem`, `nuvemMistura`,
+`chuvaNaoConvec`, `chuvaConvec`, `precipRate`, `categChuva`, `umidadeRel`, `u`, `v`,
+`uSupe`, `vSupe`, `vento`, `ventoSup`
 
 **Poluição (9):** `o3`, `total_o3`, `no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`
 
-> ⚠️ **Importante:** apenas **12 variáveis existem no produto GFS pgrb2 0p25** e são as mesmas
-> conectadas ao endpoint filter da NOAA: `ps`, `prnm`, `temp`, `temps`, `nuvem`, `umidadeRel`,
-> `u`, `v`, `uSupe`, `vSupe`, `o3`, `total_o3`.
+> ⚠️ **Importante:** **18 variáveis têm dados no produto GFS pgrb2 0p25** e estão conectadas ao
+> endpoint filter da NOAA: `ps`, `prnm`, `temp`, `temps`, `nuvem`, `nuvemMistura`, `umidadeRel`,
+> `u`, `v`, `uSupe`, `vSupe`, `vento`, `ventoSup`, `precipRate`, `chuvaNaoConvec`, `categChuva`,
+> `o3`, `total_o3`.
+>
+> - **`vento` e `ventoSup`** são **derivadas**: a resultante do vento (magnitude) é calculada em
+>   `core/processor.py` a partir das componentes `u`/`v` (`vento`) e `uSupe`/`vSupe` (`ventoSup`)
+>   — o GFS fornece apenas as componentes direcionais.
+> - **Chuva:** `precipRate` (*Precipitation rate*, `PRATE`), `chuvaNaoConvec` (*Total
+>   precipitation*, `APCP`) e `categChuva` (*Categorical rain*, `CRAIN`) são confirmadas no
+>   inventário `varMET` e verificadas ao vivo no endpoint filter. O `APCP` acumulado só existe
+>   a partir de `f006` (no `f000` é vazio/zero) — por isso o pipeline loga erro nesse caso.
+> - **Nuvens:** além da cobertura total `nuvem` (`TCDC`), adicionamos `nuvemMistura`
+>   (*Cloud mixing ratio*, `CLWMR`) em níveis isobáricos.
 >
 > Da categoria **poluição**, somente **`o3` e `total_o3`** têm dados reais. As demais
-> (`no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`) e as de chuva ficam no catálogo como
+> (`no2`, `so2`, `co`, `pm25`, `pm10`, `aod`, `dust`) e `chuvaConvec` ficam no catálogo como
 > *experimentais* — o endpoint `/data/variables` marca isso no campo `available`, e o frontend
 > só exibe as disponíveis.
 >
 > Essa lista foi **confirmada pelo inventário `varMET`** (dump ASCII do conteúdo do arquivo GRIB,
-> na raiz do projeto). Testes garantem exatamente `{o3, total_o3}` como poluição disponível —
-> então não altere `AVAILABLE_IN_GFS` em `core/variables.py` por conta própria.
+> na raiz do projeto) e **verificada ao vivo** contra o endpoint filter da NOAA. Testes garantem
+> exatamente `{o3, total_o3}` como poluição disponível — então não altere `AVAILABLE_IN_GFS` em
+> `core/variables.py` por conta própria.
 
 **Níveis isobáricos suportados:** `1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10` hPa
 **Níveis de altura (`uSupe`/`vSupe`):** `10, 20, 30, 40, 50, 80, 100` m
@@ -376,7 +398,7 @@ A base das rotas é `/api/v1` (exceto `/health` e `/docs`, que ficam na raiz).
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/health` | Status do servidor e do banco (+ `/health/ready`) |
-| GET | `/api/v1/data/variables` | Catálogo das 21 variáveis (com campo `available`) |
+| GET | `/api/v1/data/variables` | Catálogo das 26 variáveis (com campo `available`) |
 | GET | `/api/v1/data/regions` | As 18 regiões |
 | GET | `/api/v1/data/dashboard` | Resumo estatístico agregado |
 | GET | `/api/v1/data/available` | Variáveis/regiões/datas disponíveis no banco |
@@ -410,7 +432,7 @@ curl -s "$BASE/data/stats?variable=temp&level=850&region=SP"
 curl -s "$BASE/data/export/csv?variable=temp&level=850&region=SP" -o dados.csv
 
 # Baixar mapa PNG (data + análise juntas)
-curl -s "$BASE/maps/temp/SP?level=850&date=20260804&analysis=00" -o mapa.png
+curl -s "$BASE/maps/temp/SP?level=850&date=20260807&analysis=00" -o mapa.png
 
 # Último METAR de Guarulhos (SBGR)
 curl -s "$BASE/metar/SBGR"
@@ -462,6 +484,9 @@ docker compose --profile manual run pipeline   # roda o pipeline manualmente
 # Suíte de testes end-to-end (TestClient in-process, sem servidor externo)
 PYTHONPATH=. pytest tests/test_e2e.py -v
 
+# Unit tests (sem rede/dados) — ex.: lógica do vento resultante
+PYTHONPATH=. pytest tests/test_processor.py -v
+
 # Validação completa: dependências + pipeline real + banco + mapas + testes
 bash scripts/validate.sh
 ```
@@ -470,8 +495,8 @@ bash scripts/validate.sh
 > Eles verificam `total_records > 0`, boletins METAR e PNGs. Depois de populado o banco,
 > os testes não precisam de internet.
 >
-> ⚠️ O `validate.sh` **fixa a data `20260804`** no pipeline. Quando a NOAA retirar esse ciclo
-> do ar, ele falhará. Para uma checagem independente de data, rode o pipeline + pytest diretamente.
+> ⚠️ O `validate.sh` roda o pipeline sem `--date` (usa o ciclo GFS mais recente encontrado pela
+> NOAA). Para uma checagem totalmente determinística, rode o pipeline + pytest diretamente.
 
 ---
 
@@ -482,7 +507,7 @@ core/          Lógica de negócio (config, variáveis, regiões, download, GRIB
 api/           FastAPI (main, schemas, rotas: health, data, maps, metar)
 frontend/      Interface web estática (index.html, app.js, style.css)
 scripts/       process_data.py + wrappers shell (pipeline.sh, server.sh, validate.sh)
-tests/         Testes end-to-end (test_e2e.py)
+tests/         Testes end-to-end (test_e2e.py) + unit (test_processor.py)
 data/          Runtime (grib/, sqlite/, csv/, metar/) — ignorado pelo Git
 maps/          Mapas PNG gerados — ignorado pelo Git
 varMET         Inventário GRIB (dump ASCII) — referência das variáveis disponíveis
@@ -544,16 +569,20 @@ O exemplo acima roda a cada 6 horas (ciclos 00/06/12/18Z).
 
 ### 6. Quero adicionar uma nova variável. O que preciso saber?
 
-1. Ela precisa existir no GFS pgrb2 0p25 (verifique no `varMET`);
+1. Ela precisa existir no GFS pgrb2 0p25 (verifique no `varMET` e, de preferência, teste a URL do
+   endpoint filter ao vivo — alguns campos só existem a partir de `f006`, como o `APCP`);
 2. Adicione o registro em `core/variables.py` (nome GRIB, tipo de nível, conversão de unidade);
 3. Se usar o endpoint filter, mapeie o short name em `NOAA_FILTER_VARS` em `core/downloader.py`;
-4. Adicione em `AVAILABLE_IN_GFS` **somente** se o dado realmente existir — os testes E2E
+4. **Variáveis derivadas** (calculadas de outras, como a resultante do vento) usam o campo
+   `derived: ["u", "v"]` no registro — o pipeline baixa as componentes e combina em
+   `core/processor.py` (`combine_wind_resultant`);
+5. Adicione em `AVAILABLE_IN_GFS` **somente** se o dado realmente existir — os testes E2E
    garantem que as variáveis de poluição disponíveis sejam exatamente `{o3, total_o3}`.
 
 ### 7. O mapa retorna 404. O que fazer?
 
 Significa que não há PNG para aquela combinação variável/região/nível/data/análise.
-Rode o pipeline para esse conjunto (ex.: `--date 20260804 --analysis 00 --forecast 00 --regions SP`)
+Rode o pipeline para esse conjunto (ex.: `--date 20260807 --analysis 00 --forecast 00 --regions SP`)
 e confira em `/maps/list/{var}/{region}`.
 
 ### 8. A API precisa de autenticação?

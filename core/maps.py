@@ -21,6 +21,8 @@ ISOBARIC_VARIABLES = {
     "nuvem":      {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "Greys", "unit": "%"},
     "u":          {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "m/s"},
     "v":          {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "RdBu", "unit": "m/s"},
+    "vento":      {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "viridis", "unit": "m/s"},
+    "nuvemMistura": {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "Greys", "unit": "g/kg"},
     "o3":         {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
     "no2":        {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
     "so2":        {"levels": [1000, 925, 850, 700, 500, 300, 200, 100, 50, 30, 20, 10], "cmap": "OrRd", "unit": "ppbv"},
@@ -33,11 +35,14 @@ SURFACE_VARIABLES = {
     "temps":         {"cmap": "RdBu_r", "unit": "°C"},
     "chuvaNaoConvec": {"cmap": "Blues", "unit": "mm"},
     "chuvaConvec":   {"cmap": "Blues", "unit": "mm"},
+    "precipRate":    {"cmap": "Blues", "unit": "mm/h"},
+    "categChuva":    {"cmap": "Blues", "unit": "0/1"},
     "pm25":          {"cmap": "OrRd", "unit": "µg/m³"},
     "pm10":          {"cmap": "OrRd", "unit": "µg/m³"},
     "aod":           {"cmap": "YlOrBr", "unit": ""},
     "uSupe":         {"cmap": "RdBu", "unit": "m/s"},
     "vSupe":         {"cmap": "RdBu", "unit": "m/s"},
+    "ventoSup":      {"cmap": "viridis", "unit": "m/s"},
     "total_o3":      {"cmap": "viridis", "unit": "DU"},
 }
 

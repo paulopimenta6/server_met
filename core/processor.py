@@ -177,6 +177,39 @@ class DataProcessor:
                 results[var_code] = level_results
         
         return results
+
+    def combine_wind_resultant(
+        self,
+        u_data: Dict[str, Any],
+        v_data: Dict[str, Any],
+        var_code: str = "vento",
+        name: str = "Wind speed",
+        unit: str = "m/s",
+    ) -> Optional[Dict[str, Any]]:
+        """Compute the wind resultant (magnitude = sqrt(u^2 + v^2)) from the
+        already-extracted u/v components of the same level/region.
+
+        The result reuses the grid, level type and metadata of the u component.
+        """
+        if u_data is None or v_data is None:
+            return None
+        u_vals = np.asarray(u_data["data"], dtype=float)
+        v_vals = np.asarray(v_data["data"], dtype=float)
+        if u_vals.size == 0 or v_vals.size == 0:
+            return None
+
+        speed = np.sqrt(u_vals**2 + v_vals**2)
+        return {
+            "variable_code": var_code,
+            "variable_name": name,
+            "level_type": u_data["level_type"],
+            "level": u_data["level"],
+            "unit": unit,
+            "data": speed,
+            "lats": u_data["lats"],
+            "lons": u_data["lons"],
+            "metadata": u_data["metadata"],
+        }
     
     def compute_statistics(self, data: np.ndarray) -> Dict[str, float]:
         valid_data = data[~np.isnan(data)]

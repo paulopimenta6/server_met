@@ -15,7 +15,7 @@ bash scripts/server.sh start             # start the API (start|stop|restart|sta
 | Task | Command |
 |------|---------|
 | Run pipeline (real data) | `bash scripts/pipeline.sh` |
-| Pipeline (custom) | `PYTHONPATH=. python scripts/process_data.py --date 20260804 --analysis 00 --regions SP RJ PR` |
+| Pipeline (custom) | `PYTHONPATH=. python scripts/process_data.py --date 20260807 --analysis 00 --regions SP RJ PR` |
 | Run API (dev) | `uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload` |
 | Server wrapper | `bash scripts/server.sh {start\|stop\|restart\|status}` |
 | E2E validation | `bash scripts/validate.sh` |
@@ -23,8 +23,8 @@ bash scripts/server.sh start             # start the API (start|stop|restart|sta
 
 ## Pipeline behavior (read before running — it hits NOAA)
 - **Default scope is huge**: all analyses (00/06/12/18) × all forecasts (f000–f018) for every variable×region — hundreds of NOAA downloads. Narrow with `--analysis 00 06` (accepts multiple) and `--forecast 00 06`; scale regions with `--regions`.
-- Default regions: `SP RJ PR RS MG AM` (not all 18). Default dataset: `DEFAULT_VARIABLES` in `scripts/process_data.py` (temp 1000/850/500, umidadeRel/u/v 850, o3 500, total_o3, ps).
-- `--all-variables` processes all 21 codes; ones absent from GFS are skipped and logged as errors.
+- Default regions: `SP RJ PR RS MG AM` (not all 18). Default dataset: `DEFAULT_VARIABLES` in `scripts/process_data.py` (temp 1000/850/500, umidadeRel/u/v/vento 850, ventoSup 10, o3 500, total_o3/ps/precipRate/chuvaNaoConvec/categChuva, nuvemMistura 850).
+- `--all-variables` processes all 26 codes; ones absent from GFS are skipped and logged as errors.
 - Unavailable GFS cycles are auto-skipped; without `--date` it tries today then yesterday.
 - Downloaded GRIB files are cached in `data/grib/<date>/<ana>/` and skipped if already present (idempotent).
 
@@ -34,7 +34,7 @@ core/        # Business logic: config, variables, regions, persistence, download
 api/         # FastAPI app + routes (health, data, maps, metar) + schemas
 frontend/    # Static frontend served by FastAPI (index.html, app.js, style.css) with dashboard
 scripts/     # process_data.py + shell wrappers (pipeline.sh, server.sh, validate.sh)
-tests/       # test_e2e.py (end-to-end with real data)
+tests/       # test_e2e.py (end-to-end with real data) + test_processor.py (unit, no network)
 data/        # Runtime (gitignored): grib/, sqlite/, csv/, metar/
 maps/        # Generated PNGs (gitignored)
 ```
@@ -46,11 +46,15 @@ Optional Docker: `Dockerfile` + `docker-compose.yml` (api service always on; pip
 - All paths are computed from `core/config.py` (BASE_DIR) — no hardcoded absolute paths.
 - System libs required for pygrib/basemap: `libeccodes-dev libproj-dev libgeos-dev` (see README/Dockerfile).
 
-## Variables (21 total)
-**Meteorological (12):** ps, prnm, temp, temps, nuvem, chuvaNaoConvec, chuvaConvec, umidadeRel, u, v, uSupe, vSupe
+## Variables (26 total)
+**Meteorological (17):** ps, prnm, temp, temps, nuvem, nuvemMistura, chuvaNaoConvec, chuvaConvec, precipRate, categChuva, umidadeRel, u, v, uSupe, vSupe, vento, ventoSup
 **Pollution (9):** o3, total_o3, no2, so2, co, pm25, pm10, aod, dust
 
-Only **12 are available in GFS pgrb2 0p25** — the same set wired to the NOAA filter endpoint (`NOAA_FILTER_VARS` in `core/downloader.py`) and marked available in `AVAILABLE_IN_GFS` (`core/variables.py`): ps, prnm, temp, temps, nuvem, umidadeRel, u, v, uSupe, vSupe, o3, total_o3. Pollution available = only o3 + total_o3. The rest (no2, so2, co, pm25, pm10, aod, dust, chuvaNaoConvec, chuvaConvec) are catalog-only (`experimental`); `/data/variables` returns `available` and the frontend hides unavailable ones.
+**18 are available in GFS pgrb2 0p25** — wired to the NOAA filter endpoint (`NOAA_FILTER_VARS` in `core/downloader.py`) and marked available in `AVAILABLE_IN_GFS` (`core/variables.py`): ps, prnm, temp, temps, nuvem, nuvemMistura, umidadeRel, u, v, uSupe, vSupe, vento, ventoSup, precipRate, chuvaNaoConvec, categChuva, o3, total_o3. Pollution available = only o3 + total_o3. The rest (no2, so2, co, pm25, pm10, aod, dust, chuvaConvec) are catalog-only (`experimental`); `/data/variables` returns `available` and the frontend hides unavailable ones.
+
+- **vento / ventoSup** are **derived** (wind resultant): registry entries carry `derived: ["u","v"]` / `["uSupe","vSupe"]`; the pipeline downloads the components and combines them via `core/processor.py` `combine_wind_resultant` (sqrt(u²+v²)). They have NO entry in `NOAA_FILTER_VARS`.
+- **precipRate** = Precipitation rate (`PRATE`, surface, kg m-2 s-1 → mm/h ×3600); **chuvaNaoConvec** = Total precipitation (`APCP`, surface, mm; only present from f006 — at f000 the filter returns empty and the pipeline logs an error); **categChuva** = Categorical rain (`CRAIN`, surface, 0/1); **nuvemMistura** = Cloud mixing ratio (`CLWMR`, isobaric, kg/kg → g/kg ×1000).
+- **APCP at f000 is empty/zero** — don't be alarmed by that single expected pipeline error.
 
 `varMET` at repo root is an ASCII dump of the GRIB file inventory — the reference used to confirm which variables exist in the product; tests assert exactly `{o3, total_o3}` pollution available, so don't change `AVAILABLE_IN_GFS` casually.
 
@@ -72,7 +76,8 @@ bash scripts/validate.sh                 # deps + pipeline + SQLite + maps + E2E
 PYTHONPATH=. pytest tests/test_e2e.py -v # full API E2E (in-process TestClient)
 ```
 - **E2E tests read SQLite/maps and require a prior pipeline run** (they assert `total_records > 0`, METAR reports, PNGs). Run the pipeline first; tests then need no network.
-- `scripts/validate.sh` **hardcodes `--date 20260804`** — it will fail once NOAA rotates that data out; for a date-agnostic check run the pipeline + pytest directly.
+- E2E map tests now resolve the latest date dynamically (`/data/available`) — no hardcoded date.
+- `scripts/validate.sh` runs the pipeline without a fixed `--date` (uses the latest GFS cycle found by NOAA); for a fully deterministic check run the pipeline + pytest directly.
 
 ## Gotchas
 - **Always set `PYTHONPATH=.`** when running Python scripts (imports use absolute `core.*`, `api.*`).

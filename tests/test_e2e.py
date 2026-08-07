@@ -20,6 +20,15 @@ from api.main import app  # noqa: E402
 API = "/api/v1"
 
 
+def _latest_date(client) -> str:
+    """Most recent date with processed GFS data (avoids hardcoded dates)."""
+    r = client.get(f"{API}/data/available")
+    assert r.status_code == 200
+    dates = r.json().get("dates", [])
+    assert dates, "no processed dates in the database (run the pipeline first)"
+    return dates[0]
+
+
 @pytest.fixture(scope="module")
 def client():
     with TestClient(app) as c:
@@ -36,10 +45,31 @@ def test_variables(client):
     r = client.get(f"{API}/data/variables")
     assert r.status_code == 200
     vars = r.json()["variables"]
-    assert len(vars) == 21
+    assert len(vars) == 26
     categories = {v["category"] for v in vars}
     assert "pollution" in categories
     assert "temperature" in categories
+
+
+def test_new_variables(client):
+    # New variables added in v2.1: wind resultant (vento/ventoSup), rain
+    # (precipRate, categChuva, chuvaNaoConvec) and cloud (nuvemMistura).
+    r = client.get(f"{API}/data/variables")
+    assert r.status_code == 200
+    by_code = {v["code"]: v for v in r.json()["variables"]}
+
+    assert "vento" in by_code and by_code["vento"]["available"] is True
+    assert "ventoSup" in by_code and by_code["ventoSup"]["available"] is True
+    assert "precipRate" in by_code and by_code["precipRate"]["available"] is True
+    assert "categChuva" in by_code and by_code["categChuva"]["available"] is True
+    assert "chuvaNaoConvec" in by_code and by_code["chuvaNaoConvec"]["available"] is True
+    assert "nuvemMistura" in by_code and by_code["nuvemMistura"]["available"] is True
+
+    assert by_code["vento"]["category"] == "wind"
+    assert by_code["vento"]["unit"] == "m/s"
+    assert by_code["precipRate"]["category"] == "precipitation"
+    assert by_code["precipRate"]["unit"] == "mm/h"
+    assert by_code["nuvemMistura"]["category"] == "cloud"
 
 
 def test_regions(client):
@@ -134,7 +164,7 @@ def test_pollution_available_from_varmet(client):
 
 def test_map_total_ozone(client):
     r = client.get(f"{API}/maps/total_o3/SP",
-                   params={"date": "20260804", "analysis": "00"})
+                   params={"date": _latest_date(client), "analysis": "00"})
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("image/png")
 
@@ -163,7 +193,7 @@ def test_map_with_date_and_analysis(client):
     # The frontend always requests maps with date+analysis together; this must
     # not 404 even though the filename embeds analysis before date.
     r = client.get(f"{API}/maps/temp/SP",
-                   params={"level": 850, "date": "20260804", "analysis": "00"})
+                   params={"level": 850, "date": _latest_date(client), "analysis": "00"})
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("image/png")
 
@@ -180,3 +210,28 @@ def test_export_csv_surface(client):
                    params={"variable": "ps", "region": "SP"})
     assert r.status_code == 200
     assert "text/csv" in r.headers["content-type"]
+
+
+def test_wind_resultant_data(client):
+    r = client.get(f"{API}/data/", params={"variable": "vento", "region": "SP", "level": 850})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0
+    rec = r.json()["data"][0]
+    assert rec["variable_code"] == "vento"
+    assert rec["max_value"] > 0  # wind magnitude is always non-negative
+    assert rec["min_value"] >= 0
+
+
+def test_wind_resultant_map(client):
+    r = client.get(f"{API}/maps/vento/SP", params={"level": 850})
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_rain_and_cloud_data(client):
+    r = client.get(f"{API}/data/", params={"variable": "precipRate", "region": "SP"})
+    assert r.status_code == 200
+    assert r.json()["total"] > 0
+    r2 = client.get(f"{API}/data/", params={"variable": "nuvemMistura", "region": "SP", "level": 850})
+    assert r2.status_code == 200
+    assert r2.json()["total"] > 0
