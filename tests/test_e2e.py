@@ -140,6 +140,26 @@ def test_data_query(client):
     assert rec["min_value"] < rec["max_value"]
 
 
+def test_all_analyses_and_forecasts(client):
+    # The pipeline must download and process GFS data for every analysis
+    # cycle (00/06/12/18) combined with every forecast hour (f000/f006/f012/f018).
+    r = client.get(f"{API}/data/available")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body["analyses"]) == {"00", "06", "12", "18"}
+    assert set(body["forecasts"]) == {0, 6, 12, 18}
+
+    # Every analysis x forecast combination must have at least one record.
+    for analysis in body["analyses"]:
+        for forecast in body["forecasts"]:
+            q = client.get(f"{API}/data/",
+                           params={"variable": "temp", "region": "SP",
+                                   "level": 1000, "analysis": analysis,
+                                   "forecast": forecast})
+            assert q.status_code == 200, f"falha em {analysis}Z f{forecast:03d}"
+            assert q.json()["total"] > 0, f"sem dados em {analysis}Z f{forecast:03d}"
+
+
 def test_map_png(client):
     r = client.get(f"{API}/maps/temp/SP", params={"level": 1000})
     assert r.status_code == 200
